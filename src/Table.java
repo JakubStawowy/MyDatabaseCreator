@@ -11,22 +11,22 @@ public class Table {
     private String tableName;
     private int numberOfColumns;
     private int numberOfRows;
-    private String[] columnNames;
     private Object[][] data;
-    private List<String> columnTypes = new ArrayList<>();
+    private List<String> columnNames;
+    private List<String> columnTypes;
 
 
-    public Table(String tableName, int numberOfColumns, int numberOfRows, String[] columnNames, Object[][] data){
+    public Table(String tableName, int numberOfColumns, int numberOfRows, List<String> columnNames, List<String> columnTypes, Object[][] data){
 
         this.tableName = tableName;
         this.numberOfColumns = numberOfColumns;
         this.numberOfRows = numberOfRows;
-        this.columnNames = columnNames;
         this.data = data;
-        for(Object obj : data[0]){
-            columnTypes.add(String.valueOf(obj.getClass()));
-        }
+        this.columnNames = columnNames;
+        this.columnTypes = columnTypes;
     }
+
+
 
     public String getTableName() {
         return tableName;
@@ -40,7 +40,7 @@ public class Table {
         return numberOfRows;
     }
 
-    public String[] getColumnNames() {
+    public List<String> getColumnNames() {
         return columnNames;
     }
 
@@ -52,10 +52,29 @@ public class Table {
         return columnTypes;
     }
 
+    public void addColumn(String columnName, String columnType){
+
+        columnNames.add(columnName);
+
+        switch (columnType) {
+            case "String":
+                columnTypes.add(String.valueOf(String.class));
+                break;
+            case "Integer":
+                columnTypes.add(String.valueOf(Integer.class));
+                break;
+            case "Double":
+                columnTypes.add(String.valueOf(Double.class));
+                break;
+            case "Float":
+                columnTypes.add(String.valueOf(Float.class));
+                break;
+        }
+    }
     @Override
     public String toString(){
         return "Nazwa tabeli: "+tableName+"\nIlosc kolumn: "+numberOfColumns+"\nIlosc wierszy: "+
-                numberOfRows+"\nNazwy kolumn: "+ Arrays.toString(columnNames) +"\nKontent: "+
-                Arrays.deepToString(data)+"\nTypy kolumn: "+columnTypes;
+                numberOfRows+"\nNazwy kolumn: "+ columnNames +"\nTypy kolumn: "+columnTypes +"\nKontent: "+
+                Arrays.deepToString(data);
     }
 }

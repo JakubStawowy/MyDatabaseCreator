@@ -26,5 +26,10 @@ public class DatabaseConnector {
     public void execute(String query) throws SQLException{
         connection.createStatement().execute(query);
     }
-
+    /*
+    * Closes connection with database.
+    * */
+    public void disconnect()throws SQLException{
+        connection.close();
+    }
 }

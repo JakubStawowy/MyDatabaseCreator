@@ -1,34 +1,56 @@
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        /*DatabaseConnector dbConnector = new DatabaseConnector("jdbc:mysql://localhost:3306/osadnicy", "root", "");
 
-        ResultSet rs = dbConnector.executeQuery("select * from uzytkownicy");
+        Scanner scanner = new Scanner(System.in);
+        Model model;
+        while(true){
+            try{
+                System.out.println("Wpisz nazwę bazy:");
+                String dbName = scanner.nextLine();
 
-        while (rs.next()) {
+                System.out.println("Wpisz nazwe uzytkownika:");
+                String username = scanner.nextLine();
 
-            int id_col = rs.getInt("id");
-            String first_name = rs.getString("user");
-            String last_name = rs.getString("pass");
-            String job = rs.getString("email");
+                System.out.println("Wpisz haslo:");
+                String password = scanner.nextLine();
 
-            String p = id_col + " " + first_name + " " + last_name + " " + job;
-            System.out.println(p);
+                model = new Model(dbName, username, password);
+                model.importDatabase();
+                //model.showTables();
+                break;
+
+            }catch(SQLException sqlException){
+                System.out.println("Nie udalo sie polaczyc z baza danych. Sprobuj jeszcze raz");
+            }
         }
-        try{
+        model.addTableToList(new Table("Tabela1",
+                2,
+                1,
+                new ArrayList<>(){{add("id"); add("Name");}},
+                new ArrayList<>(){{add(String.valueOf(Integer.class)); add(String.valueOf(String.class));}},new Object[][]{{1, "Kuba"}}));
+        model.addTableToList(new Table("Tabela2",
+                2,
+                1,
+                new ArrayList<>(){{add("id"); add("Name");}},
+                new ArrayList<>(){{add(String.valueOf(Integer.class)); add(String.valueOf(String.class));}},new Object[][]{{1, "Kuba"}}));
+        model.addTableToList(new Table("Tabela3",
+                2,
+                1,
+                new ArrayList<>(){{add("id"); add("Name");}},
+                new ArrayList<>(){{add(String.valueOf(Integer.class)); add(String.valueOf(String.class));}},new Object[][]{{1, "Kuba"}}));
 
-            Model model = new Model("jdbc:mysql://localhost:3306/osadnicy", "root", "");
-            model.addTableToList(new Table("Tabela1",
-                    2,
-                    0,
-                    new String[]{"abc", "bcd"},
-                    new Object[][]{{13.2,"abc"},{12}}));
-            //model.showTables();
-            model.saveTables();
+        //model.showTables();
 
-        }catch (SQLException sqlException){
-            System.out.println(sqlException.getMessage());
-        }*/
+
+        try {
+            //model.saveTables();
+            model.closeConnection();
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
     }
 }

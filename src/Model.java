@@ -1,4 +1,9 @@
+import javax.print.attribute.standard.NumberOfInterveningJobs;
+import javax.xml.transform.Result;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 /*
@@ -8,6 +13,7 @@ public class Model {
 
     private List<Table> tables = new LinkedList<>();
     private DatabaseConnector dbConnector;
+    private String databaseName;
 
     /*
     * Creates new instance of DatabaseConnector(connects with database)
@@ -15,8 +21,9 @@ public class Model {
     * @param username
     * @param password
     * */
-    public Model(String host, String username, String password) throws SQLException {
-        dbConnector = new DatabaseConnector(host, username, password);
+    public Model(String databaseName, String username, String password) throws SQLException {
+        dbConnector = new DatabaseConnector("jdbc:mysql://localhost:3306/"+databaseName, username, password);
+        this.databaseName = databaseName;
     }
 
     /*
@@ -51,8 +58,8 @@ public class Model {
             }
 
             query.deleteCharAt(query.length()-2);
+            query.deleteCharAt(query.length()-1);
             query.append(");");
-
             dbConnector.execute(String.valueOf(query));
 
         }
@@ -96,5 +103,51 @@ public class Model {
                 return table;
         }
         return null;
+    }
+    /*
+    * Imports all tables from database using sql command "SHOW TABLES" and importTable() method.
+    * */
+    public void importDatabase() throws SQLException{
+
+        ResultSet rs = dbConnector.executeQuery("SHOW TABLES;");
+        System.out.println("Lista tabel:");
+
+        while(rs.next()){
+
+            tables.add(importTable(rs.getString("Tables_in_"+databaseName)));
+        }
+
+    }
+    /*
+    * Imports all table parameters without rows.
+    *
+    * @param tableName
+    * @returns new Table object
+    * */
+    public Table importTable(String tableName) throws SQLException{
+        ResultSet rs;
+
+        rs = dbConnector.executeQuery("DESC "+tableName+";");
+
+        List<String> columnNames = new ArrayList<>();
+        List<String> columnTypes = new ArrayList<>();
+
+        int numberOfColumns = 0;
+        while(rs.next()) {
+
+            columnNames.add(rs.getString("Field"));
+            columnTypes.add(rs.getString("Type"));
+            numberOfColumns++;
+        }
+
+        //rs = dbConnector.executeQuery("SELECT * FROM "+tableName+";");
+
+        return new Table(tableName, numberOfColumns,0,columnNames, columnTypes, new Object[][]{});
+    }
+    /*
+    * Closes connection with database.
+    * */
+    public void closeConnection() throws SQLException {
+        dbConnector.disconnect();
     }
 }
