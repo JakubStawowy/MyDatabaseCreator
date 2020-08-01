@@ -1,9 +1,7 @@
-import javax.print.attribute.standard.NumberOfInterveningJobs;
-import javax.xml.transform.Result;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 /*
@@ -119,30 +117,62 @@ public class Model {
 
     }
     /*
-    * Imports all table parameters without rows.
+    * Imports all table parameters.
     *
     * @param tableName
     * @returns new Table object
     * */
-    public Table importTable(String tableName) throws SQLException{
+    public Table importTable(String tableName) {
         ResultSet rs;
-
-        rs = dbConnector.executeQuery("DESC "+tableName+";");
 
         List<String> columnNames = new ArrayList<>();
         List<String> columnTypes = new ArrayList<>();
-
+        List<Object> columns;
+        List<List<Object>> data = new LinkedList<>();
         int numberOfColumns = 0;
-        while(rs.next()) {
 
-            columnNames.add(rs.getString("Field"));
-            columnTypes.add(rs.getString("Type"));
-            numberOfColumns++;
+        try {
+            rs = dbConnector.executeQuery("DESC " + tableName + ";");
+
+            while(rs.next()) {
+
+                columnNames.add(rs.getString("Field"));
+                columnTypes.add(rs.getString("Type"));
+
+                numberOfColumns++;
+            }
+
+            rs = dbConnector.executeQuery("SELECT * FROM "+tableName+";");
+
+            while(rs.next()){
+
+                columns = new LinkedList<>();
+
+                for(String column : columnNames){
+
+                    columns.add(rs.getObject(column));
+                }
+
+                data.add(columns);
+            }
+        }catch(SQLException sqlException){
+
+            System.out.println("Problemy z importem tabeli");
         }
 
-        //rs = dbConnector.executeQuery("SELECT * FROM "+tableName+";");
+        return new Table(tableName, numberOfColumns,0,columnNames, columnTypes, data);
+    }
+    public void dropTable(String tableName){
 
-        return new Table(tableName, numberOfColumns,0,columnNames, columnTypes, new Object[][]{});
+        try {
+
+            dbConnector.execute("DROP TABLE " + tableName + ";");
+
+        }catch (SQLException sqlException){
+
+            System.out.println("Blad przy usuwaniu tabeli");
+
+        }
     }
     /*
     * Closes connection with database.

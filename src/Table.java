@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,12 +10,12 @@ public class Table {
     private String tableName;
     private int numberOfColumns;
     private int numberOfRows;
-    private Object[][] data;
+    private List<List<Object>> data;
     private List<String> columnNames;
     private List<String> columnTypes;
 
 
-    public Table(String tableName, int numberOfColumns, int numberOfRows, List<String> columnNames, List<String> columnTypes, Object[][] data){
+    public Table(String tableName, int numberOfColumns, int numberOfRows, List<String> columnNames, List<String> columnTypes, List<List<Object>> data){
 
         this.tableName = tableName;
         this.numberOfColumns = numberOfColumns;
@@ -44,7 +43,7 @@ public class Table {
         return columnNames;
     }
 
-    public Object[][] getData() {
+    public List<List<Object>> getData() {
         return data;
     }
 
@@ -75,6 +74,7 @@ public class Table {
     public String toString(){
         return "Nazwa tabeli: "+tableName+"\nIlosc kolumn: "+numberOfColumns+"\nIlosc wierszy: "+
                 numberOfRows+"\nNazwy kolumn: "+ columnNames +"\nTypy kolumn: "+columnTypes +"\nKontent: "+
-                Arrays.deepToString(data);
+                data;
     }
+
 }

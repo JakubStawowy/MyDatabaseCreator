@@ -8,6 +8,7 @@ public class DatabaseConnector {
 
     /*
     * Connects with database
+    *
     * @param host
     * @param username
     * @param password
