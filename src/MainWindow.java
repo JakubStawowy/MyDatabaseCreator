@@ -1,8 +1,10 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import java.util.List;
 
 /*
 * MainWindow class is used only after successful connection with database.
@@ -17,10 +19,12 @@ public class MainWindow extends JFrame implements MyWindow{
         this.model = model;
 
         setSize(800,600);
+        setTitle("MyDatabaseCreator");
         initWindow();
-        setLayout(null);
+        setLayout(new GridLayout(1,4,0,100));
         setVisible(true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -42,24 +46,47 @@ public class MainWindow extends JFrame implements MyWindow{
     @Override
     public void initWindow() {
 
-        addButton(540, 400, 200, 40, "Import database", event->new ConnectWindow(null));
-        addButton(540, 480, 200, 40, "Close", event->new WarningWindow("Are you sure you want to exit?",subEvent->{
-
-            dispose();
-            try {
-                model.closeConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            System.exit(0);
-        }));
-
         JMenu menu = new JMenu("menu");
         JMenuBar menuBar = new JMenuBar();
-        JMenuItem it1 = new JMenuItem("miau");
+        JMenuItem it1 = new JMenuItem("Close connection");
+        it1.addActionListener(event->
+            new WarningWindow("Are you sure you want to close connection?",subEvent->{
+                try {
+                    model.closeConnection();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                dispose();
+                new StartingWindow();
+            }));
+
+        JMenuItem it2 = new JMenuItem("Exit");
+        it2.addActionListener(event->
+            new WarningWindow("Are you sure you want to exit?",subEvent->{
+                dispose();
+                try {
+                    model.closeConnection();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                System.exit(0);
+            }));
         menu.add(it1);
+        menu.add(it2);
         menuBar.add(menu);
         setJMenuBar(menuBar);
+
+        List<String> l1 = model.getTableNames();
+
+        JList<String> list = new JList<>(l1.toArray(new String[0]));
+        JScrollPane scroll = new JScrollPane();
+        scroll.setViewportView(list);
+        list.setLayoutOrientation(JList.VERTICAL);
+
+        add(scroll);
+        add(new JPanel());
+        //add(new JPanel());
+        add(new MainWindowButtons(model, list));
     }
 
     @Override
@@ -72,7 +99,7 @@ public class MainWindow extends JFrame implements MyWindow{
     }
 
     @Override
-    public JTextField addTextField(int x, int y, int width, int height) {
+    public JTextField addTextField(int x, int y, int width, int height, String text) {
 
         JTextField textField = new JTextField();
         textField.setBounds(x,y,width,height);

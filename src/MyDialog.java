@@ -45,9 +45,9 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @return textField
     * */
     @Override
-    public JTextField addTextField(int x, int y, int width, int height) {
+    public JTextField addTextField(int x, int y, int width, int height, String text) {
 
-        JTextField textField = new JTextField();
+        JTextField textField = new JTextField(text);
         textField.setBounds(x,y,width,height);
         add(textField);
 

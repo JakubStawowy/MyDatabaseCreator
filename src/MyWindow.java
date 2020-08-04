@@ -10,7 +10,7 @@ public interface MyWindow {
 
     void addButton(int x, int y, int width, int height, String text, ActionListener actionListener);
 
-    JTextField addTextField(int x, int y, int width, int height);
+    JTextField addTextField(int x, int y, int width, int height, String text);
 
     void addLabel(int x, int y, int width, int height, String text);
 }

@@ -15,9 +15,11 @@ public class WarningWindow extends MyDialog{
         this.text = text;
         this.action = action;
 
-        setSize(240,120);
+        setSize(340,120);
+        setTitle("Warning");
 
         initWindow();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
     @Override
@@ -27,13 +29,13 @@ public class WarningWindow extends MyDialog{
         JPanel subPanel = new JPanel(null);
 
         JButton yesButton = new JButton("Yes");
-        yesButton.setBounds(20,0,80,20);
+        yesButton.setBounds(50,0,80,20);
 
         yesButton.addActionListener(action);
         yesButton.addActionListener(event->dispose());
 
         JButton noButton = new JButton("No");
-        noButton.setBounds(120,0,80,20);
+        noButton.setBounds(190,0,80,20);
         noButton.addActionListener(event->dispose());
 
         subPanel.add(yesButton);

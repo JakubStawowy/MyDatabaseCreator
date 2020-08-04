@@ -10,9 +10,14 @@ import java.util.List;
 public class Model {
 
     private List<Table> tables = new LinkedList<>();
+    private List<String> tableNames = new LinkedList<>();
     private DatabaseConnector dbConnector;
     private String databaseName;
 
+    public List<String> getTableNames(){
+
+        return tableNames;
+    }
     /*
     * Creates new instance of DatabaseConnector(connects with database)
     * @param host
@@ -20,7 +25,8 @@ public class Model {
     * @param password
     * */
     public Model(String databaseName, String username, String password) throws SQLException {
-        dbConnector = new DatabaseConnector("jdbc:mysql://localhost:3306/"+databaseName, username, password);
+
+        dbConnector = new DatabaseConnector(databaseName, username, password);
         this.databaseName = databaseName;
     }
 
@@ -108,11 +114,12 @@ public class Model {
     public void importDatabase() throws SQLException{
 
         ResultSet rs = dbConnector.executeQuery("SHOW TABLES;");
-        System.out.println("Lista tabel:");
 
+        String tableName;
         while(rs.next()){
-
-            tables.add(importTable(rs.getString("Tables_in_"+databaseName)));
+            tableName = rs.getString("Tables_in_"+databaseName.substring(databaseName.lastIndexOf("/")+1));
+            tableNames.add(tableName);
+            tables.add(importTable(tableName));
         }
 
     }
