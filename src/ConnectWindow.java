@@ -49,8 +49,8 @@ public class ConnectWindow extends MyDialog{
         hidePasswordCheckBox.setBounds(185,100,125,10);
         add(hidePasswordCheckBox);
 
-        addButton(185, 120, 125, 20, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose()));
-        addButton(20, 120, 125, 20, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())));
+        addButton(185, 120, 125, 20, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose()), true);
+        addButton(20, 120, 125, 20, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())),true);
 
         addLabel(20,15,100,20,"Database name:");
         addLabel(20,45,100,20,"Username:");

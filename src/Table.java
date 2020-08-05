@@ -1,3 +1,4 @@
+import javax.xml.crypto.Data;
 import java.util.List;
 
 /*
@@ -24,7 +25,9 @@ public class Table {
         this.columnTypes = columnTypes;
     }
 
-
+    public void numberOfRowsDeincrement(){
+        numberOfRows--;
+    }
 
     public String getTableName() {
         return tableName;
@@ -75,5 +78,9 @@ public class Table {
                 numberOfRows+"\nNazwy kolumn: "+ columnNames +"\nTypy kolumn: "+columnTypes +"\nKontent: "+
                 data;
     }
-
+    public void setData(List<List<Object>> data){
+        //if(!this.data.equals(data)){
+            this.data = data;
+        //}
+    }
 }

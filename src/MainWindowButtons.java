@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /*
 * MainWindowButtons class is a class that extends JPanel class and MyWindow interface.
@@ -10,6 +12,11 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
     private Model model;
     private JList<String> tableList;
+    private JButton editTableButton;
+    private JButton addNewRowButton;
+    private JButton createTableButton;
+    private JButton removeTableButton;
+    private JButton displayTableButton;
 
     public MainWindowButtons(Model model, JList<String> tableList){
 
@@ -21,26 +28,34 @@ public class MainWindowButtons extends JPanel implements MyWindow {
     @Override
     public void initWindow() {
 
-        addButton(0,0,0,0,"Edit table",event->{
+        editTableButton = addButton(0,0,0,0,"Edit table",event->{
 
-        });
-        addButton(0,0,0,0,"Add new row",event->{
+        },false);
+        addNewRowButton = addButton(0,0,0,0,"Add new row",event->{
 
-        });
-        addButton(0,0,0,0,"Show table",event->new DisplayTableWindow(model.getTable(tableList.getSelectedValue())));
-        addButton(0,0,0,0,"Delete table",event->{
+        },false);
+        displayTableButton = addButton(0,0,0,0,"Display table",event->new DisplayTableWindow(model.getTable(tableList.getSelectedValue())),false);
+        removeTableButton = addButton(0,0,0,0,"Remove table",event->{
+            String tableName = tableList.getSelectedValue();
+            new WarningWindow("Remove table "+tableName+"?",subEvent->{
+                model.removeTableFromList(tableName);
 
-        });
-        addButton(0,0,0,0,"Create new table",event->{
+            }
+            );
+        },false);
+        createTableButton = addButton(0,0,0,0,"Create new table",event->{
 
-        });
+        },true);
+
     }
 
     @Override
-    public void addButton(int x, int y, int width, int height, String text, ActionListener actionListener) {
+    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable) {
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
+        button.setEnabled(buttonEnable);
         add(button);
+        return button;
     }
 
     @Override
@@ -51,5 +66,12 @@ public class MainWindowButtons extends JPanel implements MyWindow {
     @Override
     public void addLabel(int x, int y, int width, int height, String text) {
 
+    }
+    public void enableButtons(){
+        editTableButton.setEnabled(true);
+        addNewRowButton.setEnabled(true);
+        createTableButton.setEnabled(true);
+        removeTableButton.setEnabled(true);
+        displayTableButton.setEnabled(true);
     }
 }

@@ -137,6 +137,7 @@ public class Model {
         List<Object> columns;
         List<List<Object>> data = new LinkedList<>();
         int numberOfColumns = 0;
+        int numberOfRows = 0;
 
         try {
             rs = dbConnector.executeQuery("DESC " + tableName + ";");
@@ -161,13 +162,14 @@ public class Model {
                 }
 
                 data.add(columns);
+                numberOfRows++;
             }
         }catch(SQLException sqlException){
 
             System.out.println("Problemy z importem tabeli");
         }
 
-        return new Table(tableName, numberOfColumns,0,columnNames, columnTypes, data);
+        return new Table(tableName, numberOfColumns,numberOfRows,columnNames, columnTypes, data);
     }
     public void dropTable(String tableName){
 

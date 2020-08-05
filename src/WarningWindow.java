@@ -26,22 +26,34 @@ public class WarningWindow extends MyDialog{
     public void initWindow() {
 
         JPanel mainPanel = new JPanel(new GridLayout(2,1));
-        JPanel subPanel = new JPanel(null);
+        JPanel subPanel = new JPanel();
 
-        JButton yesButton = new JButton("Yes");
-        yesButton.setBounds(50,0,80,20);
+        mainPanel.add(new JLabel(text, SwingConstants.CENTER));
 
-        yesButton.addActionListener(action);
-        yesButton.addActionListener(event->dispose());
+        if(action!=null) {
 
-        JButton noButton = new JButton("No");
-        noButton.setBounds(190,0,80,20);
-        noButton.addActionListener(event->dispose());
+            subPanel.setLayout(null);
+            JButton yesButton = new JButton("Yes");
+            yesButton.setBounds(50, 0, 80, 20);
 
-        subPanel.add(yesButton);
-        subPanel.add(noButton);
+            yesButton.addActionListener(action);
+            yesButton.addActionListener(event -> dispose());
 
-        mainPanel.add(new JLabel(text,SwingConstants.CENTER));
+            JButton noButton = new JButton("No");
+            noButton.setBounds(190, 0, 80, 20);
+            noButton.addActionListener(event -> dispose());
+
+            subPanel.add(yesButton);
+            subPanel.add(noButton);
+
+        }
+        else{
+            JButton okButton = new JButton("Ok");
+            okButton.setBounds(65,25,80,20);
+            okButton.addActionListener(event->dispose());
+            subPanel.add(okButton);
+        }
+
         mainPanel.add(subPanel);
         add(mainPanel);
 

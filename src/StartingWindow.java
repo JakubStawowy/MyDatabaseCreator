@@ -24,9 +24,9 @@ public class StartingWindow extends MyDialog {
     @Override
     public void initWindow() {
 
-        addButton(100, 60, 200, 40, "Import database", event->new ConnectWindow(this));
+        addButton(100, 60, 200, 40, "Import database", event->new ConnectWindow(this), true);
         //addButton(100, 120, 200, 40, "Skip", event->{ });
-        addButton(100, 180, 200, 40, "Close", event->{dispose(); System.exit(0);});
+        addButton(100, 180, 200, 40, "Close", event->{dispose(); System.exit(0);},true);
 
     }
     public static void main(String[] args) {

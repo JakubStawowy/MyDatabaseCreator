@@ -25,12 +25,15 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @param actionListener - action executed after clicking on the button
     * */
     @Override
-    public void addButton(int x, int y, int width, int height, String text, ActionListener actionListener){
+    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable){
 
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setBounds(x,y,width,height);
+        button.setEnabled(buttonEnable);
         add(button);
+
+        return button;
     }
 
     /*

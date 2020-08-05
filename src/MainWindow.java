@@ -1,9 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -13,6 +12,9 @@ import java.util.List;
 public class MainWindow extends JFrame implements MyWindow{
 
     private Model model;
+    private List<String> tableList;
+    private JList<String> list;
+    private JScrollPane scroll;
 
     public MainWindow(Model model){
 
@@ -75,27 +77,55 @@ public class MainWindow extends JFrame implements MyWindow{
         menu.add(it2);
         menuBar.add(menu);
         setJMenuBar(menuBar);
+        tableList = model.getTableNames();
+        list = new JList<>(tableList.toArray(new String[0]));
 
-        List<String> l1 = model.getTableNames();
+        MainWindowButtons mainWindowButtons = new MainWindowButtons(model, list);
+        list.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mainWindowButtons.enableButtons();
+            }
 
-        JList<String> list = new JList<>(l1.toArray(new String[0]));
-        JScrollPane scroll = new JScrollPane();
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+        scroll = new JScrollPane();
         scroll.setViewportView(list);
         list.setLayoutOrientation(JList.VERTICAL);
 
         add(scroll);
         add(new JPanel());
         //add(new JPanel());
-        add(new MainWindowButtons(model, list));
+        add(mainWindowButtons);
+
     }
 
     @Override
-    public void addButton(int x, int y, int width, int height, String text, ActionListener actionListener){
+    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable){
 
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setBounds(x,y,width,height);
         add(button);
+        return button;
     }
 
     @Override
@@ -113,5 +143,12 @@ public class MainWindow extends JFrame implements MyWindow{
         JLabel label = new JLabel(text);
         label.setBounds(x,y,width,height);
         add(label);
+    }
+    public void removeTableFromJList(int index){
+
+        tableList.remove(index);
+        list = new JList<>(tableList.toArray(new String[0]));
+        scroll.setViewportView(list);
+        list.setLayoutOrientation(JList.VERTICAL);
     }
 }
