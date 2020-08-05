@@ -78,9 +78,12 @@ public class Table {
                 numberOfRows+"\nNazwy kolumn: "+ columnNames +"\nTypy kolumn: "+columnTypes +"\nKontent: "+
                 data;
     }
+    /*
+    * setData method sets new table data and table number of rows
+    * */
     public void setData(List<List<Object>> data){
-        //if(!this.data.equals(data)){
+
             this.data = data;
-        //}
+            numberOfRows = data.size();
     }
 }

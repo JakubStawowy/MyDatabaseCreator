@@ -27,6 +27,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
     @Override
     public void initWindow() {
 
+        //------------------------------------DisplayedTable---------------------------------------------------
         Object[][] tableData= new Object[table.getData().size()][table.getColumnNames().size()];
         for(int i = 0 ; i < table.getNumberOfRows() ; i++)
             for(int j = 0 ; j < table.getNumberOfColumns() ; j++)
@@ -38,13 +39,20 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         add(scrollPane);
 
+
+        //------------------------------------ButtonsPanel---------------------------------------------------
         JPanel Panel = new JPanel(null);
         JPanel subPanel = new JPanel(new GridLayout(2,2,20,20));
         subPanel.setBounds(10,10,565,110);
 
 
         JButton addRowButton = new JButton("Add row");
-        addRowButton.addActionListener(event->((DefaultTableModel) newTable.getModel()).addRow(new Object[][]{}));
+        addRowButton.addActionListener(event->{
+
+            ((DefaultTableModel) newTable.getModel()).addRow(new Object[][]{});
+            Rectangle rect = newTable.getCellRect(newTable.getRowCount(),0,true);
+            newTable.scrollRectToVisible(rect);
+        });
 
         JButton removeRowButton = new JButton("Delete row");
         removeRowButton.setEnabled(false);
@@ -124,11 +132,17 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
     }
 
+    /*
+    * saveTable method returns multidimensional ArrayList with data collected from newTable (JTable)
+    *
+    * @return rows
+    * */
     private List<List<Object>> saveTable(){
 
         List<List<Object>> rows = new ArrayList<>();
         List<Object> columns;
         newTable.clearSelection();
+        System.out.println(newTable.getRowCount());
         for(int i = 0; i < newTable.getRowCount();i++) {
             columns = new ArrayList<>();
             for (int j = 0; j < newTable.getColumnCount(); j++)

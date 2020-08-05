@@ -11,17 +11,17 @@ import java.awt.event.MouseListener;
 public class MainWindowButtons extends JPanel implements MyWindow {
 
     private Model model;
-    private JList<String> tableList;
+    private MainWindow mainWindow;
     private JButton editTableButton;
     private JButton addNewRowButton;
     private JButton createTableButton;
     private JButton removeTableButton;
     private JButton displayTableButton;
 
-    public MainWindowButtons(Model model, JList<String> tableList){
+    public MainWindowButtons(Model model, MainWindow mainWindow){
 
         this.model = model;
-        this.tableList = tableList;
+        this.mainWindow = mainWindow;
         setLayout(new GridLayout(5,1,0,50));
         initWindow();
     }
@@ -34,12 +34,16 @@ public class MainWindowButtons extends JPanel implements MyWindow {
         addNewRowButton = addButton(0,0,0,0,"Add new row",event->{
 
         },false);
-        displayTableButton = addButton(0,0,0,0,"Display table",event->new DisplayTableWindow(model.getTable(tableList.getSelectedValue())),false);
+        displayTableButton = addButton(0,0,0,0,"Display table",event->new DisplayTableWindow(model.getTable(mainWindow.getSelectedTable())),false);
         removeTableButton = addButton(0,0,0,0,"Remove table",event->{
-            String tableName = tableList.getSelectedValue();
+
+            String tableName = mainWindow.getSelectedTable();
+            int tableIndex = mainWindow.getSelectedTableIndex();
+
             new WarningWindow("Remove table "+tableName+"?",subEvent->{
                 model.removeTableFromList(tableName);
-
+                mainWindow.removeTableFromJList(tableIndex);
+                setButtons(false);
             }
             );
         },false);
@@ -67,11 +71,11 @@ public class MainWindowButtons extends JPanel implements MyWindow {
     public void addLabel(int x, int y, int width, int height, String text) {
 
     }
-    public void enableButtons(){
-        editTableButton.setEnabled(true);
-        addNewRowButton.setEnabled(true);
-        createTableButton.setEnabled(true);
-        removeTableButton.setEnabled(true);
-        displayTableButton.setEnabled(true);
+    public void setButtons(Boolean enable){
+
+        editTableButton.setEnabled(enable);
+        addNewRowButton.setEnabled(enable);
+        removeTableButton.setEnabled(enable);
+        displayTableButton.setEnabled(enable);
     }
 }

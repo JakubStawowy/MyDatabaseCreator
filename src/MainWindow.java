@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -15,6 +14,7 @@ public class MainWindow extends JFrame implements MyWindow{
     private List<String> tableList;
     private JList<String> list;
     private JScrollPane scroll;
+    private MainWindowButtons mainWindowButtons;
 
     public MainWindow(Model model){
 
@@ -48,10 +48,11 @@ public class MainWindow extends JFrame implements MyWindow{
     @Override
     public void initWindow() {
 
+        //------------------------------------MenuBar---------------------------------------------------
         JMenu menu = new JMenu("menu");
         JMenuBar menuBar = new JMenuBar();
-        JMenuItem it1 = new JMenuItem("Close connection");
-        it1.addActionListener(event->
+        JMenuItem closeConnectionItem = new JMenuItem("Close connection");
+        closeConnectionItem.addActionListener(event->
             new WarningWindow("Are you sure you want to close connection?",subEvent->{
                 try {
                     model.closeConnection();
@@ -62,8 +63,8 @@ public class MainWindow extends JFrame implements MyWindow{
                 new StartingWindow();
             }));
 
-        JMenuItem it2 = new JMenuItem("Exit");
-        it2.addActionListener(event->
+        JMenuItem exitItem = new JMenuItem("Exit");
+        exitItem.addActionListener(event->
             new WarningWindow("Are you sure you want to exit?",subEvent->{
                 dispose();
                 try {
@@ -73,47 +74,24 @@ public class MainWindow extends JFrame implements MyWindow{
                 }
                 System.exit(0);
             }));
-        menu.add(it1);
-        menu.add(it2);
+        menu.add(closeConnectionItem);
+        menu.add(exitItem);
         menuBar.add(menu);
         setJMenuBar(menuBar);
+
+        //------------------------------------TableList---------------------------------------------------
         tableList = model.getTableNames();
         list = new JList<>(tableList.toArray(new String[0]));
+        setListMouseListener();
+        //------------------------------------MainWindowButtons---------------------------------------------------
+        mainWindowButtons = new MainWindowButtons(model, this);
 
-        MainWindowButtons mainWindowButtons = new MainWindowButtons(model, list);
-        list.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                mainWindowButtons.enableButtons();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
         scroll = new JScrollPane();
         scroll.setViewportView(list);
         list.setLayoutOrientation(JList.VERTICAL);
 
         add(scroll);
         add(new JPanel());
-        //add(new JPanel());
         add(mainWindowButtons);
 
     }
@@ -144,11 +122,55 @@ public class MainWindow extends JFrame implements MyWindow{
         label.setBounds(x,y,width,height);
         add(label);
     }
+    /*
+    * removeTableFromJList method sets new list without removed table (using table index).
+    *
+    * @param index - table index
+    * */
     public void removeTableFromJList(int index){
 
         tableList.remove(index);
         list = new JList<>(tableList.toArray(new String[0]));
+        setListMouseListener();
         scroll.setViewportView(list);
         list.setLayoutOrientation(JList.VERTICAL);
+    }
+    public String getSelectedTable(){
+        return list.getSelectedValue();
+    }
+    public int getSelectedTableIndex(){
+        return list.getSelectedIndex();
+    }
+    /*
+    * setListMouseListener method sets all buttons which require table to be selected from table list enabled.
+    * */
+    private void setListMouseListener(){
+        list.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                mainWindowButtons.setButtons(true);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
     }
 }
