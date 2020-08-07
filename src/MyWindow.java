@@ -12,5 +12,5 @@ public interface MyWindow {
 
     JTextField addTextField(int x, int y, int width, int height, String text);
 
-    void addLabel(int x, int y, int width, int height, String text);
+    JLabel addLabel(int x, int y, int width, int height, String text);
 }

@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+
 /*
 * Model class is responsible for most logical methods such as creating tables, saving tables etc.
 * */
@@ -93,7 +95,34 @@ public class Model {
             System.out.println(table);
         }
     }
+    /*
+    * generateRandomCondition method generates random condition using random column and random cell value in that column.
+    *
+    * @param table
+    * */
+    public String generateRandomCondition(Table table){
 
+        Random random = new Random();
+        int randomColumnIndex = random.nextInt(table.getNumberOfColumns());
+        int randomRowIndex = random.nextInt(table.getNumberOfRows());
+        int randomOperatorIndex;
+
+        String[] operators = new String[]{"=", "!=", ">", "<", "<=",">="};
+        String cellData;
+        String columnType = table.getColumnTypes().get(randomColumnIndex);
+        if(columnType.equals("varchar(30)") || columnType.equals("date")) {
+
+            randomOperatorIndex = random.nextInt(2);
+            cellData = "\""+table.getData().get(randomRowIndex).get(randomColumnIndex)+"\"";
+        }
+        else {
+
+            randomOperatorIndex = random.nextInt(operators.length);
+            cellData = String.valueOf(table.getData().get(randomRowIndex).get(randomColumnIndex));
+        }
+
+        return table.getColumnNames().get(randomColumnIndex)+operators[randomOperatorIndex]+cellData;
+    }
     /*
     * Returns table object using table name.
     *
@@ -171,6 +200,11 @@ public class Model {
 
         return new Table(tableName, numberOfColumns,numberOfRows,columnNames, columnTypes, data);
     }
+    /*
+    * dropTable method removes table from database using table name
+    *
+    * @param tableName
+    * */
     public void dropTable(String tableName){
 
         try {
@@ -183,6 +217,55 @@ public class Model {
 
         }
     }
+    /*
+    * Search table method returns a new table containing all rows that met the conditions specified as an argument.
+    * It uses sql command SELECT * FROM tablename WHERE condition
+    *
+    * @param tableName
+    * @param condition
+    * @param sorted ("ASC"/"DESC"/null)
+    * @param columnName - table would be sorted using column with that name
+    *
+    * @return data (multidimensional ArrayList)
+    * */
+    public List<List<Object>> searchTable(String tableName, String condition, String sorted, String columnName) {
+
+        ResultSet rs;
+
+        List<String> columnNames = new ArrayList<>();
+        List<Object> columns;
+        List<List<Object>> data = new LinkedList<>();
+
+        try {
+            rs = dbConnector.executeQuery("DESC "+tableName+";");
+
+            while(rs.next()) {
+
+                columnNames.add(rs.getString("Field"));
+            }
+            if(sorted!=null)
+                rs = dbConnector.executeQuery("SELECT * FROM " + tableName + " WHERE "+condition+" ORDER BY("+columnName+") "+sorted+";");
+            else
+                rs = dbConnector.executeQuery("SELECT * FROM " + tableName + " WHERE "+condition+";");
+
+            while(rs.next()){
+
+                columns = new LinkedList<>();
+
+                for(String column : columnNames){
+
+                    columns.add(rs.getObject(column));
+                }
+                data.add(columns);
+            }
+        }catch(SQLException sqlException){
+
+            System.out.println("Problemy z przeszukaniem tabeli");
+        }
+
+        return data;
+    }
+
     /*
     * Closes connection with database.
     * */

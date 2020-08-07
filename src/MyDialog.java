@@ -68,10 +68,11 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @param text - text displayed on the button
     * */
     @Override
-    public void addLabel(int x, int y, int width, int height, String text) {
+    public JLabel addLabel(int x, int y, int width, int height, String text) {
         JLabel label = new JLabel(text);
         label.setBounds(x,y,width,height);
         add(label);
+        return label;
     }
 }
 

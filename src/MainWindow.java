@@ -117,10 +117,11 @@ public class MainWindow extends JFrame implements MyWindow{
     }
 
     @Override
-    public void addLabel(int x, int y, int width, int height, String text) {
+    public JLabel addLabel(int x, int y, int width, int height, String text) {
         JLabel label = new JLabel(text);
         label.setBounds(x,y,width,height);
         add(label);
+        return label;
     }
     /*
     * removeTableFromJList method sets new list without removed table (using table index).

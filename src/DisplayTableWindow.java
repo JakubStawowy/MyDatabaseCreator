@@ -11,15 +11,22 @@ import java.util.List;
 * DisplayTableWindow class is used to display all table data.
 * */
 public class DisplayTableWindow extends JFrame implements MyWindow{
+
     private Table table;
-    private JTable newTable;
-    public DisplayTableWindow(Table table){
+    private Model model;
+    private JTable displayedTable;
+    private Object[][] tableData;
+    private JScrollPane scrollPane;
+
+    public DisplayTableWindow(Model model, Table table){
         this.table = table;
+        this.model = model;
+        tableData = new Object[table.getData().size()][table.getColumnNames().size()];
         initWindow();
+        setLocation(new Point(300,200));
         setTitle(table.getTableName());
         setLayout(new GridLayout(2,1));
-        setLocationRelativeTo(null);
-        setPreferredSize(new Dimension(600,300));
+        setPreferredSize(new Dimension(600,450));
         setVisible(true);
         pack();
     }
@@ -28,37 +35,32 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
     public void initWindow() {
 
         //------------------------------------DisplayedTable---------------------------------------------------
-        Object[][] tableData= new Object[table.getData().size()][table.getColumnNames().size()];
-        for(int i = 0 ; i < table.getNumberOfRows() ; i++)
-            for(int j = 0 ; j < table.getNumberOfColumns() ; j++)
-                tableData[i][j] = table.getData().get(i).get(j);
-
-        newTable = new JTable(new DefaultTableModel(tableData,table.getColumnNames().toArray()));
-
-        JScrollPane scrollPane = new JScrollPane(newTable);
+        scrollPane = new JScrollPane(displayedTable);
+        displayTable(table.getData());
 
         add(scrollPane);
 
-
         //------------------------------------ButtonsPanel---------------------------------------------------
         JPanel Panel = new JPanel(null);
-        JPanel subPanel = new JPanel(new GridLayout(2,2,20,20));
-        subPanel.setBounds(10,10,565,110);
+        JPanel subPanel = new JPanel(new GridLayout(3,2,20,20));
+        subPanel.setBounds(10,10,565,185);
 
+        JButton searchTableButton = new JButton("Search table");
+        searchTableButton.addActionListener(event->new SearchTableWindow(this));
 
         JButton addRowButton = new JButton("Add row");
         addRowButton.addActionListener(event->{
 
-            ((DefaultTableModel) newTable.getModel()).addRow(new Object[][]{});
-            Rectangle rect = newTable.getCellRect(newTable.getRowCount(),0,true);
-            newTable.scrollRectToVisible(rect);
+            ((DefaultTableModel) displayedTable.getModel()).addRow(new Object[][]{});
+            Rectangle rect = displayedTable.getCellRect(displayedTable.getRowCount(),0,true);
+            displayedTable.scrollRectToVisible(rect);
         });
 
-        JButton removeRowButton = new JButton("Delete row");
+        JButton removeRowButton = new JButton("Remove row");
         removeRowButton.setEnabled(false);
         removeRowButton.addActionListener(event->{
             try {
-                ((DefaultTableModel) newTable.getModel()).removeRow(newTable.getSelectedRow());
+                ((DefaultTableModel) displayedTable.getModel()).removeRow(displayedTable.getSelectedRow());
                 table.numberOfRowsDeincrement();
                 removeRowButton.setEnabled(false);
             }
@@ -79,12 +81,12 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(event->dispose());
 
-        newTable.getModel().addTableModelListener(event -> saveButton.setEnabled(true));
-        newTable.addMouseListener(new MouseListener() {
+        displayedTable.getModel().addTableModelListener(event -> saveButton.setEnabled(true));
+        displayedTable.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                if(newTable.getSelectedRow() != -1)
+                if(displayedTable.getSelectedRow() != -1)
                     removeRowButton.setEnabled(true);
 
             }
@@ -109,10 +111,12 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
             }
         });
+        subPanel.add(searchTableButton);
         subPanel.add(addRowButton);
         subPanel.add(removeRowButton);
         subPanel.add(saveButton);
         subPanel.add(closeButton);
+
         Panel.add(subPanel);
         add(Panel);
     }
@@ -128,8 +132,8 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
     }
 
     @Override
-    public void addLabel(int x, int y, int width, int height, String text) {
-
+    public JLabel addLabel(int x, int y, int width, int height, String text) {
+        return null;
     }
 
     /*
@@ -141,14 +145,40 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         List<List<Object>> rows = new ArrayList<>();
         List<Object> columns;
-        newTable.clearSelection();
-        System.out.println(newTable.getRowCount());
-        for(int i = 0; i < newTable.getRowCount();i++) {
+        displayedTable.clearSelection();
+        for(int i = 0; i < displayedTable.getRowCount();i++) {
             columns = new ArrayList<>();
-            for (int j = 0; j < newTable.getColumnCount(); j++)
-                columns.add(newTable.getValueAt(i, j));
+            for (int j = 0; j < displayedTable.getColumnCount(); j++)
+                columns.add(displayedTable.getValueAt(i, j));
             rows.add(columns);
         }
         return rows;
+    }
+    public Table getTable(){
+        return table;
+    }
+    public Object[][] getTableData(){
+        return tableData;
+    }
+    public Model getModel(){
+        return model;
+    }
+
+    /*
+    * displayTable method displays table using data parameter
+    *
+    * @param data (multidimensional ArrayList)
+    * */
+    public void displayTable(List<List<Object>> data){
+
+        tableData = new Object[data.size()][table.getColumnNames().size()];
+        for(int i = 0 ; i < data.size() ; i++)
+            for(int j = 0 ; j < table.getNumberOfColumns() ; j++)
+                tableData[i][j] = data.get(i).get(j);
+
+
+        displayedTable = new JTable(new DefaultTableModel(tableData,table.getColumnNames().toArray()));
+        scrollPane.setViewportView(displayedTable);
+        //scrollPane = new JScrollPane(displayedTable);
     }
 }
