@@ -200,6 +200,26 @@ public class Model {
 
         return new Table(tableName, numberOfColumns,numberOfRows,columnNames, columnTypes, data);
     }
+    public void deleteRow(String tableName, int rowIndex){
+
+        StringBuilder condition = new StringBuilder();
+        Table table = getTable(tableName);
+        for(int index = 0; index < table.getNumberOfColumns(); index++){
+            condition.append(table.getColumnNames().get(index)).append(" = ").append(table.getData().get(rowIndex).get(index));
+            if(index < table.getNumberOfColumns()-1)
+                condition.append(" AND ");
+        }
+
+        table.getData().remove(rowIndex);
+        table.numberOfRowsDeincrement();
+        System.out.println(condition);
+        /*try{
+            dbConnector.execute("DELETE FROM"+tableName+" WHERE "+condition+";");
+        }
+        catch (SQLException sqlException){
+            System.out.println("Blad przy usuwaniu wiersza");
+        }*/
+    }
     /*
     * dropTable method removes table from database using table name
     *
@@ -235,6 +255,9 @@ public class Model {
         List<String> columnNames = new ArrayList<>();
         List<Object> columns;
         List<List<Object>> data = new LinkedList<>();
+
+        if(condition.equals(""))
+            condition = "TRUE";
 
         try {
             rs = dbConnector.executeQuery("DESC "+tableName+";");
