@@ -34,7 +34,7 @@ public class MainWindowButtons extends JPanel implements MyWindow {
         addNewRowButton = addButton(0,0,0,0,"Add new row",event->{
 
         },false);
-        displayTableButton = addButton(0,0,0,0,"Display table",event->new DisplayTableWindow(model, model.getTable(mainWindow.getSelectedTable())),false);
+        displayTableButton = addButton(0,0,0,0,"Display table",event->new DisplayTableWindow(model, mainWindow.getSelectedTable()), false);
         removeTableButton = addButton(0,0,0,0,"Remove table",event->{
 
             String tableName = mainWindow.getSelectedTable();

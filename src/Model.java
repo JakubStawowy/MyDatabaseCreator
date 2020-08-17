@@ -104,7 +104,7 @@ public class Model {
         String[] operators = new String[]{"=", "!=", ">", "<", "<=",">="};
         String cellData;
         String columnType = table.getColumnTypes().get(randomColumnIndex);
-        if(columnType.equals("date") || columnType.substring(0,7).equals("varchar")) {
+        if(columnType.equals("date") || columnType.equals("text") || columnType.substring(0,3).equals("var")) {
 
             randomOperatorIndex = random.nextInt(2);
             cellData = "\""+table.getData().get(randomRowIndex).get(randomColumnIndex)+"\"";
@@ -161,11 +161,14 @@ public class Model {
         List<List<Object>> data = new LinkedList<>();
         int numberOfColumns = 0;
         int numberOfRows = 0;
-
+        int primaryKeyColumnIndex = 0;
         try {
             rs = dbConnector.executeQuery("DESC " + tableName + ";");
 
             while(rs.next()) {
+
+                if(rs.getString("Key").equals("PRI"))
+                    primaryKeyColumnIndex = numberOfColumns;
 
                 columnNames.add(rs.getString("Field"));
                 columnTypes.add(rs.getString("Type"));
@@ -192,7 +195,7 @@ public class Model {
             System.out.println("Problemy z importem tabeli");
         }
 
-        return new Table(tableName, numberOfColumns,numberOfRows,columnNames, columnTypes, data);
+        return new Table(tableName, numberOfColumns,numberOfRows, primaryKeyColumnIndex, data, columnNames, columnTypes);
     }
     /*
     * DeleteRow method removes selected row using sql query.
@@ -211,8 +214,7 @@ public class Model {
 
             type = table.getColumnTypes().get(index);
             value = table.getData().get(rowIndex).get(index);
-            System.out.println("type == "+type);
-            if(type.equals("date") || type.substring(0,7).equals("varchar"))
+            if(type.equals("date") || type.equals("text")  || type.substring(0,3).equals("var"))
                 value = "\""+value+"\"";
 
             condition.append(table.getColumnNames().get(index)).append(" = ").append(value);
@@ -222,13 +224,64 @@ public class Model {
 
         table.getData().remove(rowIndex);
         table.numberOfRowsDeincrement();
-
+        String query = "DELETE FROM "+tableName+" WHERE "+condition+";";
         try{
-            dbConnector.execute("DELETE FROM "+tableName+" WHERE "+condition+";");
+            dbConnector.execute(query);
         }
         catch (SQLException sqlException){
             System.out.println("Blad przy usuwaniu wiersza");
         }
+    }
+    public void updateRow(String tableName, int rowIndex, int columnIndex, Object oldValue, Object newValue) throws SQLException{
+
+        Table table = getTable(tableName);
+        String type = table.getColumnTypes().get(columnIndex);
+        String columnName = table.getColumnNames().get(columnIndex);
+
+        if(type.equals("date") || type.equals("text")  || type.substring(0,3).equals("var")){
+            newValue = "\""+newValue+"\"";
+            oldValue = "\""+oldValue+"\"";
+        }
+
+        StringBuilder query = new StringBuilder("UPDATE "+tableName+" SET "+columnName+" = "+newValue+" WHERE ");
+        for(int index = 0; index < table.getNumberOfColumns(); index++){
+            if(index == columnIndex)
+                query.append(columnName).append(" = ").append(oldValue);
+            else {
+                String columnType = table.getColumnTypes().get(index);
+                if(columnType.equals("date") || columnType.equals("text") || columnType.substring(0,3).equals("var")){
+
+                    query.append(table.getColumnNames().get(index)).append(" = ").append("\"").append(table.getData().get(rowIndex).get(index)).append("\"");
+                }
+                else
+                    query.append(table.getColumnNames().get(index)).append(" = ").append(table.getData().get(rowIndex).get(index));
+            }
+            if(index < table.getNumberOfColumns()-1)
+                query.append(" AND ");
+        }
+        query.append(";");
+
+        System.out.println(query);
+        dbConnector.execute(String.valueOf(query));
+    }
+    public void undoChanges(String tableName, Table oldTable) throws SQLException{
+
+        Table actualTable = importTable(tableName);
+
+        Object oldValue, actualValue;
+
+        for(int rowIndex = 0 ; rowIndex < oldTable.getNumberOfRows(); rowIndex++)
+            for(int columnIndex = 0 ; columnIndex < oldTable.getNumberOfColumns(); columnIndex++){
+
+                oldValue = oldTable.getData().get(rowIndex).get(columnIndex);
+                actualValue = actualTable.getData().get(rowIndex).get(columnIndex);
+
+                if(!oldValue.equals(actualValue)){
+
+                    updateRow(tableName,rowIndex, columnIndex,actualValue,oldValue);
+                }
+            }
+
     }
     /*
     * dropTable method removes table from database using table name

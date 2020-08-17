@@ -9,16 +9,18 @@ public class Table {
     private String tableName;
     private int numberOfColumns;
     private int numberOfRows;
+    private int primaryKeyColumnIndex;
     private List<List<Object>> data;
     private List<String> columnNames;
     private List<String> columnTypes;
 
 
-    public Table(String tableName, int numberOfColumns, int numberOfRows, List<String> columnNames, List<String> columnTypes, List<List<Object>> data){
+    public Table(String tableName, int numberOfColumns, int numberOfRows, int primaryKeyColumnIndex, List<List<Object>> data, List<String> columnNames, List<String> columnTypes){
 
         this.tableName = tableName;
         this.numberOfColumns = numberOfColumns;
         this.numberOfRows = numberOfRows;
+        this.primaryKeyColumnIndex = primaryKeyColumnIndex;
         this.data = data;
         this.columnNames = columnNames;
         this.columnTypes = columnTypes;

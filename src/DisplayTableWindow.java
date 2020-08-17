@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +18,10 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
     private JTable displayedTable;
     private Object[][] tableData;
     private JScrollPane scrollPane;
+    private Object buffer;
 
-    public DisplayTableWindow(Model model, Table table){
-        this.table = table;
+    public DisplayTableWindow(Model model, String tableName){
+        this.table = model.importTable(tableName);
         this.model = model;
         tableData = new Object[table.getData().size()][table.getColumnNames().size()];
         initWindow();
@@ -33,6 +35,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
     @Override
     public void initWindow() {
+
 
         //------------------------------------DisplayedTable---------------------------------------------------
         scrollPane = new JScrollPane(displayedTable);
@@ -72,26 +75,33 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
             }
         }));
 
-        JButton saveButton = new JButton("Save");
-        saveButton.setEnabled(false);
-        saveButton.addActionListener(event->{
-            table.setData(saveTable());
-            saveButton.setEnabled(false);
-            removeRowButton.setEnabled(false);
-        });
+        JButton undoChangesButton = new JButton("Undo changes");
+        undoChangesButton.setEnabled(false);
+        undoChangesButton.addActionListener(event->new WarningWindow("Are you sure you want to undo changes?", subEvent->{
+            try{
+                model.undoChanges(table.getTableName(), table);
+                displayTable(table.getData());
+            }
+            catch (SQLException sqlException){
+                new WarningWindow(sqlException.getMessage(), null);
+            }
+        }));
 
 
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(event->dispose());
 
-        displayedTable.getModel().addTableModelListener(event -> saveButton.setEnabled(true));
         displayedTable.addMouseListener(new MouseListener() {
+
+
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                if(displayedTable.getSelectedRow() != -1)
+                if(displayedTable.getSelectedRow() != -1) {
                     removeRowButton.setEnabled(true);
-
+                    buffer = displayedTable.getValueAt(displayedTable.getSelectedRow(),displayedTable.getSelectedColumn());
+                    System.out.println("Bufor: "+buffer);
+                }
             }
 
             @Override
@@ -114,10 +124,28 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
             }
         });
+        displayedTable.getModel().addTableModelListener(event -> {
+
+            undoChangesButton.setEnabled(true);
+
+            int rowIndex = displayedTable.getSelectedRow();
+            int columnIndex = displayedTable.getSelectedColumn();
+
+            Object value = displayedTable.getValueAt(rowIndex, columnIndex);
+
+            if(!value.equals(buffer))
+                try{
+                    model.updateRow(table.getTableName(), rowIndex, columnIndex, buffer, value);
+                }
+                catch (SQLException sqlException){
+                    displayedTable.setValueAt(buffer, rowIndex, columnIndex);
+                    new WarningWindow(sqlException.getMessage(), null);
+                }
+        });
         subPanel.add(searchTableButton);
         subPanel.add(addRowButton);
         subPanel.add(removeRowButton);
-        subPanel.add(saveButton);
+        subPanel.add(undoChangesButton);
         subPanel.add(closeButton);
 
         Panel.add(subPanel);
@@ -174,6 +202,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
     * */
     public void displayTable(List<List<Object>> data){
 
+
         tableData = new Object[data.size()][table.getColumnNames().size()];
         for(int i = 0 ; i < data.size() ; i++)
             for(int j = 0 ; j < table.getNumberOfColumns() ; j++)
@@ -182,6 +211,5 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         displayedTable = new JTable(new DefaultTableModel(tableData,table.getColumnNames().toArray()));
         scrollPane.setViewportView(displayedTable);
-        //scrollPane = new JScrollPane(displayedTable);
     }
 }
