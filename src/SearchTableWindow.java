@@ -57,18 +57,12 @@ public class SearchTableWindow extends MyDialog{
             @Override
             public void insertUpdate(DocumentEvent e) {
 
-                if(!textField.getText().equals(""))
                     searchButton.setEnabled(true);
-                else
-                    searchButton.setEnabled(false);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-
-                if(!textField.getText().equals(""))
-                    searchButton.setEnabled(true);
-                else
+                if(textField.getText().equals("") && !descSortCheckBox.isSelected() && !ascSortCheckBox.isSelected())
                     searchButton.setEnabled(false);
             }
 
@@ -84,20 +78,33 @@ public class SearchTableWindow extends MyDialog{
         ascSortCheckBox.addActionListener(event-> {
 
             descSortCheckBox.setSelected(false);
+            searchButton.setEnabled(true);
+
             if(ascSortCheckBox.isSelected())
                 columnComboBox.setEnabled(true);
-            else if(!ascSortCheckBox.isSelected() && !descSortCheckBox.isSelected())
+
+            else if(!ascSortCheckBox.isSelected() && !descSortCheckBox.isSelected()) {
                 columnComboBox.setEnabled(false);
+
+                if(textField.getText().equals(""))
+                    searchButton.setEnabled(false);
+            }
         });
 
         descSortCheckBox.addActionListener(event->{
 
             ascSortCheckBox.setSelected(false);
+            searchButton.setEnabled(true);
 
             if(descSortCheckBox.isSelected())
                 columnComboBox.setEnabled(true);
-            else if(!ascSortCheckBox.isSelected() && !descSortCheckBox.isSelected())
+
+            else if(!ascSortCheckBox.isSelected() && !descSortCheckBox.isSelected()) {
                 columnComboBox.setEnabled(false);
+
+                if(textField.getText().equals(""))
+                    searchButton.setEnabled(false);
+            }
         });
 
         //------------------------------------SortByLabel---------------------------------------------------

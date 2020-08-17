@@ -42,6 +42,7 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
             new WarningWindow("Remove table "+tableName+"?",subEvent->{
                 model.removeTableFromList(tableName);
+                model.dropTable(tableName);
                 mainWindow.removeTableFromJList(tableIndex);
                 setButtons(false);
             }

@@ -22,9 +22,9 @@ public class Model {
     }
     /*
     * Creates new instance of DatabaseConnector(connects with database)
-    * @param host
-    * @param username
-    * @param password
+    * @param String databaseName
+    * @param String username
+    * @param String password
     * */
     public Model(String databaseName, String username, String password) throws SQLException {
 
@@ -49,7 +49,7 @@ public class Model {
                     query.append(" int");
                 }
                 else if(table.getColumnTypes().get(helpIndex).equals(String.valueOf(String.class))){
-                    query.append(" varchar(20)");
+                    query.append(" varchar");
                 }
 
                 else if(table.getColumnTypes().get(helpIndex).equals(String.valueOf(Float.class))){
@@ -72,6 +72,8 @@ public class Model {
     }
     /*
     * Adds new table object to tables List.
+    *
+    * @param Table table
     * */
     public void addTableToList(Table table){
         tables.add(table);
@@ -80,7 +82,7 @@ public class Model {
     /*
     * Removes table from tables List using table's name.
     *
-    * @param tableName
+    * @param String tableName
     * */
     public void removeTableFromList(String tableName){
 
@@ -88,17 +90,9 @@ public class Model {
     }
 
     /*
-    * Prints table structure
-    * */
-    public void showTables(){
-        for(Table table : tables){
-            System.out.println(table);
-        }
-    }
-    /*
     * generateRandomCondition method generates random condition using random column and random cell value in that column.
     *
-    * @param table
+    * @param Table table
     * */
     public String generateRandomCondition(Table table){
 
@@ -110,7 +104,7 @@ public class Model {
         String[] operators = new String[]{"=", "!=", ">", "<", "<=",">="};
         String cellData;
         String columnType = table.getColumnTypes().get(randomColumnIndex);
-        if(columnType.equals("varchar(30)") || columnType.equals("date")) {
+        if(columnType.equals("date") || columnType.substring(0,7).equals("varchar")) {
 
             randomOperatorIndex = random.nextInt(2);
             cellData = "\""+table.getData().get(randomRowIndex).get(randomColumnIndex)+"\"";
@@ -126,8 +120,8 @@ public class Model {
     /*
     * Returns table object using table name.
     *
-    * @param tableName
-    * @returns table
+    * @param String tableName
+    * @returns Table table
     * */
     public Table getTable(String tableName) {
 
@@ -155,8 +149,8 @@ public class Model {
     /*
     * Imports all table parameters.
     *
-    * @param tableName
-    * @returns new Table object
+    * @param String tableName
+    * @returns new Table
     * */
     public Table importTable(String tableName) {
         ResultSet rs;
@@ -200,30 +194,46 @@ public class Model {
 
         return new Table(tableName, numberOfColumns,numberOfRows,columnNames, columnTypes, data);
     }
+    /*
+    * DeleteRow method removes selected row using sql query.
+    *
+    * @param String tableName
+    * @param int rowIndex
+    * */
     public void deleteRow(String tableName, int rowIndex){
 
         StringBuilder condition = new StringBuilder();
         Table table = getTable(tableName);
+        Object value;
+        String type;
+
         for(int index = 0; index < table.getNumberOfColumns(); index++){
-            condition.append(table.getColumnNames().get(index)).append(" = ").append(table.getData().get(rowIndex).get(index));
+
+            type = table.getColumnTypes().get(index);
+            value = table.getData().get(rowIndex).get(index);
+            System.out.println("type == "+type);
+            if(type.equals("date") || type.substring(0,7).equals("varchar"))
+                value = "\""+value+"\"";
+
+            condition.append(table.getColumnNames().get(index)).append(" = ").append(value);
             if(index < table.getNumberOfColumns()-1)
                 condition.append(" AND ");
         }
 
         table.getData().remove(rowIndex);
         table.numberOfRowsDeincrement();
-        System.out.println(condition);
-        /*try{
-            dbConnector.execute("DELETE FROM"+tableName+" WHERE "+condition+";");
+
+        try{
+            dbConnector.execute("DELETE FROM "+tableName+" WHERE "+condition+";");
         }
         catch (SQLException sqlException){
             System.out.println("Blad przy usuwaniu wiersza");
-        }*/
+        }
     }
     /*
     * dropTable method removes table from database using table name
     *
-    * @param tableName
+    * @param String tableName
     * */
     public void dropTable(String tableName){
 
@@ -241,10 +251,10 @@ public class Model {
     * Search table method returns a new table containing all rows that met the conditions specified as an argument.
     * It uses sql command SELECT * FROM tablename WHERE condition
     *
-    * @param tableName
-    * @param condition
-    * @param sorted ("ASC"/"DESC"/null)
-    * @param columnName - table would be sorted using column with that name
+    * @param String tableName
+    * @param String condition
+    * @param String sorted ("ASC"/"DESC"/null)
+    * @param String columnName - table would be sorted using column with that name
     *
     * @return data (multidimensional ArrayList)
     * */

@@ -58,16 +58,19 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         JButton removeRowButton = new JButton("Remove row");
         removeRowButton.setEnabled(false);
-        removeRowButton.addActionListener(event->{
+        removeRowButton.addActionListener(event->new WarningWindow("Remove row?",subEvent->{
+
             try {
+
+                model.deleteRow(table.getTableName(), displayedTable.getSelectedRow());
                 ((DefaultTableModel) displayedTable.getModel()).removeRow(displayedTable.getSelectedRow());
-                table.numberOfRowsDeincrement();
+
                 removeRowButton.setEnabled(false);
             }
             catch(ArrayIndexOutOfBoundsException exception){
                 new WarningWindow("No row selected",null);
             }
-        });
+        }));
 
         JButton saveButton = new JButton("Save");
         saveButton.setEnabled(false);
