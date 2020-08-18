@@ -104,7 +104,7 @@ public class Model {
         String[] operators = new String[]{"=", "!=", ">", "<", "<=",">="};
         String cellData;
         String columnType = table.getColumnTypes().get(randomColumnIndex);
-        if(columnType.equals("date") || columnType.equals("text") || columnType.substring(0,3).equals("var")) {
+        if(columnType.equals("text") || columnType.substring(0,4).equals("date") || columnType.substring(0,3).equals("var") || columnType.substring(0,4).equals("enum")) {
 
             randomOperatorIndex = random.nextInt(2);
             cellData = "\""+table.getData().get(randomRowIndex).get(randomColumnIndex)+"\"";
@@ -203,7 +203,7 @@ public class Model {
     * @param String tableName
     * @param int rowIndex
     * */
-    public void deleteRow(String tableName, int rowIndex){
+    public void deleteRow(String tableName, int rowIndex) throws SQLException {
 
         StringBuilder condition = new StringBuilder();
         Table table = getTable(tableName);
@@ -214,7 +214,7 @@ public class Model {
 
             type = table.getColumnTypes().get(index);
             value = table.getData().get(rowIndex).get(index);
-            if(type.equals("date") || type.equals("text")  || type.substring(0,3).equals("var"))
+            if(type.equals("text")  || type.substring(0,4).equals("date") || type.substring(0,3).equals("var") || type.substring(0,4).equals("enum"))
                 value = "\""+value+"\"";
 
             condition.append(table.getColumnNames().get(index)).append(" = ").append(value);
@@ -225,12 +225,7 @@ public class Model {
         table.getData().remove(rowIndex);
         table.numberOfRowsDeincrement();
         String query = "DELETE FROM "+tableName+" WHERE "+condition+";";
-        try{
-            dbConnector.execute(query);
-        }
-        catch (SQLException sqlException){
-            System.out.println("Blad przy usuwaniu wiersza");
-        }
+        dbConnector.execute(query);
     }
     public void updateRow(String tableName, int rowIndex, int columnIndex, Object oldValue, Object newValue) throws SQLException{
 
@@ -238,7 +233,7 @@ public class Model {
         String type = table.getColumnTypes().get(columnIndex);
         String columnName = table.getColumnNames().get(columnIndex);
 
-        if(type.equals("date") || type.equals("text")  || type.substring(0,3).equals("var")){
+        if(type.equals("text") || type.substring(0,4).equals("date")  || type.substring(0,3).equals("var") || type.substring(0,4).equals("enum")){
             newValue = "\""+newValue+"\"";
             oldValue = "\""+oldValue+"\"";
         }
@@ -249,7 +244,7 @@ public class Model {
                 query.append(columnName).append(" = ").append(oldValue);
             else {
                 String columnType = table.getColumnTypes().get(index);
-                if(columnType.equals("date") || columnType.equals("text") || columnType.substring(0,3).equals("var")){
+                if(columnType.equals("text")|| type.substring(0,4).equals("date") || columnType.substring(0,3).equals("var") || columnType.substring(0,4).equals("enum")){
 
                     query.append(table.getColumnNames().get(index)).append(" = ").append("\"").append(table.getData().get(rowIndex).get(index)).append("\"");
                 }
@@ -261,11 +256,10 @@ public class Model {
         }
         query.append(";");
 
-        System.out.println(query);
         dbConnector.execute(String.valueOf(query));
     }
     public void undoChanges(String tableName, Table oldTable) throws SQLException{
-
+    // UPDATE users INNER JOIN  new_table ON users.id = new_table.id SET users.firstname = new_table.firstname where users.firstname!=new_table.firstname;
         Table actualTable = importTable(tableName);
 
         Object oldValue, actualValue;
@@ -282,6 +276,48 @@ public class Model {
                 }
             }
 
+    }
+    public void copyTable(String tableName){
+        String copyTableName = tableName+"_cpy";
+        String query_1 = "CREATE TABLE IF NOT EXISTS "+copyTableName+" LIKE "+tableName+";";
+        String query_2 =  "INSERT INTO "+copyTableName+" SELECT * FROM "+tableName+";";
+        try{
+            dbConnector.execute(query_1);
+            dbConnector.execute(query_2);
+
+        }catch (SQLException sqlException){
+            System.out.println(sqlException.getMessage());
+        }
+    }
+    public void dropCopiedTable(String tableName){
+        String query = "DROP TABLE IF EXISTS "+tableName+"_cpy;";
+        try{
+            dbConnector.execute(query);
+        }catch(SQLException sqlException){
+            System.out.println(sqlException.getMessage());
+        }
+    }
+    public void undoChanges_2(String tableName){
+
+        String query;
+        Table table = getTable(tableName);
+        String copiedTableName=tableName+"_cpy";
+        String primaryKey = table.getColumnNames().get(table.getPrimaryKeyColumnIndex());
+        String columnName;
+        for(int i = 0; i < table.getNumberOfColumns(); i++){
+            columnName = table.getColumnNames().get(i);
+            if(i!=table.getPrimaryKeyColumnIndex()){
+
+                query= "UPDATE "+tableName+" INNER JOIN "+copiedTableName+" ON "+tableName+"."+primaryKey+
+                        " = "+copiedTableName+"."+primaryKey+" SET "+tableName+"."+columnName+" = "+copiedTableName+"."+
+                        columnName+" where "+tableName+"."+columnName+"!="+copiedTableName+"."+columnName+";";
+                try {
+                    dbConnector.execute(query);
+                } catch (SQLException sqlException) {
+                    System.out.println(sqlException.getMessage());
+                }
+            }
+        }
     }
     /*
     * dropTable method removes table from database using table name

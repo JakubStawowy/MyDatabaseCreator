@@ -42,6 +42,7 @@ public class Table {
         return numberOfRows;
     }
 
+    public int getPrimaryKeyColumnIndex(){ return primaryKeyColumnIndex; }
     public List<String> getColumnNames() {
         return columnNames;
     }

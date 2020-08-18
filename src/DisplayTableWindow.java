@@ -4,9 +4,11 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.event.*;
 
 /*
 * DisplayTableWindow class is used to display all table data.
@@ -22,6 +24,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
     public DisplayTableWindow(Model model, String tableName){
         this.table = model.importTable(tableName);
+        model.copyTable(table.getTableName());
         this.model = model;
         tableData = new Object[table.getData().size()][table.getColumnNames().size()];
         initWindow();
@@ -29,8 +32,17 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         setTitle(table.getTableName());
         setLayout(new GridLayout(2,1));
         setPreferredSize(new Dimension(600,450));
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                model.dropCopiedTable(table.getTableName());
+            }
+        });
         setVisible(true);
         pack();
+
+
     }
 
     @Override
@@ -60,7 +72,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         });
 
         JButton removeRowButton = new JButton("Remove row");
-        removeRowButton.setEnabled(false);
+        removeRowButton.setEnabled(true);
         removeRowButton.addActionListener(event->new WarningWindow("Remove row?",subEvent->{
 
             try {
@@ -68,80 +80,33 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
                 model.deleteRow(table.getTableName(), displayedTable.getSelectedRow());
                 ((DefaultTableModel) displayedTable.getModel()).removeRow(displayedTable.getSelectedRow());
 
-                removeRowButton.setEnabled(false);
-            }
-            catch(ArrayIndexOutOfBoundsException exception){
+                removeRowButton.setEnabled(true);
+            } catch(IndexOutOfBoundsException exception){
                 new WarningWindow("No row selected",null);
+                System.out.println(exception.getMessage());
+            } catch (SQLException sqlException){
+                new WarningWindow(sqlException.getMessage(),null);
+                System.out.println(sqlException.getMessage());
             }
         }));
 
         JButton undoChangesButton = new JButton("Undo changes");
-        undoChangesButton.setEnabled(false);
+        undoChangesButton.setEnabled(true);
         undoChangesButton.addActionListener(event->new WarningWindow("Are you sure you want to undo changes?", subEvent->{
-            try{
-                model.undoChanges(table.getTableName(), table);
+
+                //model.undoChanges(table.getTableName(), table);
+                model.undoChanges_2(table.getTableName());
                 displayTable(table.getData());
-            }
-            catch (SQLException sqlException){
-                new WarningWindow(sqlException.getMessage(), null);
-            }
         }));
 
 
         JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(event->dispose());
-
-        displayedTable.addMouseListener(new MouseListener() {
-
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-                if(displayedTable.getSelectedRow() != -1) {
-                    removeRowButton.setEnabled(true);
-                    buffer = displayedTable.getValueAt(displayedTable.getSelectedRow(),displayedTable.getSelectedColumn());
-                    System.out.println("Bufor: "+buffer);
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
+        closeButton.addActionListener(event->{
+            model.dropCopiedTable(table.getTableName());
+            dispose();
         });
-        displayedTable.getModel().addTableModelListener(event -> {
 
-            undoChangesButton.setEnabled(true);
 
-            int rowIndex = displayedTable.getSelectedRow();
-            int columnIndex = displayedTable.getSelectedColumn();
-
-            Object value = displayedTable.getValueAt(rowIndex, columnIndex);
-
-            if(!value.equals(buffer))
-                try{
-                    model.updateRow(table.getTableName(), rowIndex, columnIndex, buffer, value);
-                }
-                catch (SQLException sqlException){
-                    displayedTable.setValueAt(buffer, rowIndex, columnIndex);
-                    new WarningWindow(sqlException.getMessage(), null);
-                }
-        });
         subPanel.add(searchTableButton);
         subPanel.add(addRowButton);
         subPanel.add(removeRowButton);
@@ -210,6 +175,54 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
 
         displayedTable = new JTable(new DefaultTableModel(tableData,table.getColumnNames().toArray()));
+        displayedTable.addMouseListener(new MouseListener() {
+
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                if(displayedTable.getSelectedRow() != -1) {
+                    //removeRowButton.setEnabled(true);
+                    buffer = displayedTable.getValueAt(displayedTable.getSelectedRow(),displayedTable.getSelectedColumn());
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+        displayedTable.getModel().addTableModelListener(event -> {
+
+            int rowIndex = displayedTable.getSelectedRow();
+            int columnIndex = displayedTable.getSelectedColumn();
+
+            Object value = displayedTable.getValueAt(rowIndex, columnIndex);
+
+            if(!value.equals(buffer))
+                try{
+                    model.updateRow(table.getTableName(), rowIndex, columnIndex, buffer, value);
+                }
+                catch (SQLException sqlException){
+                    displayedTable.setValueAt(buffer, rowIndex, columnIndex);
+                    new WarningWindow(sqlException.getMessage(), null);
+                }
+        });
         scrollPane.setViewportView(displayedTable);
     }
 }
