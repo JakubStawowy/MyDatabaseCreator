@@ -88,4 +88,7 @@ public class Table {
             this.data = data;
             numberOfRows = data.size();
     }
+    public void removeRow(int index){
+        data.remove(index);
+    }
 }

@@ -45,7 +45,7 @@ public class MainWindowButtons extends JPanel implements MyWindow {
                 model.dropTable(tableName);
                 mainWindow.removeTableFromJList(tableIndex);
                 setButtons(false);
-            }
+            }, null
             );
         },false);
         createTableButton = addButton(0,0,0,0,"Create new table",event->{

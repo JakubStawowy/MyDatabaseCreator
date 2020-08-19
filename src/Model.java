@@ -13,8 +13,12 @@ public class Model {
 
     private List<Table> tables = new LinkedList<>();
     private List<String> tableNames = new LinkedList<>();
+    private final String[] numericTypes = {"bit", "tinyint", "smallint","mediumint", "bigint",
+            "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"};
     private DatabaseConnector dbConnector;
     private String databaseName;
+    private String username;
+    private String password;
 
     public List<String> getTableNames(){
 
@@ -30,6 +34,8 @@ public class Model {
 
         dbConnector = new DatabaseConnector(databaseName, username, password);
         this.databaseName = databaseName;
+        this.username = username;
+        this.password = password;
     }
 
     /*
@@ -104,7 +110,7 @@ public class Model {
         String[] operators = new String[]{"=", "!=", ">", "<", "<=",">="};
         String cellData;
         String columnType = table.getColumnTypes().get(randomColumnIndex);
-        if(columnType.equals("text") || columnType.substring(0,4).equals("date") || columnType.substring(0,3).equals("var") || columnType.substring(0,4).equals("enum")) {
+        if(!isNumeric(columnType)) {
 
             randomOperatorIndex = random.nextInt(2);
             cellData = "\""+table.getData().get(randomRowIndex).get(randomColumnIndex)+"\"";
@@ -214,7 +220,7 @@ public class Model {
 
             type = table.getColumnTypes().get(index);
             value = table.getData().get(rowIndex).get(index);
-            if(type.equals("text")  || type.substring(0,4).equals("date") || type.substring(0,3).equals("var") || type.substring(0,4).equals("enum"))
+            if(!isNumeric(type))
                 value = "\""+value+"\"";
 
             condition.append(table.getColumnNames().get(index)).append(" = ").append(value);
@@ -227,13 +233,25 @@ public class Model {
         String query = "DELETE FROM "+tableName+" WHERE "+condition+";";
         dbConnector.execute(query);
     }
-    public void updateRow(String tableName, int rowIndex, int columnIndex, Object oldValue, Object newValue) throws SQLException{
+    /*
+    * updateRow method is used to update row in a given table.
+    * It uses SQL DML Language (UPDATE)
+    *
+    * @param String tableName
+    * @param List<List<Object>> newData (table data after editing)
+    * @param int rowIndex (selected row index)
+    * @param int columnIndex (selected column index)
+    * @param Object oldValue
+    * @param Object newValue
+    * @throws SQLException
+    * */
+    public void updateRow(String tableName, List<List<Object>> newData, int rowIndex, int columnIndex, Object oldValue, Object newValue) throws SQLException{
 
         Table table = getTable(tableName);
         String type = table.getColumnTypes().get(columnIndex);
         String columnName = table.getColumnNames().get(columnIndex);
 
-        if(type.equals("text") || type.substring(0,4).equals("date")  || type.substring(0,3).equals("var") || type.substring(0,4).equals("enum")){
+        if(!isNumeric(type)){
             newValue = "\""+newValue+"\"";
             oldValue = "\""+oldValue+"\"";
         }
@@ -244,39 +262,25 @@ public class Model {
                 query.append(columnName).append(" = ").append(oldValue);
             else {
                 String columnType = table.getColumnTypes().get(index);
-                if(columnType.equals("text")|| type.substring(0,4).equals("date") || columnType.substring(0,3).equals("var") || columnType.substring(0,4).equals("enum")){
+                if(!isNumeric(columnType)){
 
-                    query.append(table.getColumnNames().get(index)).append(" = ").append("\"").append(table.getData().get(rowIndex).get(index)).append("\"");
+                    query.append(table.getColumnNames().get(index)).append(" = ").append("\"").append(newData.get(rowIndex).get(index)).append("\"");
                 }
                 else
-                    query.append(table.getColumnNames().get(index)).append(" = ").append(table.getData().get(rowIndex).get(index));
+                    query.append(table.getColumnNames().get(index)).append(" = ").append(newData.get(rowIndex).get(index));
             }
             if(index < table.getNumberOfColumns()-1)
                 query.append(" AND ");
         }
         query.append(";");
-
+        System.out.println(query);
         dbConnector.execute(String.valueOf(query));
     }
-    public void undoChanges(String tableName, Table oldTable) throws SQLException{
-    // UPDATE users INNER JOIN  new_table ON users.id = new_table.id SET users.firstname = new_table.firstname where users.firstname!=new_table.firstname;
-        Table actualTable = importTable(tableName);
-
-        Object oldValue, actualValue;
-
-        for(int rowIndex = 0 ; rowIndex < oldTable.getNumberOfRows(); rowIndex++)
-            for(int columnIndex = 0 ; columnIndex < oldTable.getNumberOfColumns(); columnIndex++){
-
-                oldValue = oldTable.getData().get(rowIndex).get(columnIndex);
-                actualValue = actualTable.getData().get(rowIndex).get(columnIndex);
-
-                if(!oldValue.equals(actualValue)){
-
-                    updateRow(tableName,rowIndex, columnIndex,actualValue,oldValue);
-                }
-            }
-
-    }
+    /*
+    * copyTable method is used to create buffer table before editing original table
+    *
+    * @param String tableName
+    * */
     public void copyTable(String tableName){
         String copyTableName = tableName+"_cpy";
         String query_1 = "CREATE TABLE IF NOT EXISTS "+copyTableName+" LIKE "+tableName+";";
@@ -289,6 +293,11 @@ public class Model {
             System.out.println(sqlException.getMessage());
         }
     }
+    /*
+    * dropCopiedTable method is used to drop buffer table created before editing table.
+    *
+    * @param String tableName
+    * */
     public void dropCopiedTable(String tableName){
         String query = "DROP TABLE IF EXISTS "+tableName+"_cpy;";
         try{
@@ -297,7 +306,14 @@ public class Model {
             System.out.println(sqlException.getMessage());
         }
     }
-    public void undoChanges_2(String tableName){
+    /*
+    * undoChanges method is used to restore table to its original state.
+    * It requires table to have a primary key.
+    * It uses SQL DML Language (UPDATE, INSERT)
+    *
+    *@param String tableName
+    * */
+    public void undoChanges(String tableName){
 
         String query;
         Table table = getTable(tableName);
@@ -316,6 +332,12 @@ public class Model {
                 } catch (SQLException sqlException) {
                     System.out.println(sqlException.getMessage());
                 }
+            }
+            query = "INSERT INTO "+tableName+" SELECT * FROM "+copiedTableName+" EXCEPT SELECT * FROM "+tableName+";";
+            try {
+                dbConnector.execute(query);
+            } catch (SQLException sqlException) {
+                System.out.println(sqlException.getMessage());
             }
         }
     }
@@ -387,7 +409,32 @@ public class Model {
 
         return data;
     }
+    /*
+    * isNumeric method is used to check if given type is numeric or no.
+    *
+    * @param String type
+    * @return Boolean
+    * */
+    public Boolean isNumeric(String type) {
 
+        type = type.toLowerCase();
+        for (String types : numericTypes) {
+            if(type.length()>=types.length() && types.equals(type.substring(0,types.length())))
+                return true;
+            else if(type.length()<types.length() && (type.equals(types.substring(0,type.length()))))
+                return true;
+        }
+        return false;
+    }
+
+    /*
+    * getLoginData method is used to reconnect database with the same database name, username and password
+    *
+    * @return String[] LoginData
+    * */
+    public String[] getLoginData(){
+        return new String[]{databaseName, username, password};
+    }
     /*
     * Closes connection with database.
     * */

@@ -8,12 +8,14 @@ import java.awt.event.ActionListener;
 public class WarningWindow extends MyDialog{
 
     private ActionListener action;
+    private ActionListener finalAction;
     private String text;
 
-    public WarningWindow(String text, ActionListener action){
+    public WarningWindow(String text, ActionListener action, ActionListener finalAction){
 
         this.text = text;
         this.action = action;
+        this.finalAction = finalAction;
 
         setSize(340,120);
         setTitle("Warning");
@@ -38,10 +40,14 @@ public class WarningWindow extends MyDialog{
 
             yesButton.addActionListener(action);
             yesButton.addActionListener(event -> dispose());
+            yesButton.addActionListener(finalAction);
 
             JButton noButton = new JButton("No");
             noButton.setBounds(190, 0, 80, 20);
             noButton.addActionListener(event -> dispose());
+
+            if(finalAction!=null)
+                noButton.addActionListener(finalAction);
 
             subPanel.add(yesButton);
             subPanel.add(noButton);
@@ -51,6 +57,8 @@ public class WarningWindow extends MyDialog{
             JButton okButton = new JButton("Ok");
             okButton.setBounds(65,25,80,20);
             okButton.addActionListener(event->dispose());
+            if(finalAction!=null)
+                okButton.addActionListener(finalAction);
             subPanel.add(okButton);
         }
 

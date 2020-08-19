@@ -40,7 +40,7 @@ public class MainWindow extends JFrame implements MyWindow{
                         sqlException.printStackTrace();
                     }
                     System.exit(0);
-                });
+                }, null);
             }
         });
     }
@@ -51,6 +51,40 @@ public class MainWindow extends JFrame implements MyWindow{
         //------------------------------------MenuBar---------------------------------------------------
         JMenu menu = new JMenu("menu");
         JMenuBar menuBar = new JMenuBar();
+
+        JMenu newItem = new JMenu("New");
+
+        JMenuItem newConnectionItem = new JMenuItem("Connection");
+        newConnectionItem.addActionListener(event->
+                        new WarningWindow("Close current connection?", subEvent -> {
+                            try {
+                                model.closeConnection();
+                            } catch (SQLException sqlException) {
+                                sqlException.getMessage();
+                            }
+                            dispose();
+                        }, finalAction->new ConnectWindow(null))
+        );
+
+        JMenuItem reconnectItem = new JMenuItem("Reconnect");
+        reconnectItem.addActionListener(event->
+            new WarningWindow("Reconnect?", subEvent->{
+                String[] loginData = model.getLoginData();
+                try {
+                    model.closeConnection();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    model = new Model(loginData[0], loginData[1], loginData[2]);
+                    model.importDatabase();
+                    new MainWindow(model);
+                    dispose();
+                } catch (SQLException ignored) {
+                    new WarningWindow("Reconnecting failed", null, null);
+                }
+            }, null)
+        );
         JMenuItem closeConnectionItem = new JMenuItem("Close connection");
         closeConnectionItem.addActionListener(event->
             new WarningWindow("Are you sure you want to close connection?",subEvent->{
@@ -61,7 +95,7 @@ public class MainWindow extends JFrame implements MyWindow{
                 }
                 dispose();
                 new StartingWindow();
-            }));
+            }, null));
 
         JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(event->
@@ -73,7 +107,10 @@ public class MainWindow extends JFrame implements MyWindow{
                     e.printStackTrace();
                 }
                 System.exit(0);
-            }));
+            }, null));
+        newItem.add(newConnectionItem);
+        menu.add(newItem);
+        menu.add(reconnectItem);
         menu.add(closeConnectionItem);
         menu.add(exitItem);
         menuBar.add(menu);

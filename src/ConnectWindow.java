@@ -49,7 +49,7 @@ public class ConnectWindow extends MyDialog{
         hidePasswordCheckBox.setBounds(185,100,125,10);
         add(hidePasswordCheckBox);
 
-        addButton(185, 120, 125, 20, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose()), true);
+        addButton(185, 120, 125, 20, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true);
         addButton(20, 120, 125, 20, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())),true);
 
         addLabel(20,15,100,20,"Database name:");
@@ -70,12 +70,13 @@ public class ConnectWindow extends MyDialog{
             Model model = new Model(databaseName, username, password);
             model.importDatabase();
             new MainWindow(model);
-            startingWindow.dispose();
+            if(startingWindow!=null)
+                startingWindow.dispose();
             dispose();
 
-        } catch (SQLException e) {
-            new WarningWindow("Connecting failed. Do you want to try again?", event1 ->
-                connect(databaseName, username, password));
+        } catch (SQLException ignored) {
+            new WarningWindow("Connecting failed. Do you want to try again?", event ->
+                connect(databaseName, username, password), null);
 
         }
     }
