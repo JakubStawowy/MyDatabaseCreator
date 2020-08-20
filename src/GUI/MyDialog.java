@@ -1,8 +1,11 @@
+package GUI;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 /*
-* Abstract Class MyDialog
+* Abstract Class GUI.MyDialog
 * */
 abstract class MyDialog extends JDialog implements MyWindow{
 
@@ -12,6 +15,9 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * */
     @Override
     public abstract void initWindow();
+
+    @Override
+    public abstract void displayTable(List<List<Object>> data);
 
     /*
     * addButton method allows to add new button to subclass window.
@@ -25,13 +31,13 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @param actionListener - action executed after clicking on the button
     * */
     @Override
-    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable){
+    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel){
 
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setBounds(x,y,width,height);
         button.setEnabled(buttonEnable);
-        add(button);
+        panel.add(button);
 
         return button;
     }
@@ -48,11 +54,11 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @return textField
     * */
     @Override
-    public JTextField addTextField(int x, int y, int width, int height, String text) {
+    public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
 
         JTextField textField = new JTextField(text);
         textField.setBounds(x,y,width,height);
-        add(textField);
+        panel.add(textField);
 
         return textField;
     }
@@ -68,10 +74,10 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @param text - text displayed on the button
     * */
     @Override
-    public JLabel addLabel(int x, int y, int width, int height, String text) {
+    public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
         JLabel label = new JLabel(text);
         label.setBounds(x,y,width,height);
-        add(label);
+        panel.add(label);
         return label;
     }
 }

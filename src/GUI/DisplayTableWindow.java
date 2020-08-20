@@ -1,3 +1,7 @@
+package GUI;
+import Logic.Model;
+import Logic.Table;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -27,14 +31,15 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         this.table = model.importTable(tableName);
         tablecopy = model.importTable(tableName);
-        model.copyTable(table.getTableName()); //Table copy is made in case of restoration table to its original form
+        model.copyTable(table.getTableName()); //Logic.Table copy is made in case of restoration table to its original form
 
         this.model = model;
         tableData = new Object[table.getData().size()][table.getColumnNames().size()];
         initWindow();
+
         setLocation(new Point(300,200));
         setTitle(table.getTableName());
-        setLayout(new GridLayout(2,1));
+
         setPreferredSize(new Dimension(600,450));
 
         addWindowListener(new WindowAdapter() {
@@ -51,16 +56,16 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
     @Override
     public void initWindow() {
-
+        JPanel mainPanel = new JPanel(new GridLayout(2,1));
 
         //------------------------------------DisplayedTable---------------------------------------------------
         scrollPane = new JScrollPane(displayedTable);
         displayTable(table.getData());
 
-        add(scrollPane);
+        mainPanel.add(scrollPane);
 
         //------------------------------------ButtonsPanel---------------------------------------------------
-        JPanel Panel = new JPanel(null);
+        JPanel panel = new JPanel(null);
         JPanel subPanel = new JPanel(new GridLayout(3,2,20,20));
         subPanel.setBounds(10,10,565,185);
 
@@ -70,12 +75,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         //------------------------------------AddRowButton---------------------------------------------------
         JButton addRowButton = new JButton("Add row");
-        addRowButton.addActionListener(event->{
-
-            ((DefaultTableModel) displayedTable.getModel()).addRow(new Object[][]{});
-            Rectangle rect = displayedTable.getCellRect(displayedTable.getRowCount(),0,true);
-            displayedTable.scrollRectToVisible(rect);
-        });
+        addRowButton.addActionListener(event->new AddRowWindow(table.getColumnNames()));
 
         //------------------------------------RemoveRowButton---------------------------------------------------
         JButton removeRowButton = new JButton("Remove row");
@@ -125,22 +125,23 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         subPanel.add(undoChangesButton);
         subPanel.add(closeButton);
 
-        Panel.add(subPanel);
-        add(Panel);
+        panel.add(subPanel);
+        mainPanel.add(panel);
+        add(mainPanel);
     }
 
     @Override
-    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable) {
+    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel) {
         return null;
     }
 
     @Override
-    public JTextField addTextField(int x, int y, int width, int height, String text) {
+    public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
         return null;
     }
 
     @Override
-    public JLabel addLabel(int x, int y, int width, int height, String text) {
+    public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
         return null;
     }
 
@@ -234,7 +235,10 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
                 }
                 catch (SQLException sqlException){
-                    displayedTable.setValueAt(buffer, rowIndex, columnIndex);
+                    System.out.println("ROW INDEX: "+rowIndex);
+                    System.out.println("Column INDEX: "+columnIndex);
+                    //displayedTable.setValueAt(buffer, rowIndex, columnIndex);
+
                     new WarningWindow(sqlException.getMessage(), null, null);
                     System.out.println(sqlException.getMessage());
                 }

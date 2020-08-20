@@ -1,7 +1,12 @@
+package GUI;
+
+import Logic.Table;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.util.List;
 
 /*
 * SearchTableWindow class
@@ -16,7 +21,6 @@ public class SearchTableWindow extends MyDialog{
 
         setPreferredSize(new Dimension(500,100));
         setTitle("Search table "+displayTableWindow.getTable().getTableName());
-        setLayout(new GridLayout(2,3));
         initWindow();
         setLocationRelativeTo(null);
         pack();
@@ -25,15 +29,16 @@ public class SearchTableWindow extends MyDialog{
     @Override
     public void initWindow() {
 
+        JPanel mainPanel = new JPanel(new GridLayout(2,3));
         JButton searchButton;
 
         //------------------------------------ConditionLabel---------------------------------------------------
-        JLabel conditionLabel = addLabel(0,0,0,0,"Condition:");
+        JLabel conditionLabel = addLabel(0,0,0,0,"Condition:", mainPanel);
         conditionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 
         //------------------------------------Textfield---------------------------------------------------
-        JTextField textField = addTextField(0,0,0,0,"");
+        JTextField textField = addTextField(0,0,0,0,"", mainPanel);
 
         //------------------------------------ColumnComboBox---------------------------------------------------
         JComboBox<String> columnComboBox = new JComboBox<>();
@@ -46,10 +51,10 @@ public class SearchTableWindow extends MyDialog{
         addButton(0,0,0,0,"Random condition",event->{
             Table table = displayTableWindow.getTable();
             textField.setText(displayTableWindow.getModel().generateRandomCondition(table));
-        },true);
+        },true, mainPanel);
 
         //------------------------------------SearchButton---------------------------------------------------
-        searchButton = addButton(0,0,0,0,"Search",event->search(textField.getText(), (String) columnComboBox.getSelectedItem()),true);
+        searchButton = addButton(0,0,0,0,"Search",event->search(textField.getText(), (String) columnComboBox.getSelectedItem()),true, mainPanel);
         searchButton.setEnabled(false);
 
         //------------------------------------TextFieldDocumentListener---------------------------------------------------
@@ -108,14 +113,20 @@ public class SearchTableWindow extends MyDialog{
         });
 
         //------------------------------------SortByLabel---------------------------------------------------
-        JLabel columnLabel = addLabel(0,0,0,0,"Sort by:");
+        JLabel columnLabel = addLabel(0,0,0,0,"Sort by:", mainPanel);
         columnLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        add(columnComboBox);
-        add(ascSortCheckBox);
-        add(descSortCheckBox);
+        mainPanel.add(columnComboBox);
+        mainPanel.add(ascSortCheckBox);
+        mainPanel.add(descSortCheckBox);
+        add(mainPanel);
 
         }
+
+    @Override
+    public void displayTable(List<List<Object>> data) {
+
+    }
 
     public void search(String condition, String columnName){
         if(ascSortCheckBox.isSelected())

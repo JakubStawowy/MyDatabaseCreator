@@ -1,3 +1,6 @@
+package GUI;
+import Logic.Model;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -20,10 +23,10 @@ public class MainWindow extends JFrame implements MyWindow{
 
         this.model = model;
 
-        setSize(800,600);
+        //setSize(800,600);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setTitle("MyDatabaseCreator");
         initWindow();
-        setLayout(new GridLayout(1,4,0,100));
         setVisible(true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -48,6 +51,7 @@ public class MainWindow extends JFrame implements MyWindow{
     @Override
     public void initWindow() {
 
+        JPanel mainPanel = new JPanel(new GridLayout(1,4,0,100));
         //------------------------------------MenuBar---------------------------------------------------
         JMenu menu = new JMenu("menu");
         JMenuBar menuBar = new JMenuBar();
@@ -120,44 +124,51 @@ public class MainWindow extends JFrame implements MyWindow{
         tableList = model.getTableNames();
         list = new JList<>(tableList.toArray(new String[0]));
         setListMouseListener();
-        //------------------------------------MainWindowButtons---------------------------------------------------
+        //------------------------------------GUI.MainWindowButtons---------------------------------------------------
         mainWindowButtons = new MainWindowButtons(model, this);
 
         scroll = new JScrollPane();
         scroll.setViewportView(list);
         list.setLayoutOrientation(JList.VERTICAL);
 
-        add(scroll);
-        add(new JPanel());
-        add(mainWindowButtons);
+        mainPanel.add(scroll);
+        mainPanel.add(new JPanel());
+        mainPanel.add(mainWindowButtons);
+
+        add(mainPanel);
 
     }
 
     @Override
-    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable){
+    public void displayTable(List<List<Object>> data) {
+
+    }
+
+    @Override
+    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel){
 
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setBounds(x,y,width,height);
-        add(button);
+        panel.add(button);
         return button;
     }
 
     @Override
-    public JTextField addTextField(int x, int y, int width, int height, String text) {
+    public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
 
         JTextField textField = new JTextField();
         textField.setBounds(x,y,width,height);
-        add(textField);
+        panel.add(textField);
 
         return textField;
     }
 
     @Override
-    public JLabel addLabel(int x, int y, int width, int height, String text) {
+    public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
         JLabel label = new JLabel(text);
         label.setBounds(x,y,width,height);
-        add(label);
+        panel.add(label);
         return label;
     }
     /*

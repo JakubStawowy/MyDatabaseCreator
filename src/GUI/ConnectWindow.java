@@ -1,6 +1,12 @@
+package GUI;
+
+import Logic.Model;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
+import java.util.List;
 
 /*
 * ConnectWindow class allows to connect with database using database name, username and password.
@@ -13,23 +19,26 @@ public class ConnectWindow extends MyDialog{
 
         this.startingWindow = window;
 
-        setBounds(50,50,350,200);
+        //setBounds(50,50,350,200);
+        setSize(350,200);
         setTitle("Connect");
+
+        initWindow();
         setVisible(true);
         setLocationRelativeTo(null);
-        initWindow();
 
     }
 
     @Override
     public void initWindow() {
 
-        JTextField databaseName = addTextField(185,15,125,20,"jdbc:mysql://localhost:3306/");
-        JTextField username = addTextField(185,45,125,20,"root");
+        JPanel mainPanel = new JPanel(null);
+        JTextField databaseName = addTextField(185,15,125,20,"jdbc:mysql://localhost:3306/", mainPanel);
+        JTextField username = addTextField(185,45,125,20,"root", mainPanel);
 
         JPasswordField password = new JPasswordField();
         password.setBounds(185,75,125,20);
-        add(password);
+        mainPanel.add(password);
 
         JCheckBox hidePasswordCheckBox = new JCheckBox();
         hidePasswordCheckBox.setSelected(true);
@@ -47,15 +56,23 @@ public class ConnectWindow extends MyDialog{
         });
         hidePasswordCheckBox.setText("hide password");
         hidePasswordCheckBox.setBounds(185,100,125,10);
-        add(hidePasswordCheckBox);
+        mainPanel.add(hidePasswordCheckBox);
 
-        addButton(185, 120, 125, 20, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true);
-        addButton(20, 120, 125, 20, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())),true);
+        addButton(185, 120, 125, 20, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true, mainPanel);
+        addButton(20, 120, 125, 20, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())),true, mainPanel);
 
-        addLabel(20,15,100,20,"Database name:");
-        addLabel(20,45,100,20,"Username:");
-        addLabel(20,75,100,20,"Password:");
+        addLabel(20,15,100,20,"Database name:", mainPanel);
+        addLabel(20,45,100,20,"Username:", mainPanel);
+        addLabel(20,75,100,20,"Password:", mainPanel);
+
+        add(mainPanel);
     }
+
+    @Override
+    public void displayTable(List<List<Object>> data) {
+
+    }
+
     /*
     * connect method tries to connect with database using given parameters and initializes WarningWindow class
     * if the connection was failed. If user decides to connect again, method calls itself.

@@ -1,6 +1,9 @@
+package GUI;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 /*
 * WarningWindow class is responsible for displaying warnings and executing action passed as constructor parameters.
@@ -64,6 +67,11 @@ public class WarningWindow extends MyDialog{
 
         mainPanel.add(subPanel);
         add(mainPanel);
+
+    }
+
+    @Override
+    public void displayTable(List<List<Object>> data) {
 
     }
 }

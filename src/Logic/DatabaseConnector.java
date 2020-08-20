@@ -1,3 +1,5 @@
+package Logic;
+
 import java.sql.*;
 /*
 * Database Connector class is used to connect with sql database

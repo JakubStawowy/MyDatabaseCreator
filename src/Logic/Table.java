@@ -1,7 +1,9 @@
+package Logic;
+
 import java.util.List;
 
 /*
-* Table class keeps basic table parametres: table name, number of columns, number of rows,
+* Logic.Table class keeps basic table parametres: table name, number of columns, number of rows,
 * column names, column types and table data.
 * */
 public class Table {

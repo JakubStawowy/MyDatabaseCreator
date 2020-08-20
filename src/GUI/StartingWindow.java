@@ -1,5 +1,9 @@
+package GUI;
+
+import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 /*
 * StartingWindow class
@@ -8,7 +12,6 @@ public class StartingWindow extends MyDialog {
 
     public StartingWindow(){
 
-        setLayout(null);
         setSize(400,300);
         setTitle("MyDatabaseCreator");
         initWindow();
@@ -23,12 +26,19 @@ public class StartingWindow extends MyDialog {
     }
     @Override
     public void initWindow() {
+        JPanel mainPanel = new JPanel(null);
+        addButton(100, 60, 200, 40, "Import database", event->new ConnectWindow(this), true, mainPanel);
+        addButton(100, 120, 200, 40, "Skip", event->dispose(),false, mainPanel);
+        addButton(100, 180, 200, 40, "Close", event->{dispose(); System.exit(0);},true, mainPanel);
 
-        addButton(100, 60, 200, 40, "Import database", event->new ConnectWindow(this), true);
-        addButton(100, 120, 200, 40, "Skip", event->dispose(),false);
-        addButton(100, 180, 200, 40, "Close", event->{dispose(); System.exit(0);},true);
+        add(mainPanel);
+    }
+
+    @Override
+    public void displayTable(List<List<Object>> data) {
 
     }
+
     public static void main(String[] args) {
 
         new StartingWindow();

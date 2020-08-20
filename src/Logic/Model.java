@@ -1,3 +1,4 @@
+package Logic;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 /*
-* Model class is responsible for most logical methods such as creating tables, saving tables etc.
+* Logic.Model class is responsible for most logical methods such as creating tables, saving tables etc.
 * */
 public class Model {
 
@@ -25,7 +26,7 @@ public class Model {
         return tableNames;
     }
     /*
-    * Creates new instance of DatabaseConnector(connects with database)
+    * Creates new instance of Logic.DatabaseConnector(connects with database)
     * @param String databaseName
     * @param String username
     * @param String password
@@ -79,7 +80,7 @@ public class Model {
     /*
     * Adds new table object to tables List.
     *
-    * @param Table table
+    * @param Logic.Table table
     * */
     public void addTableToList(Table table){
         tables.add(table);
@@ -98,7 +99,7 @@ public class Model {
     /*
     * generateRandomCondition method generates random condition using random column and random cell value in that column.
     *
-    * @param Table table
+    * @param Logic.Table table
     * */
     public String generateRandomCondition(Table table){
 
@@ -127,7 +128,7 @@ public class Model {
     * Returns table object using table name.
     *
     * @param String tableName
-    * @returns Table table
+    * @returns Logic.Table table
     * */
     public Table getTable(String tableName) {
 
@@ -156,7 +157,7 @@ public class Model {
     * Imports all table parameters.
     *
     * @param String tableName
-    * @returns new Table
+    * @returns new Logic.Table
     * */
     public Table importTable(String tableName) {
         ResultSet rs;
@@ -231,6 +232,7 @@ public class Model {
         table.getData().remove(rowIndex);
         table.numberOfRowsDeincrement();
         String query = "DELETE FROM "+tableName+" WHERE "+condition+";";
+        System.out.println(query);
         dbConnector.execute(query);
     }
     /*
