@@ -93,4 +93,5 @@ public class Table {
     public void removeRow(int index){
         data.remove(index);
     }
+    public void addRow(List<Object> row){ data.add(row); }
 }

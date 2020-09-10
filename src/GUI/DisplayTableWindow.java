@@ -20,18 +20,18 @@ import java.awt.event.*;
 public class DisplayTableWindow extends JFrame implements MyWindow{
 
     private Table table;
-    private Table tablecopy;
     private Model model;
     private JTable displayedTable;
     private Object[][] tableData;
     private JScrollPane scrollPane;
     private Object buffer;
+    JButton removeRowButton;
 
     public DisplayTableWindow(Model model, String tableName){
 
         this.table = model.importTable(tableName);
-        tablecopy = model.importTable(tableName);
-        model.copyTable(table.getTableName()); //Logic.Table copy is made in case of restoration table to its original form
+//        tablecopy = model.importTable(tableName);
+//        model.copyTable(table.getTableName()); /
 
         this.model = model;
         tableData = new Object[table.getData().size()][table.getColumnNames().size()];
@@ -40,7 +40,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         setLocation(new Point(300,200));
         setTitle(table.getTableName());
 
-        setPreferredSize(new Dimension(600,450));
+        setPreferredSize(new Dimension(600,350));
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -66,8 +66,8 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         //------------------------------------ButtonsPanel---------------------------------------------------
         JPanel panel = new JPanel(null);
-        JPanel subPanel = new JPanel(new GridLayout(3,2,20,20));
-        subPanel.setBounds(10,10,565,185);
+        JPanel subPanel = new JPanel(new GridLayout(2,2,20,20));
+        subPanel.setBounds(10,10,565,135);
 
         //------------------------------------SearchTableButton---------------------------------------------------
         JButton searchTableButton = new JButton("Search table");
@@ -75,23 +75,28 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
 
         //------------------------------------AddRowButton---------------------------------------------------
         JButton addRowButton = new JButton("Add row");
-        addRowButton.addActionListener(event->new AddRowWindow(table.getColumnNames()));
+        addRowButton.addActionListener(event->new AddRowWindow(table.getTableName(), model, this));
 
         //------------------------------------RemoveRowButton---------------------------------------------------
-        JButton removeRowButton = new JButton("Remove row");
-        removeRowButton.setEnabled(true);
+        removeRowButton = new JButton("Remove row");
+        removeRowButton.setEnabled(false);
         removeRowButton.addActionListener(event->new WarningWindow("Remove row?",subEvent->{
 
             try {
-                int index = displayedTable.getSelectedRow();
-                model.deleteRow(table.getTableName(), index);
-                table.removeRow(index);
-                displayTable(table.getData());
+//                int index = displayedTable.getSelectedRow();
+//                model.deleteRow(table.getTableName(), index);
+//                table.removeRow(index);
+                List<Object> row = new ArrayList<>();
+                for(int index = 0; index < table.getNumberOfColumns(); index++){
+                    row.add(displayedTable.getValueAt(displayedTable.getSelectedRow(), index));
+                }
+                model.deleteRow_2(table.getTableName(), row);
+                displayTable(model.importTable(table.getTableName()).getData());
 
-                Rectangle rect = displayedTable.getCellRect(index-1,0,true);
-                displayedTable.scrollRectToVisible(rect);
+//                Rectangle rect = displayedTable.getCellRect(index-1,0,true);
+//                displayedTable.scrollRectToVisible(rect);
 
-                removeRowButton.setEnabled(true);
+                removeRowButton.setEnabled(false);
             } catch(IndexOutOfBoundsException exception){
                 new WarningWindow("No row selected",null, null);
                 System.out.println(exception.getMessage());
@@ -102,14 +107,18 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         }, null));
 
         //------------------------------------UndoChangesButton---------------------------------------------------
-        JButton undoChangesButton = new JButton("Undo changes");
-        undoChangesButton.setEnabled(true);
-        undoChangesButton.addActionListener(event->new WarningWindow("Are you sure you want to undo changes?", subEvent->{
-
-                //model.undoChanges(table.getTableName(), table);
-                model.undoChanges(table.getTableName());
-                displayTable(tablecopy.getData());
-        }, null));
+//        JButton undoChangesButton = new JButton("Undo changes");
+//        undoChangesButton.setEnabled(true);
+//        undoChangesButton.addActionListener(event->new WarningWindow("Are you sure you want to undo changes?", subEvent->{
+//
+//            try {
+//                model.undoChanges(table.getTableName());
+//            } catch (SQLException sqlException) {
+//                System.out.println(sqlException.getMessage());
+//                new WarningWindow("Undo changes failed", null, null);
+//            }
+//            displayTable(tablecopy.getData());
+//        }, null));
 
         //------------------------------------CloseButton---------------------------------------------------
         JButton closeButton = new JButton("Close");
@@ -122,7 +131,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         subPanel.add(searchTableButton);
         subPanel.add(addRowButton);
         subPanel.add(removeRowButton);
-        subPanel.add(undoChangesButton);
+//        subPanel.add(undoChangesButton);
         subPanel.add(closeButton);
 
         panel.add(subPanel);
@@ -195,7 +204,7 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
             public void mouseClicked(MouseEvent e) {
 
                 if(displayedTable.getSelectedRow() != -1) {
-                    //removeRowButton.setEnabled(true);
+                    removeRowButton.setEnabled(true);
                     buffer = displayedTable.getValueAt(displayedTable.getSelectedRow(),displayedTable.getSelectedColumn());
                 }
             }

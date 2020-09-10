@@ -235,6 +235,25 @@ public class Model {
         System.out.println(query);
         dbConnector.execute(query);
     }
+
+    public void deleteRow_2(String tableName, List<Object> row) throws SQLException {
+        StringBuilder condition = new StringBuilder();
+        Table table = importTable(tableName);
+        String type;
+        for(int index = 0; index<table.getNumberOfColumns(); index++){
+            type=table.getColumnTypes().get(index);
+            if(!isNumeric(type))
+                condition.append(table.getColumnNames().get(index)).append("=\"").append(row.get(index)).append("\"");
+            else
+                condition.append(table.getColumnNames().get(index)).append("=").append(row.get(index));
+
+            if(index < table.getNumberOfColumns()-1)
+                condition.append(" AND ");
+        }
+        String query = "DELETE FROM "+tableName+" WHERE "+condition+";";
+        System.out.println(query);
+        dbConnector.execute(query);
+    }
     /*
     * updateRow method is used to update row in a given table.
     * It uses SQL DML Language (UPDATE)
@@ -278,6 +297,26 @@ public class Model {
         System.out.println(query);
         dbConnector.execute(String.valueOf(query));
     }
+    public void addRow(List<Object> row, String tableName) throws SQLException {
+
+        Table table = getTable(tableName);
+        String columntype;
+        Object value;
+        StringBuilder query = new StringBuilder("INSERT INTO " + tableName + " VALUES (");
+        for(int i = 0; i < table.getNumberOfColumns(); i++){
+            columntype = table.getColumnTypes().get(i);
+            value = row.get(i);
+            if(!isNumeric(columntype))
+                value = "\""+row.get(i)+"\"";
+            query.append(value).append(", ");
+        }
+        query = new StringBuilder(query.substring(0, query.length() - 2));
+        query.append(");");
+        dbConnector.execute(String.valueOf(query));
+
+        table.addRow(row);
+    }
+
     /*
     * copyTable method is used to create buffer table before editing original table
     *
@@ -315,32 +354,45 @@ public class Model {
     *
     *@param String tableName
     * */
-    public void undoChanges(String tableName){
+    public void undoChanges(String tableName) throws SQLException {
 
         String query;
         Table table = getTable(tableName);
         String copiedTableName=tableName+"_cpy";
         String primaryKey = table.getColumnNames().get(table.getPrimaryKeyColumnIndex());
         String columnName;
-        for(int i = 0; i < table.getNumberOfColumns(); i++){
+
+        ResultSet rs;
+        int[] tableRowCount = new int[2];
+
+        rs = dbConnector.executeQuery("SELECT COUNT(*) FROM " + tableName + " UNION SELECT COUNT(*) FROM " + copiedTableName + ";");
+        int i = 0;
+        while(rs.next()) {
+
+            tableRowCount[i] = Integer.parseInt(rs.getString("COUNT(*)"));
+            i++;
+        }
+
+        for(i = 0; i < table.getNumberOfColumns(); i++){
             columnName = table.getColumnNames().get(i);
             if(i!=table.getPrimaryKeyColumnIndex()){
 
                 query= "UPDATE "+tableName+" INNER JOIN "+copiedTableName+" ON "+tableName+"."+primaryKey+
                         " = "+copiedTableName+"."+primaryKey+" SET "+tableName+"."+columnName+" = "+copiedTableName+"."+
                         columnName+" where "+tableName+"."+columnName+"!="+copiedTableName+"."+columnName+";";
-                try {
-                    dbConnector.execute(query);
-                } catch (SQLException sqlException) {
-                    System.out.println(sqlException.getMessage());
-                }
-            }
-            query = "INSERT INTO "+tableName+" SELECT * FROM "+copiedTableName+" EXCEPT SELECT * FROM "+tableName+";";
-            try {
+
                 dbConnector.execute(query);
-            } catch (SQLException sqlException) {
-                System.out.println(sqlException.getMessage());
+
             }
+        }
+        if(tableRowCount[0] < tableRowCount[1]) {
+            query = "INSERT INTO " + tableName + " SELECT * FROM " + copiedTableName + " EXCEPT SELECT * FROM " + tableName + ";";
+
+            dbConnector.execute(query);
+
+        }
+        else if(tableRowCount[0] > tableRowCount[1]){
+            deleteRow(tableName, table.getNumberOfRows());
         }
     }
     /*

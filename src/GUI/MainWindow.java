@@ -38,6 +38,10 @@ public class MainWindow extends JFrame implements MyWindow{
 
                     dispose();
                     try {
+                        for(String tableName: tableList){
+                            System.out.println(tableName);
+                            model.dropCopiedTable(tableName);
+                        }
                         model.closeConnection();
                     } catch (SQLException sqlException) {
                         sqlException.printStackTrace();
@@ -93,6 +97,11 @@ public class MainWindow extends JFrame implements MyWindow{
         closeConnectionItem.addActionListener(event->
             new WarningWindow("Are you sure you want to close connection?",subEvent->{
                 try {
+
+                    for(String tableName: tableList){
+                        System.out.println(tableName);
+                        model.dropCopiedTable(tableName);
+                    }
                     model.closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -106,6 +115,11 @@ public class MainWindow extends JFrame implements MyWindow{
             new WarningWindow("Are you sure you want to exit?",subEvent->{
                 dispose();
                 try {
+
+                    for(String tableName: tableList){
+                        System.out.println(tableName);
+                        model.dropCopiedTable(tableName);
+                    }
                     model.closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
