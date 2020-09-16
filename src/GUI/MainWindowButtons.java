@@ -17,30 +17,28 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
     private Model model;
     private MainWindow mainWindow;
-    private JButton editTableButton;
     private JButton addNewRowButton;
     private JButton createTableButton;
     private JButton removeTableButton;
-    private JButton displayTableButton;
+    private JButton editTableButton;
 
     public MainWindowButtons(Model model, MainWindow mainWindow){
 
         this.model = model;
         this.mainWindow = mainWindow;
+        setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         initWindow();
-        setLayout(new GridLayout(5,1,0,50));
+        setLayout(new GridLayout(4,1,0,50));
     }
     @Override
     public void initWindow() {
 
 
-        editTableButton = addButton(0,0,0,0,"Edit table",event->{
 
-        },false, this);
         addNewRowButton = addButton(0,0,0,0,"Add new row",event->{
 
         },false, this);
-        displayTableButton = addButton(0,0,0,0,"Display table",event->new DisplayTableWindow(model, mainWindow.getSelectedTable()), false, this);
+        editTableButton = addButton(0,0,0,0,"Edit table",event->new DisplayTableWindow(model, mainWindow.getSelectedTable()), false, this);
         removeTableButton = addButton(0,0,0,0,"Remove table",event->{
 
             String tableName = mainWindow.getSelectedTable();
@@ -54,22 +52,23 @@ public class MainWindowButtons extends JPanel implements MyWindow {
             }, null
             );
         },false, this);
-        createTableButton = addButton(0,0,0,0,"Create new table",event->{
-
-        },true, this);
+        createTableButton = addButton(0,0,0,0,"Create new table",event->new CreateTableWindow(model),true, this);
 
     }
 
     @Override
-    public void displayTable(List<List<Object>> data) {
+    public void displayTable(List<List<Object>> data) {}
 
-    }
+    @Override
+    public void setTextField(JTextField textField, String textFieldText) {}
 
     @Override
     public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel) {
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setEnabled(buttonEnable);
+        button.setBackground(new Color(105,105,105));
+        button.setForeground(Color.WHITE);
         panel.add(button);
         return button;
     }
@@ -85,9 +84,8 @@ public class MainWindowButtons extends JPanel implements MyWindow {
     }
     public void setButtons(Boolean enable){
 
-        editTableButton.setEnabled(enable);
         addNewRowButton.setEnabled(enable);
         removeTableButton.setEnabled(enable);
-        displayTableButton.setEnabled(enable);
+        editTableButton.setEnabled(enable);
     }
 }

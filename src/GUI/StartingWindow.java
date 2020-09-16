@@ -1,6 +1,9 @@
 package GUI;
 
+import Logic.Run;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
@@ -17,31 +20,28 @@ public class StartingWindow extends MyDialog {
         initWindow();
         setVisible(true);
         setLocationRelativeTo(null);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        });
+
     }
     @Override
     public void initWindow() {
+
+
+
         JPanel mainPanel = new JPanel(null);
-        addButton(100, 60, 200, 40, "Import database", event->new ConnectWindow(this), true, mainPanel);
-        addButton(100, 120, 200, 40, "Skip", event->dispose(),false, mainPanel);
-        addButton(100, 180, 200, 40, "Close", event->{dispose(); System.exit(0);},true, mainPanel);
+
+        mainPanel.setLayout(new GridLayout(3,1,0,20));
+        mainPanel.setBackground(new Color(67,67,67));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+
+        addButton(0,0,0,0, "Import database", event->new ConnectWindow(this), true, mainPanel);
+        addButton(0,0,0,0, "Skip", event->dispose(),false, mainPanel);
+        addButton(0,0,0,0,  "Close", event->dispose(),true, mainPanel);
 
         add(mainPanel);
     }
 
     @Override
     public void displayTable(List<List<Object>> data) {
-
-    }
-
-    public static void main(String[] args) {
-
-        new StartingWindow();
 
     }
 }

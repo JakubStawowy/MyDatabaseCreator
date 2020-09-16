@@ -1,7 +1,8 @@
 package GUI;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.List;
 
 /*
@@ -32,11 +33,13 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * */
     @Override
     public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel){
-
+        Color buttonColor = new Color(105,105,105);
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
         button.setBounds(x,y,width,height);
         button.setEnabled(buttonEnable);
+        button.setBackground(buttonColor);
+        button.setForeground(Color.WHITE);
         panel.add(button);
 
         return button;
@@ -55,9 +58,12 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * */
     @Override
     public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
-
+        Color textFieldColor = new Color(105,105,105);
         JTextField textField = new JTextField(text);
         textField.setBounds(x,y,width,height);
+        textField.setBackground(textFieldColor);
+        textField.setForeground(Color.WHITE);
+        setTextField(textField, text);
         panel.add(textField);
 
         return textField;
@@ -77,8 +83,51 @@ abstract class MyDialog extends JDialog implements MyWindow{
     public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
         JLabel label = new JLabel(text);
         label.setBounds(x,y,width,height);
+        label.setForeground(Color.WHITE);
         panel.add(label);
         return label;
+    }
+    @Override
+    public void setTextField(JTextField textField, String textFieldText){
+        textField.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(textField.getText().equals(textFieldText))
+                    textField.setText("");
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
+        textField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+
+                if(textField.getText().equals(""))
+                    textField.setText(textFieldText);
+            }
+        });
     }
 }
 

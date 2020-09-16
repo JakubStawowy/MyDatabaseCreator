@@ -1,6 +1,7 @@
 package GUI;
 
 import Logic.Model;
+import Logic.Run;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,8 +20,7 @@ public class ConnectWindow extends MyDialog{
 
         this.startingWindow = window;
 
-        //setBounds(50,50,350,200);
-        setSize(350,200);
+        setSize(400,300);
         setTitle("Connect");
 
         initWindow();
@@ -32,13 +32,26 @@ public class ConnectWindow extends MyDialog{
     @Override
     public void initWindow() {
 
-        JPanel mainPanel = new JPanel(null);
-        JTextField databaseName = addTextField(185,15,125,20,"jdbc:mysql://localhost:3306/", mainPanel);
-        JTextField username = addTextField(185,45,125,20,"root", mainPanel);
+        JPanel mainPanel = new JPanel(new GridLayout(5,2,20,20));
+        mainPanel.setBackground(new Color(67,67,67));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+
+        addLabel(0,0,0,0,"Database name:", mainPanel);
+
+        JTextField databaseName = addTextField(0,0,0,0,"jdbc:mysql://localhost:3306/", mainPanel);
+
+        addLabel(0,0,0,0,"Username:", mainPanel);
+
+        JTextField username = addTextField(0,0,0,0,"root", mainPanel);
+
+        addLabel(0,0,0,0,"Password:", mainPanel);
 
         JPasswordField password = new JPasswordField();
-        password.setBounds(185,75,125,20);
+        password.setBackground(new Color(105,105,105));
+        password.setForeground(Color.WHITE);
         mainPanel.add(password);
+
+        addLabel(0,0,0,0,null, mainPanel);
 
         JCheckBox hidePasswordCheckBox = new JCheckBox();
         hidePasswordCheckBox.setSelected(true);
@@ -55,15 +68,14 @@ public class ConnectWindow extends MyDialog{
             }
         });
         hidePasswordCheckBox.setText("hide password");
-        hidePasswordCheckBox.setBounds(185,100,125,10);
+        hidePasswordCheckBox.setBackground(new Color(67,67,67));
+        hidePasswordCheckBox.setForeground(Color.WHITE);
+
         mainPanel.add(hidePasswordCheckBox);
 
-        addButton(185, 120, 125, 20, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true, mainPanel);
-        addButton(20, 120, 125, 20, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())),true, mainPanel);
+        addButton(0,0,0,0, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())),true, mainPanel);
+        addButton(0,0,0,0, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true, mainPanel);
 
-        addLabel(20,15,100,20,"Database name:", mainPanel);
-        addLabel(20,45,100,20,"Username:", mainPanel);
-        addLabel(20,75,100,20,"Password:", mainPanel);
 
         add(mainPanel);
     }

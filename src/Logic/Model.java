@@ -22,8 +22,10 @@ public class Model {
     private String password;
 
     public List<String> getTableNames(){
-
         return tableNames;
+    }
+    public String[] getNumericTypes(){
+        return numericTypes;
     }
     /*
     * Creates new instance of Logic.DatabaseConnector(connects with database)

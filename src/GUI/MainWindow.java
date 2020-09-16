@@ -1,7 +1,9 @@
 package GUI;
 import Logic.Model;
+import Logic.Run;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
@@ -17,13 +19,14 @@ public class MainWindow extends JFrame implements MyWindow{
     private List<String> tableList;
     private JList<String> list;
     private JScrollPane scroll;
+    private JScrollPane scrollPane;
+    private JPanel tablePanel;
     private MainWindowButtons mainWindowButtons;
-
+    private Color backgroundColor = new Color(67,67,67);
     public MainWindow(Model model){
 
         this.model = model;
 
-        //setSize(800,600);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setTitle("MyDatabaseCreator");
         initWindow();
@@ -35,18 +38,13 @@ public class MainWindow extends JFrame implements MyWindow{
             @Override
             public void windowClosing(WindowEvent e) {
                 new WarningWindow("Are you sure you want to exit?",subEvent->{
-
                     dispose();
                     try {
-                        for(String tableName: tableList){
-                            System.out.println(tableName);
-                            model.dropCopiedTable(tableName);
-                        }
                         model.closeConnection();
                     } catch (SQLException sqlException) {
                         sqlException.printStackTrace();
                     }
-                    System.exit(0);
+//                    System.exit(0);
                 }, null);
             }
         });
@@ -54,8 +52,18 @@ public class MainWindow extends JFrame implements MyWindow{
 
     @Override
     public void initWindow() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(backgroundColor);
+        tablePanel = new JPanel(new GridLayout(1,1));
+        tablePanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        tablePanel.setBackground(backgroundColor);
+        scrollPane = new JScrollPane();
+        scrollPane.getViewport().setBackground(backgroundColor);
+        scrollPane.setBorder(null);
+        tablePanel.add(scrollPane);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(40,40,40,40));
+        mainPanel.setPreferredSize(new Dimension(800,600));
 
-        JPanel mainPanel = new JPanel(new GridLayout(1,4,0,100));
         //------------------------------------MenuBar---------------------------------------------------
         JMenu menu = new JMenu("menu");
         JMenuBar menuBar = new JMenuBar();
@@ -71,7 +79,7 @@ public class MainWindow extends JFrame implements MyWindow{
                                 sqlException.getMessage();
                             }
                             dispose();
-                        }, finalAction->new ConnectWindow(null))
+                        }, finalAction->new Run())
         );
 
         JMenuItem reconnectItem = new JMenuItem("Reconnect");
@@ -107,7 +115,7 @@ public class MainWindow extends JFrame implements MyWindow{
                     e.printStackTrace();
                 }
                 dispose();
-                new StartingWindow();
+                new Run();
             }, null));
 
         JMenuItem exitItem = new JMenuItem("Exit");
@@ -115,16 +123,11 @@ public class MainWindow extends JFrame implements MyWindow{
             new WarningWindow("Are you sure you want to exit?",subEvent->{
                 dispose();
                 try {
-
-                    for(String tableName: tableList){
-                        System.out.println(tableName);
-                        model.dropCopiedTable(tableName);
-                    }
                     model.closeConnection();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                System.exit(0);
+//                System.exit(0);
             }, null));
         newItem.add(newConnectionItem);
         menu.add(newItem);
@@ -137,17 +140,24 @@ public class MainWindow extends JFrame implements MyWindow{
         //------------------------------------TableList---------------------------------------------------
         tableList = model.getTableNames();
         list = new JList<>(tableList.toArray(new String[0]));
+        list.setBackground(new Color(105,105,105));
+        list.setForeground(Color.WHITE);
         setListMouseListener();
         //------------------------------------GUI.MainWindowButtons---------------------------------------------------
         mainWindowButtons = new MainWindowButtons(model, this);
+        mainWindowButtons.setPreferredSize(new Dimension(300,0));
+        mainWindowButtons.setBackground(new Color(67,67,67));
 
         scroll = new JScrollPane();
         scroll.setViewportView(list);
+        scroll.setBorder(null);
+        scroll.setPreferredSize(new Dimension(300,0));
         list.setLayoutOrientation(JList.VERTICAL);
 
-        mainPanel.add(scroll);
-        mainPanel.add(new JPanel());
-        mainPanel.add(mainWindowButtons);
+
+        mainPanel.add(scroll, BorderLayout.WEST);
+        mainPanel.add(tablePanel, BorderLayout.CENTER);
+        mainPanel.add(mainWindowButtons, BorderLayout.EAST);
 
         add(mainPanel);
 
@@ -155,8 +165,20 @@ public class MainWindow extends JFrame implements MyWindow{
 
     @Override
     public void displayTable(List<List<Object>> data) {
-
+        JTable displayedTable;
+        List<String>columnNames = model.importTable(list.getSelectedValue()).getColumnNames();
+        Object[][] tableData = new Object[data.size()][columnNames.size()];
+        for(int i = 0 ; i < data.size(); i++)
+            for(int j = 0 ; j < columnNames.size() ; j++)
+                tableData[i][j] = data.get(i).get(j);
+        displayedTable = new JTable(new DefaultTableModel(tableData,columnNames.toArray()));
+        scrollPane.setViewportView(displayedTable);
+        scrollPane.getViewport().setBackground(backgroundColor);
+        scrollPane.setBorder(null);
     }
+
+    @Override
+    public void setTextField(JTextField textField, String textFieldText) {}
 
     @Override
     public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel){
@@ -213,6 +235,7 @@ public class MainWindow extends JFrame implements MyWindow{
             public void mouseClicked(MouseEvent e) {
 
                 mainWindowButtons.setButtons(true);
+                displayTable(model.importTable(list.getSelectedValue()).getData());
             }
 
             @Override

@@ -139,26 +139,12 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         add(mainPanel);
     }
 
-    @Override
-    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel) {
-        return null;
-    }
-
-    @Override
-    public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
-        return null;
-    }
-
-    @Override
-    public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
-        return null;
-    }
-
     /*
     * saveTable method returns multidimensional ArrayList with data collected from newTable (JTable)
     *
     * @return rows
     * */
+
     private List<List<Object>> saveTable(){
 
         List<List<Object>> rows = new ArrayList<>();
@@ -181,12 +167,12 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
     public Model getModel(){
         return model;
     }
-
     /*
     * displayTable method displays table using data parameter
     *
     * @param data (multidimensional ArrayList)
     * */
+
     public void displayTable(List<List<Object>> data){
 
 
@@ -254,4 +240,21 @@ public class DisplayTableWindow extends JFrame implements MyWindow{
         });
         scrollPane.setViewportView(displayedTable);
     }
+    @Override
+    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel) {
+        return null;
+    }
+
+    @Override
+    public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
+        return null;
+    }
+
+    @Override
+    public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
+        return null;
+    }
+
+    @Override
+    public void setTextField(JTextField textField, String textFieldText) {}
 }
