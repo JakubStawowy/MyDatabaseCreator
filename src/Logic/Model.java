@@ -2,10 +2,7 @@ package Logic;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /*
 * Logic.Model class is responsible for most logical methods such as creating tables, saving tables etc.
@@ -16,6 +13,8 @@ public class Model {
     private List<String> tableNames = new LinkedList<>();
     private final String[] numericTypes = {"bit", "tinyint", "smallint","mediumint", "bigint",
             "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"};
+    private final String[] stringTypes ={"char", "varchar", "binary", "tinyblob", "tinytext", "text",
+            "blob", "mediumtext", "mediumblob", "longtext", "longblob", "enum", "set"};
     private DatabaseConnector dbConnector;
     private String databaseName;
     private String username;
@@ -24,9 +23,7 @@ public class Model {
     public List<String> getTableNames(){
         return tableNames;
     }
-    public String[] getNumericTypes(){
-        return numericTypes;
-    }
+
     /*
     * Creates new instance of Logic.DatabaseConnector(connects with database)
     * @param String databaseName
@@ -464,6 +461,18 @@ public class Model {
         }
 
         return data;
+    }
+
+    public void createTable(String tableName, Vector<String> columnNames, Vector<String> columnTypes, String primaryKey, Boolean dropExistingTable){
+        StringBuilder query = new StringBuilder("CREATE TABLE "+tableName+"(");
+        for(int index = 0 ; index < columnNames.size() ; index++)
+            query.append(columnNames.get(index)).append(" ").append(columnTypes.get(index)).append(", ");
+        query.append("PRIMARY KEY(").append(primaryKey).append(")");
+        query.append(");");
+        if(dropExistingTable)
+            dropTable(tableName);
+
+        System.out.println(query);
     }
     /*
     * isNumeric method is used to check if given type is numeric or no.

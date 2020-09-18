@@ -21,7 +21,7 @@ abstract class MyDialog extends JDialog implements MyWindow{
     public abstract void displayTable(List<List<Object>> data);
 
     /*
-    * addButton method allows to add new button to subclass window.
+    * createButton method allows to add new button to subclass window.
     * It doesn't require an override.
     *
     * @param x - x axis coordinate
@@ -32,21 +32,19 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @param actionListener - action executed after clicking on the button
     * */
     @Override
-    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel){
+    public JButton createButton(String text, ActionListener actionListener, Boolean buttonEnable){
         Color buttonColor = new Color(105,105,105);
         JButton button = new JButton(text);
         button.addActionListener(actionListener);
-        button.setBounds(x,y,width,height);
         button.setEnabled(buttonEnable);
         button.setBackground(buttonColor);
         button.setForeground(Color.WHITE);
-        panel.add(button);
 
         return button;
     }
 
     /*
-    * addTextField method allows to add and return new text field to subclass window.
+    * createTextField method allows to add and return new text field to subclass window.
     * Returning JTextField object is necessary to get text from text field.
     * It doesn't require an override.
     *
@@ -57,20 +55,18 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @return textField
     * */
     @Override
-    public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
+    public JTextField createTextField(String text) {
         Color textFieldColor = new Color(105,105,105);
         JTextField textField = new JTextField(text);
-        textField.setBounds(x,y,width,height);
         textField.setBackground(textFieldColor);
         textField.setForeground(Color.WHITE);
         setTextField(textField, text);
-        panel.add(textField);
 
         return textField;
     }
 
     /*
-    * addLabel method allows to add new label to subclass window.
+    * createLabel method allows to add new label to subclass window.
     * It doesn't require an override.
     *
     * @param x - x axis coordinate
@@ -80,12 +76,18 @@ abstract class MyDialog extends JDialog implements MyWindow{
     * @param text - text displayed on the button
     * */
     @Override
-    public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
+    public JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setBounds(x,y,width,height);
         label.setForeground(Color.WHITE);
-        panel.add(label);
         return label;
+    }
+    @Override
+    public JPanel createGridPanel(int rows, int cols, int hgap, int vgap, int margin){
+        JPanel panel = new JPanel(new GridLayout(rows,cols,hgap,vgap));
+        panel.setBorder(BorderFactory.createEmptyBorder(margin, margin, margin, margin));
+        panel.setBackground(new Color(67,67,67));
+        panel.setForeground(Color.WHITE);
+        return panel;
     }
     @Override
     public void setTextField(JTextField textField, String textFieldText){

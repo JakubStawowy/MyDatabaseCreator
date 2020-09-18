@@ -1,10 +1,6 @@
 package Logic;
-
-import GUI.ConnectWindow;
 import GUI.StartingWindow;
 
-import java.util.LinkedList;
-import java.util.List;
 
 public class Run implements Runnable {
     public Run(){

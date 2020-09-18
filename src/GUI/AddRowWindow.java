@@ -15,10 +15,11 @@ public class AddRowWindow extends MyDialog {
     private String tableName;
     private Table table;
     private JTable displayedTable;
-    private DisplayTableWindow tableWindow;
+    private EditTableWindow tableWindow;
+    private JPanel tablePanel = createGridPanel(1,1,0,0, 0);
     private Model model;
 
-    public AddRowWindow(String tableName, Model model, DisplayTableWindow tableWindow){
+    public AddRowWindow(String tableName, Model model, EditTableWindow tableWindow){
 
         this.model = model;
         this.tableName = tableName;
@@ -27,11 +28,10 @@ public class AddRowWindow extends MyDialog {
         table = model.getTable(tableName);
         String title = "Add row";
         setTitle(title);
-        int height = 115;
+        int height = 200;
         int width = 400;
         setSize(new Dimension(width, height));
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(2,1));
         initWindow();
         setVisible(true);
     }
@@ -39,19 +39,21 @@ public class AddRowWindow extends MyDialog {
     public void initWindow() {
 
         displayTable(null);
-        JPanel buttonsPanel = new JPanel(new GridLayout(1,3));
-        addButton(0,0,0,0,"Add",event->{
+        JPanel mainPanel = createGridPanel(2,1,0,20, 20);
+        JPanel buttonsPanel = createGridPanel(1,3,20,0, 0);
+
+        JButton createButton = createButton("Add",event->{
             try {
                 model.addRow(getRow(), tableName);
-//                tableWindow.displayTable(table.getData());
                 tableWindow.displayTable(model.importTable(tableName).getData());
                 dispose();
             }catch (SQLException sqlException){
                 new WarningWindow(sqlException.getMessage(), null, null);
                 System.out.println(sqlException.getMessage());
             }
-            },true, buttonsPanel);
-        addButton(0,0,0,0,"Test",event->{
+            },true);
+
+        JButton testButton = createButton("Test",event->{
             try {
                 model.addRow(getRow(), tableName);
                 model.deleteRow(tableName, table.getNumberOfRows());
@@ -59,17 +61,27 @@ public class AddRowWindow extends MyDialog {
             } catch (SQLException sqlException) {
                 new WarningWindow(sqlException.getMessage(), null,  null);
             }
-        },true, buttonsPanel);
-        addButton(0,0,0,0,"Cancel",event->dispose(),true, buttonsPanel);
-        add(buttonsPanel);
+        },true);
 
+        JButton cancelButton = createButton("Cancel",event->dispose(),true);
+
+        buttonsPanel.add(createButton);
+        buttonsPanel.add(testButton);
+        buttonsPanel.add(cancelButton);
+
+        mainPanel.add(tablePanel);
+        mainPanel.add(buttonsPanel);
+
+        add(mainPanel);
     }
     @Override
     public void displayTable(List<List<Object>> data){
 
         displayedTable = new JTable(new DefaultTableModel(new Object[][]{{}}, table.getColumnNames().toArray()));
         JScrollPane scrollPane = new JScrollPane(displayedTable);
-        add(scrollPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+        scrollPane.getViewport().setBackground(new Color(67,67,67));
+        tablePanel.add(scrollPane);
     }
     private List<Object> getRow(){
         List<Object> row = new ArrayList<>();

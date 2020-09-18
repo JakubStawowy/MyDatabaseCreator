@@ -15,9 +15,11 @@ public interface MyWindow {
 
     void setTextField(JTextField textField, String textFieldText);
 
-    JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel);
+    JButton createButton(String text, ActionListener actionListener, Boolean buttonEnable);
 
-    JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel);
+    JTextField createTextField(String text);
 
-    JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel);
+    JLabel createLabel(String text);
+
+    JPanel createGridPanel(int rows, int cols, int hgap, int vgap, int margin);
 }

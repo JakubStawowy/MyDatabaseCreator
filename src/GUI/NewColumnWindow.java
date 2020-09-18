@@ -1,13 +1,15 @@
 package GUI;
 
-import Logic.Model;
+import Logic.Controller;
+import Logic.MyExceptions.BadColumnNameException;
+import Logic.MyExceptions.BadColumnTypeException;
+import Logic.MyExceptions.BadTypeLengthException;
+import Logic.MyExceptions.RepeteadColumnNameException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,16 +17,29 @@ public class NewColumnWindow extends MyDialog {
 
     private CreateTableWindow createTableWindow;
     private Vector<String> columnNames;
-    private String[] types;
+    private Vector<String> columnTypes;
+    private Controller controller = new Controller();
+    private final String[] numericTypes = {
+            "bit", "tinyint", "smallint","mediumint", "bigint",
+            "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"
+    };
+    private final String[] stringTypes ={
+            "char", "varchar", "binary", "tinyblob", "tinytext", "text",
+            "blob", "mediumtext", "mediumblob", "longtext", "longblob", "enum", "set"
+    };
+    private final String[] constraints = {
+            "Not Null", "Unique", "Default", "Check",
+            "Primary Key", "Foreign Key"
+    };
 
-    public NewColumnWindow(CreateTableWindow createTableWindow, String[] types, Vector<String> columnNames){
+    public NewColumnWindow(CreateTableWindow createTableWindow){
 
-        this.types = types;
         this.createTableWindow = createTableWindow;
-        this.columnNames = columnNames;
+        columnNames = createTableWindow.getColumnNames();
+        columnTypes = createTableWindow.getColumnTypes();
 
         setTitle("New Column");
-        setBounds(new Rectangle(300,250));
+        setBounds(new Rectangle(300,400));
         setLocationRelativeTo(null);
 
         initWindow();
@@ -32,36 +47,80 @@ public class NewColumnWindow extends MyDialog {
     }
     @Override
     public void initWindow() {
-        String textFieldText = "Column Name";
-        JPanel mainPanel = new JPanel(new GridLayout(4,1, 0,20));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+//        String textFieldText = "Column Name";
 
-        JPanel buttonsPanel = new JPanel(new GridLayout(1, 2,20,0));
+        JPanel mainPanel = createGridPanel(6,1,0,20,20);
+        JPanel buttonsPanel = createGridPanel(1,2,20,0,0);
+        JPanel sidePanel = new JPanel(new BorderLayout());
+        sidePanel.setBackground(new Color(67,67,67));
 
-        JTextField textField = addTextField(0,0,0,0, textFieldText, mainPanel);
 
-        JComboBox<String> comboBox = new JComboBox<>();
-        comboBox.setRenderer(new MyComboBoxRenderer("Type"));
+        JTextField columnNameField = createTextField("Column Name");
+        JTextField lengthField = createTextField("Length");
 
-        for(String types: types){
-            comboBox.addItem(types);
-        }
-        comboBox.setSelectedIndex(-1);
-        mainPanel.add(comboBox);
+        JComboBox<String> typeComboBox = new JComboBox<>();
+        typeComboBox.setRenderer(new MyComboBoxRenderer("Type"));
 
-        addTextField(0,0,0,0,"Length",mainPanel);
+        Vector<JCheckBox> constraintsCheckBoxes = new Vector<>();
 
-        addButton(0,0,0,0,"Add Column",event->{
-            columnNames.add(textField.getText());
-            createTableWindow.displayTable(null);
-            dispose();
-        },true,buttonsPanel);
-        addButton(0,0,0,0,"Cancel",event->dispose(),true,buttonsPanel);
+        for(String constraint: constraints)
+            constraintsCheckBoxes.add(new JCheckBox(constraint));
 
+        JButton foreignKeyButton = createButton("Add Foreign Key", null, false);
+
+        CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, foreignKeyButton);
+
+        for(String numericType: numericTypes)
+            typeComboBox.addItem(numericType);
+
+        for(String stringType: stringTypes)
+            typeComboBox.addItem(stringType);
+
+        typeComboBox.setSelectedIndex(-1);
+
+        JButton addColumnButton = createButton("Add Column",event->{
+
+            String columnName = columnNameField.getText();
+            String columnType = String.valueOf(typeComboBox.getSelectedItem());
+            String length;
+            try {
+                controller.checkColumnName(columnName);
+                controller.checkType(columnType);
+                controller.checkColumnNameUniqueness(columnName, columnNames);
+                length = controller.checkLength(lengthField.getText());
+
+                columnNames.add(columnName);
+                columnType = columnType+length;
+                columnTypes.add(columnType);
+                createTableWindow.addColumnToComboBox(columnName);
+                createTableWindow.displayTable(null);
+                dispose();
+            }catch (BadColumnNameException | BadTypeLengthException | BadColumnTypeException | RepeteadColumnNameException exception){
+                new WarningWindow(exception.getMessage(), null, null);
+            }
+            for(int i = 0 ; i < columnNames.size() ; i++){
+                System.out.println(columnNames.get(i)+" - "+columnTypes.get(i));
+            }
+        },true);
+        JButton cancelButton = createButton("Cancel",event->dispose(),true);
+
+        buttonsPanel.add(addColumnButton);
+        buttonsPanel.add(cancelButton);
+
+        JLabel constraintsLabel = createLabel("Constraints:");
+        constraintsLabel.setPreferredSize(new Dimension(80,20));
+        sidePanel.add(constraintsLabel, BorderLayout.WEST);
+        sidePanel.add(constraintsComboBox, BorderLayout.EAST);
+
+        mainPanel.add(columnNameField);
+        mainPanel.add(typeComboBox);
+        mainPanel.add(lengthField);
+        mainPanel.add(sidePanel);
+        mainPanel.add(foreignKeyButton);
         mainPanel.add(buttonsPanel);
+
         add(mainPanel);
     }
-
     @Override
     public void displayTable(List<List<Object>> data) {}
     private static class MyComboBoxRenderer extends JLabel implements ListCellRenderer<String>
@@ -81,4 +140,51 @@ public class NewColumnWindow extends MyDialog {
             return this;
         }
     }
+    public static class CheckBoxesComboBox extends JComboBox<JCheckBox>{
+        public CheckBoxesComboBox(Vector<JCheckBox> checkBoxes, JButton foreignKeyButton) {
+            super(checkBoxes);
+            setRenderer(new ListCellRenderer<Component>() {
+                @Override
+                public Component getListCellRendererComponent(JList<? extends Component> list, Component value, int index, boolean isSelected, boolean cellHasFocus) {
+
+
+                    if (isSelected) {
+                        value.setBackground(list.getSelectionBackground());
+                        value.setForeground(list.getSelectionForeground());
+                    } else {
+                        value.setBackground(list.getBackground());
+                        value.setForeground(list.getForeground());
+                    }
+                    return value;
+                }
+            }
+            );
+            addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    showPopup();
+                    setPopupVisible(true);
+                    JCheckBox checkBox = (JCheckBox)getSelectedItem();
+                    if(checkBox!=null) {
+                        checkBox.setSelected(!checkBox.isSelected());
+
+                        if (getItemAt(5).isSelected()) {
+                            foreignKeyButton.setEnabled(true);
+
+                            getItemAt(4).setSelected(false);
+                            }
+                        }
+                        else if(getItemAt(4).isSelected()){
+                            foreignKeyButton.setEnabled(false);
+                            getItemAt(5).setSelected(false);
+                        }
+                        else
+                            foreignKeyButton.setEnabled(false);
+
+                    }
+                }
+            );
+        }
+    }
 }
+

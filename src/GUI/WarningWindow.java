@@ -20,58 +20,53 @@ public class WarningWindow extends MyDialog{
         this.action = action;
         this.finalAction = finalAction;
 
-        setSize(340,120);
         setTitle("Warning");
+        setLocationRelativeTo(null);
 
         initWindow();
-        setLocationRelativeTo(null);
+        pack();
         setVisible(true);
     }
     @Override
     public void initWindow() {
 
-        JPanel mainPanel = new JPanel(new GridLayout(2,1));
-        JPanel subPanel = new JPanel();
+        JPanel mainPanel = createGridPanel(2,1,0,20,20);
+        JPanel buttonsPanel;
 
-        mainPanel.add(new JLabel(text, SwingConstants.CENTER));
+        JLabel messageLabel = createLabel(text);
+        messageLabel.setHorizontalAlignment(JLabel.CENTER);
 
         if(action!=null) {
+            buttonsPanel = createGridPanel(1,2,20,0,0);
+            JButton yesButton = createButton("Yes",action,true);
 
-            subPanel.setLayout(null);
-            JButton yesButton = new JButton("Yes");
-            yesButton.setBounds(50, 0, 80, 20);
-
-            yesButton.addActionListener(action);
             yesButton.addActionListener(event -> dispose());
             yesButton.addActionListener(finalAction);
 
-            JButton noButton = new JButton("No");
-            noButton.setBounds(190, 0, 80, 20);
-            noButton.addActionListener(event -> dispose());
+            JButton noButton = createButton("No", event->dispose(),true);
 
-            if(finalAction!=null)
+            if(finalAction!=null) {
                 noButton.addActionListener(finalAction);
+            }
 
-            subPanel.add(yesButton);
-            subPanel.add(noButton);
+            buttonsPanel.add(yesButton);
+            buttonsPanel.add(noButton);
 
         }
         else{
-            JButton okButton = new JButton("Ok");
-            okButton.setBounds(65,25,80,20);
-            okButton.addActionListener(event->dispose());
-            if(finalAction!=null)
+            buttonsPanel = createGridPanel(1,1,20,0,0);
+            JButton okButton = createButton("Ok", event->dispose(), true);
+            if(finalAction!=null) {
                 okButton.addActionListener(finalAction);
-            subPanel.add(okButton);
+            }
+            buttonsPanel.add(okButton);
         }
 
-        mainPanel.add(subPanel);
+        mainPanel.add(messageLabel);
+        mainPanel.add(buttonsPanel);
         add(mainPanel);
-
     }
 
     @Override
-    public void displayTable(List<List<Object>> data) {
-
-    }
+    public void displayTable(List<List<Object>> data) {}
 }

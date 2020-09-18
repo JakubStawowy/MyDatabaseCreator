@@ -32,26 +32,23 @@ public class ConnectWindow extends MyDialog{
     @Override
     public void initWindow() {
 
-        JPanel mainPanel = new JPanel(new GridLayout(5,2,20,20));
-        mainPanel.setBackground(new Color(67,67,67));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        JPanel mainPanel = createGridPanel(5,2,20,20,20);
 
-        addLabel(0,0,0,0,"Database name:", mainPanel);
+        JLabel databaseNameLabel = createLabel("Database name:");
 
-        JTextField databaseName = addTextField(0,0,0,0,"jdbc:mysql://localhost:3306/", mainPanel);
+        JTextField databaseNameField = createTextField("jdbc:mysql://localhost:3306/");
 
-        addLabel(0,0,0,0,"Username:", mainPanel);
+        JLabel usernameLabel = createLabel("Username:");
 
-        JTextField username = addTextField(0,0,0,0,"root", mainPanel);
+        JTextField usernameField = createTextField("root");
 
-        addLabel(0,0,0,0,"Password:", mainPanel);
+        JLabel passwordLabel = createLabel("Password:");
 
-        JPasswordField password = new JPasswordField();
-        password.setBackground(new Color(105,105,105));
-        password.setForeground(Color.WHITE);
-        mainPanel.add(password);
+        JPasswordField passwordField = new JPasswordField();
+        passwordField.setBackground(new Color(105,105,105));
+        passwordField.setForeground(Color.WHITE);
 
-        addLabel(0,0,0,0,null, mainPanel);
+
 
         JCheckBox hidePasswordCheckBox = new JCheckBox();
         hidePasswordCheckBox.setSelected(true);
@@ -60,10 +57,10 @@ public class ConnectWindow extends MyDialog{
             public void actionPerformed(ActionEvent e) {
                 if(hidePasswordCheckBox.isSelected()){
 
-                    password.setEchoChar('*');
+                    passwordField.setEchoChar('*');
 
                 }else{
-                    password.setEchoChar((char)0);
+                    passwordField.setEchoChar((char)0);
                 }
             }
         });
@@ -71,11 +68,20 @@ public class ConnectWindow extends MyDialog{
         hidePasswordCheckBox.setBackground(new Color(67,67,67));
         hidePasswordCheckBox.setForeground(Color.WHITE);
 
+
+        JButton connectButton = createButton("Connect", event-> connect(databaseNameField.getText(), usernameField.getText(), String.valueOf(passwordField.getPassword())),true);
+        JButton cancelButton = createButton("Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true);
+
+        mainPanel.add(databaseNameLabel);
+        mainPanel.add(databaseNameField);
+        mainPanel.add(usernameLabel);
+        mainPanel.add(usernameField);
+        mainPanel.add(passwordLabel);
+        mainPanel.add(passwordField);
+        mainPanel.add(createLabel(null));
         mainPanel.add(hidePasswordCheckBox);
-
-        addButton(0,0,0,0, "Connect", event-> connect(databaseName.getText(), username.getText(), String.valueOf(password.getPassword())),true, mainPanel);
-        addButton(0,0,0,0, "Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true, mainPanel);
-
+        mainPanel.add(connectButton);
+        mainPanel.add(cancelButton);
 
         add(mainPanel);
     }

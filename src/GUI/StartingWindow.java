@@ -33,9 +33,13 @@ public class StartingWindow extends MyDialog {
         mainPanel.setBackground(new Color(67,67,67));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
 
-        addButton(0,0,0,0, "Import database", event->new ConnectWindow(this), true, mainPanel);
-        addButton(0,0,0,0, "Skip", event->dispose(),false, mainPanel);
-        addButton(0,0,0,0,  "Close", event->dispose(),true, mainPanel);
+        JButton importButton = createButton("Import database", event->new ConnectWindow(this), true);
+        JButton skipButton = createButton("Skip", event->dispose(),false);
+        JButton closeButton = createButton("Close", event->dispose(),true);
+
+        mainPanel.add(importButton);
+        mainPanel.add(skipButton);
+        mainPanel.add(closeButton);
 
         add(mainPanel);
     }

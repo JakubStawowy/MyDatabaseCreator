@@ -13,7 +13,7 @@ import java.util.List;
 * MainWindow class is used only after successful connection with database.
 * MainWindow allows to use all functions operating on database (create table, drop table etc.)
 * */
-public class MainWindow extends JFrame implements MyWindow{
+public class MainWindow extends MyFrame{
 
     private Model model;
     private List<String> tableList;
@@ -54,17 +54,17 @@ public class MainWindow extends JFrame implements MyWindow{
     public void initWindow() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(backgroundColor);
-        tablePanel = new JPanel(new GridLayout(1,1));
-        tablePanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
-        tablePanel.setBackground(backgroundColor);
+        tablePanel = createGridPanel(1,1,0,0,20);
         scrollPane = new JScrollPane();
         scrollPane.getViewport().setBackground(backgroundColor);
         scrollPane.setBorder(null);
-        tablePanel.add(scrollPane);
+
+
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40,40,40,40));
         mainPanel.setPreferredSize(new Dimension(800,600));
 
         //------------------------------------MenuBar---------------------------------------------------
+
         JMenu menu = new JMenu("menu");
         JMenuBar menuBar = new JMenuBar();
 
@@ -154,6 +154,7 @@ public class MainWindow extends JFrame implements MyWindow{
         scroll.setPreferredSize(new Dimension(300,0));
         list.setLayoutOrientation(JList.VERTICAL);
 
+        tablePanel.add(scrollPane);
 
         mainPanel.add(scroll, BorderLayout.WEST);
         mainPanel.add(tablePanel, BorderLayout.CENTER);
@@ -177,36 +178,6 @@ public class MainWindow extends JFrame implements MyWindow{
         scrollPane.setBorder(null);
     }
 
-    @Override
-    public void setTextField(JTextField textField, String textFieldText) {}
-
-    @Override
-    public JButton addButton(int x, int y, int width, int height, String text, ActionListener actionListener, Boolean buttonEnable, JPanel panel){
-
-        JButton button = new JButton(text);
-        button.addActionListener(actionListener);
-        button.setBounds(x,y,width,height);
-        panel.add(button);
-        return button;
-    }
-
-    @Override
-    public JTextField addTextField(int x, int y, int width, int height, String text, JPanel panel) {
-
-        JTextField textField = new JTextField();
-        textField.setBounds(x,y,width,height);
-        panel.add(textField);
-
-        return textField;
-    }
-
-    @Override
-    public JLabel addLabel(int x, int y, int width, int height, String text, JPanel panel) {
-        JLabel label = new JLabel(text);
-        label.setBounds(x,y,width,height);
-        panel.add(label);
-        return label;
-    }
     /*
     * removeTableFromJList method sets new list without removed table (using table index).
     *
