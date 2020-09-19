@@ -1,10 +1,7 @@
 package GUI;
 
 import Logic.Controller;
-import Logic.MyExceptions.BadColumnNameException;
-import Logic.MyExceptions.BadColumnTypeException;
-import Logic.MyExceptions.BadTypeLengthException;
-import Logic.MyExceptions.RepeteadColumnNameException;
+import Logic.MyExceptions.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +28,8 @@ public class NewColumnWindow extends MyDialog {
             "Not Null", "Unique", "Default", "Check",
             "Primary Key", "Foreign Key"
     };
-
+    private final int foreignKeyIndex = 5;
+    private final int primaryKeyIndex = 4;
     public NewColumnWindow(CreateTableWindow createTableWindow){
 
         this.createTableWindow = createTableWindow;
@@ -39,17 +37,15 @@ public class NewColumnWindow extends MyDialog {
         columnTypes = createTableWindow.getColumnTypes();
 
         setTitle("New Column");
-        setBounds(new Rectangle(300,400));
         setLocationRelativeTo(null);
-
         initWindow();
+        pack();
         setVisible(true);
     }
     @Override
     public void initWindow() {
-//        String textFieldText = "Column Name";
 
-        JPanel mainPanel = createGridPanel(6,1,0,20,20);
+        JPanel mainPanel = createGridPanel(8,1,0,20,20);
         JPanel buttonsPanel = createGridPanel(1,2,20,0,0);
         JPanel sidePanel = new JPanel(new BorderLayout());
         sidePanel.setBackground(new Color(67,67,67));
@@ -67,8 +63,13 @@ public class NewColumnWindow extends MyDialog {
             constraintsCheckBoxes.add(new JCheckBox(constraint));
 
         JButton foreignKeyButton = createButton("Add Foreign Key", null, false);
+        JTextField defaultTextBox = createTextField("Default value");
+        JTextField checkTextBox = createTextField("Check");
 
-        CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, foreignKeyButton);
+        defaultTextBox.setEnabled(false);
+        checkTextBox.setEnabled(false);
+
+        CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, foreignKeyButton, defaultTextBox, checkTextBox);
 
         for(String numericType: numericTypes)
             typeComboBox.addItem(numericType);
@@ -83,19 +84,25 @@ public class NewColumnWindow extends MyDialog {
             String columnName = columnNameField.getText();
             String columnType = String.valueOf(typeComboBox.getSelectedItem());
             String length;
+            StringBuilder _constraints = new StringBuilder();
             try {
                 controller.checkColumnName(columnName);
                 controller.checkType(columnType);
                 controller.checkColumnNameUniqueness(columnName, columnNames);
-                length = controller.checkLength(lengthField.getText());
+                controller.checkTwoCheckBoxesSelection(constraintsComboBox.getItemAt(primaryKeyIndex), constraintsComboBox.getItemAt(foreignKeyIndex));
 
+                length = controller.checkLength(lengthField.getText());
+                for(int i = 0 ; i < constraints.length ; i++)
+                    if(constraintsCheckBoxes.get(i).isSelected())
+                        _constraints.append(constraintsCheckBoxes.get(i).getText()).append(" ");
+                System.out.println("Tutej "+_constraints);
                 columnNames.add(columnName);
                 columnType = columnType+length;
                 columnTypes.add(columnType);
                 createTableWindow.addColumnToComboBox(columnName);
                 createTableWindow.displayTable(null);
                 dispose();
-            }catch (BadColumnNameException | BadTypeLengthException | BadColumnTypeException | RepeteadColumnNameException exception){
+            }catch (BadColumnNameException | BadTypeLengthException | BadColumnTypeException | RepeteadColumnNameException | TwoCheckBoxesSelectedException exception){
                 new WarningWindow(exception.getMessage(), null, null);
             }
             for(int i = 0 ; i < columnNames.size() ; i++){
@@ -117,6 +124,8 @@ public class NewColumnWindow extends MyDialog {
         mainPanel.add(lengthField);
         mainPanel.add(sidePanel);
         mainPanel.add(foreignKeyButton);
+        mainPanel.add(defaultTextBox);
+        mainPanel.add(checkTextBox);
         mainPanel.add(buttonsPanel);
 
         add(mainPanel);
@@ -141,12 +150,16 @@ public class NewColumnWindow extends MyDialog {
         }
     }
     public static class CheckBoxesComboBox extends JComboBox<JCheckBox>{
-        public CheckBoxesComboBox(Vector<JCheckBox> checkBoxes, JButton foreignKeyButton) {
+
+        private final int foreignKeyIndex = 5;
+        private final int defaultIndex = 2;
+        private final int checkIndex = 3;
+
+        public CheckBoxesComboBox(Vector<JCheckBox> checkBoxes, JButton foreignKeyButton, JTextField defaultTextField, JTextField checkTextBox) {
             super(checkBoxes);
             setRenderer(new ListCellRenderer<Component>() {
                 @Override
                 public Component getListCellRendererComponent(JList<? extends Component> list, Component value, int index, boolean isSelected, boolean cellHasFocus) {
-
 
                     if (isSelected) {
                         value.setBackground(list.getSelectionBackground());
@@ -168,22 +181,26 @@ public class NewColumnWindow extends MyDialog {
                     if(checkBox!=null) {
                         checkBox.setSelected(!checkBox.isSelected());
 
-                        if (getItemAt(5).isSelected()) {
-                            foreignKeyButton.setEnabled(true);
+                        if(getItemAt(defaultIndex).isSelected())
+                            defaultTextField.setEnabled(true);
+                        else
+                            defaultTextField.setEnabled(false);
 
-                            getItemAt(4).setSelected(false);
-                            }
-                        }
-                        else if(getItemAt(4).isSelected()){
-                            foreignKeyButton.setEnabled(false);
-                            getItemAt(5).setSelected(false);
+                        if(getItemAt(checkIndex).isSelected())
+                            checkTextBox.setEnabled(true);
+                        else
+                            checkTextBox.setEnabled(false);
+
+                        if (getItemAt(foreignKeyIndex).isSelected()) {
+                            foreignKeyButton.setEnabled(true);
                         }
                         else
                             foreignKeyButton.setEnabled(false);
 
+
                     }
                 }
-            );
+            });
         }
     }
 }

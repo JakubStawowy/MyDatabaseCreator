@@ -2,6 +2,7 @@ package Logic;
 
 import Logic.MyExceptions.*;
 
+import javax.swing.*;
 import java.util.Vector;
 
 public class Controller {
@@ -68,5 +69,9 @@ public class Controller {
     public void checkNamesTypesQuantity(Vector<String> columnNames, Vector<String> columnTypes) throws BadNamesTypesQuantityException {
         if(columnNames.size()!=columnTypes.size())
             throw new BadNamesTypesQuantityException();
+    }
+    public void checkTwoCheckBoxesSelection(JCheckBox checkBox1, JCheckBox checkBox2) throws TwoCheckBoxesSelectedException {
+        if(checkBox1.isSelected() && checkBox2.isSelected())
+            throw new TwoCheckBoxesSelectedException(checkBox1, checkBox2);
     }
 }

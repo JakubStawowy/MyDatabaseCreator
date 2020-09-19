@@ -65,7 +65,6 @@ public class CreateTableWindow extends MyDialog{
 
         primaryKeyComboBox = new JComboBox<>();
 
-        JButton addForeignKeyButton = createButton("Add Foreign Key", event->dispose(),true);
         JButton addRowButton = createButton("Add Row", event->{
             numberOfRows++;
             tableData = new Object[numberOfRows][columnNames.size()];
@@ -80,7 +79,7 @@ public class CreateTableWindow extends MyDialog{
                 controller.checkNamesTypesQuantity(columnNames, columnTypes);
 
                 model.createTable(tableName, columnNames, columnTypes,primaryKey, false);
-            } catch (BadTableNameException | BadColumnNumberException | SQLException | BadNamesTypesQuantityException exception) {
+            } catch (BadTableNameException | BadColumnNumberException | BadNamesTypesQuantityException exception) {
                 new WarningWindow(exception.getMessage(), null, null);
             }
         },true);
@@ -93,8 +92,6 @@ public class CreateTableWindow extends MyDialog{
         sidePanel.add(textField);
         sidePanel.add(label);
         sidePanel.add(newColumnButton);
-//        sidePanel.add(subPanel);
-//        sidePanel.add(addForeignKeyButton);
         sidePanel.add(addRowButton);
         sidePanel.add(createTableButton);
         sidePanel.add(cancelButton);
