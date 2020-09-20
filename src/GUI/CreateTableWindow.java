@@ -5,12 +5,11 @@ import Logic.Model;
 import Logic.MyExceptions.BadColumnNumberException;
 import Logic.MyExceptions.BadNamesTypesQuantityException;
 import Logic.MyExceptions.BadTableNameException;
+import Logic.MyExceptions.NoPrimaryKeyException;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
@@ -21,10 +20,12 @@ public class CreateTableWindow extends MyDialog{
     private JTable displayedTable;
     private JScrollPane scrollPane;
     private JLabel label;
+    private JTextField tableNameField;
     private int numberOfRows = 0;
     private JComboBox<String> primaryKeyComboBox;
     private Vector<String> columnNames = new Vector<>();
     private Vector<String> columnTypes = new Vector<>();
+    private Vector<String> constraintsVector = new Vector<>();
     public CreateTableWindow(Model model){
 
         this.model = model;
@@ -40,11 +41,17 @@ public class CreateTableWindow extends MyDialog{
     public Vector<String> getColumnTypes(){
         return columnTypes;
     }
+    public Vector<String> getConstraintsVector(){
+        return constraintsVector;
+    }
+    public String getTableName(){
+        return tableNameField.getText();
+    }
     @Override
     public void initWindow() {
         Color backgroundColor = new Color(67,67,67);
         JPanel mainPanel = createGridPanel(1,2,0,0,0);
-        JPanel sidePanel = createGridPanel(6,1,20,20,20);
+        JPanel sidePanel = createGridPanel(7,1,20,20,20);
         JPanel tablePanel = createGridPanel(1,1,20,20,20);
         JPanel subPanel = createGridPanel(1,2,20,0,0);
 
@@ -54,9 +61,9 @@ public class CreateTableWindow extends MyDialog{
         label = createLabel("Number Of Columns: "+columnNames.size());
         label.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JTextField textField = createTextField(textFieldText);
-        textField.setHorizontalAlignment(SwingConstants.CENTER);
-        textField.setCaretPosition(textFieldText.length());
+        tableNameField = createTextField(textFieldText);
+        tableNameField.setHorizontalAlignment(SwingConstants.CENTER);
+        tableNameField.setCaretPosition(textFieldText.length());
 
         JButton newColumnButton = createButton("New Column",event->new NewColumnWindow(this),true);
 
@@ -64,6 +71,7 @@ public class CreateTableWindow extends MyDialog{
         primaryKeyLabel.setHorizontalAlignment(JLabel.CENTER);
 
         primaryKeyComboBox = new JComboBox<>();
+        primaryKeyComboBox.addItem("None");
 
         JButton addRowButton = createButton("Add Row", event->{
             numberOfRows++;
@@ -71,16 +79,22 @@ public class CreateTableWindow extends MyDialog{
             displayTable(null);
         }, true);
         JButton createTableButton = createButton("Create Table",event->{
-            String tableName = textField.getText();
+            String tableName = tableNameField.getText();
             String primaryKey = String.valueOf(primaryKeyComboBox.getSelectedItem());
             try{
                 controller.checkTableName(tableName);
                 controller.checkNumberOfColumns(columnNames.size());
-                controller.checkNamesTypesQuantity(columnNames, columnTypes);
-
-                model.createTable(tableName, columnNames, columnTypes,primaryKey, false);
+                controller.checkNamesTypesQuantity(this);
+                if(primaryKeyComboBox.getSelectedItem().equals("None"))
+                    throw new NoPrimaryKeyException();
+                model.createTable(tableName, this ,primaryKey, false);
             } catch (BadTableNameException | BadColumnNumberException | BadNamesTypesQuantityException exception) {
                 new WarningWindow(exception.getMessage(), null, null);
+            }
+            catch (NoPrimaryKeyException exception){
+                new WarningWindow(exception.getMessage(), subEvent->{
+                    model.createTable(tableName, this ,primaryKey, false);
+                }, null);
             }
         },true);
         JButton cancelButton = createButton("Cancel",event->dispose(),true);
@@ -89,9 +103,10 @@ public class CreateTableWindow extends MyDialog{
         subPanel.add(primaryKeyComboBox);
         subPanel.setBorder(BorderFactory.createEmptyBorder(10,0,10,0));
 
-        sidePanel.add(textField);
+        sidePanel.add(tableNameField);
         sidePanel.add(label);
         sidePanel.add(newColumnButton);
+        sidePanel.add(subPanel);
         sidePanel.add(addRowButton);
         sidePanel.add(createTableButton);
         sidePanel.add(cancelButton);

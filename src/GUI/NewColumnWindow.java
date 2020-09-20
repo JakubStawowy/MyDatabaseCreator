@@ -15,6 +15,7 @@ public class NewColumnWindow extends MyDialog {
     private CreateTableWindow createTableWindow;
     private Vector<String> columnNames;
     private Vector<String> columnTypes;
+    private Vector<String> constraintsVector;
     private Controller controller = new Controller();
     private final String[] numericTypes = {
             "bit", "tinyint", "smallint","mediumint", "bigint",
@@ -25,16 +26,14 @@ public class NewColumnWindow extends MyDialog {
             "blob", "mediumtext", "mediumblob", "longtext", "longblob", "enum", "set"
     };
     private final String[] constraints = {
-            "Not Null", "Unique", "Default", "Check",
-            "Primary Key", "Foreign Key"
+            "Not Null", "Unique", "Default", "Check"
     };
-    private final int foreignKeyIndex = 5;
-    private final int primaryKeyIndex = 4;
     public NewColumnWindow(CreateTableWindow createTableWindow){
 
         this.createTableWindow = createTableWindow;
         columnNames = createTableWindow.getColumnNames();
         columnTypes = createTableWindow.getColumnTypes();
+        constraintsVector = createTableWindow.getConstraintsVector();
 
         setTitle("New Column");
         setLocationRelativeTo(null);
@@ -62,14 +61,14 @@ public class NewColumnWindow extends MyDialog {
         for(String constraint: constraints)
             constraintsCheckBoxes.add(new JCheckBox(constraint));
 
-        JButton foreignKeyButton = createButton("Add Foreign Key", null, false);
+        JButton foreignKeyButton = createButton("Add Foreign Key", null, true);
         JTextField defaultTextBox = createTextField("Default value");
         JTextField checkTextBox = createTextField("Check");
 
         defaultTextBox.setEnabled(false);
         checkTextBox.setEnabled(false);
 
-        CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, foreignKeyButton, defaultTextBox, checkTextBox);
+        CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, defaultTextBox, checkTextBox);
 
         for(String numericType: numericTypes)
             typeComboBox.addItem(numericType);
@@ -89,24 +88,22 @@ public class NewColumnWindow extends MyDialog {
                 controller.checkColumnName(columnName);
                 controller.checkType(columnType);
                 controller.checkColumnNameUniqueness(columnName, columnNames);
-                controller.checkTwoCheckBoxesSelection(constraintsComboBox.getItemAt(primaryKeyIndex), constraintsComboBox.getItemAt(foreignKeyIndex));
-
                 length = controller.checkLength(lengthField.getText());
+
                 for(int i = 0 ; i < constraints.length ; i++)
-                    if(constraintsCheckBoxes.get(i).isSelected())
+                    if(constraintsCheckBoxes.get(i).isSelected()) {
                         _constraints.append(constraintsCheckBoxes.get(i).getText()).append(" ");
-                System.out.println("Tutej "+_constraints);
+                    }
+
                 columnNames.add(columnName);
                 columnType = columnType+length;
                 columnTypes.add(columnType);
+                constraintsVector.add(String.valueOf(_constraints));
                 createTableWindow.addColumnToComboBox(columnName);
                 createTableWindow.displayTable(null);
                 dispose();
-            }catch (BadColumnNameException | BadTypeLengthException | BadColumnTypeException | RepeteadColumnNameException | TwoCheckBoxesSelectedException exception){
+            }catch (BadColumnNameException | BadTypeLengthException | BadColumnTypeException | RepeteadColumnNameException exception){
                 new WarningWindow(exception.getMessage(), null, null);
-            }
-            for(int i = 0 ; i < columnNames.size() ; i++){
-                System.out.println(columnNames.get(i)+" - "+columnTypes.get(i));
             }
         },true);
         JButton cancelButton = createButton("Cancel",event->dispose(),true);
@@ -151,11 +148,10 @@ public class NewColumnWindow extends MyDialog {
     }
     public static class CheckBoxesComboBox extends JComboBox<JCheckBox>{
 
-        private final int foreignKeyIndex = 5;
         private final int defaultIndex = 2;
         private final int checkIndex = 3;
 
-        public CheckBoxesComboBox(Vector<JCheckBox> checkBoxes, JButton foreignKeyButton, JTextField defaultTextField, JTextField checkTextBox) {
+        public CheckBoxesComboBox(Vector<JCheckBox> checkBoxes, JTextField defaultTextField, JTextField checkTextBox) {
             super(checkBoxes);
             setRenderer(new ListCellRenderer<Component>() {
                 @Override
@@ -190,14 +186,6 @@ public class NewColumnWindow extends MyDialog {
                             checkTextBox.setEnabled(true);
                         else
                             checkTextBox.setEnabled(false);
-
-                        if (getItemAt(foreignKeyIndex).isSelected()) {
-                            foreignKeyButton.setEnabled(true);
-                        }
-                        else
-                            foreignKeyButton.setEnabled(false);
-
-
                     }
                 }
             });
