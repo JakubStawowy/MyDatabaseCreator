@@ -148,8 +148,7 @@ public class MainWindow extends MyFrame{
         mainWindowButtons.setPreferredSize(new Dimension(300,0));
         mainWindowButtons.setBackground(new Color(67,67,67));
 
-        scroll = new JScrollPane();
-        scroll.setViewportView(list);
+        scroll = new JScrollPane(list);
         scroll.setBorder(null);
         scroll.setPreferredSize(new Dimension(300,0));
         list.setLayoutOrientation(JList.VERTICAL);

@@ -26,6 +26,7 @@ public class CreateTableWindow extends MyDialog{
     private Vector<String> columnNames = new Vector<>();
     private Vector<String> columnTypes = new Vector<>();
     private Vector<String> constraintsVector = new Vector<>();
+    private Vector<String> foreignKeys = new Vector<>();
     public CreateTableWindow(Model model){
 
         this.model = model;
@@ -34,6 +35,9 @@ public class CreateTableWindow extends MyDialog{
         setLocationRelativeTo(null);
         initWindow();
         setVisible(true);
+    }
+    public Model getModel(){
+        return model;
     }
     public Vector<String> getColumnNames(){
         return columnNames;
@@ -47,11 +51,17 @@ public class CreateTableWindow extends MyDialog{
     public String getTableName(){
         return tableNameField.getText();
     }
+    public void addForeignKey(String foreignKey){
+        foreignKeys.add(foreignKey);
+    }
+    public Vector<String> getForeignKeys(){
+        return foreignKeys;
+    }
     @Override
     public void initWindow() {
         Color backgroundColor = new Color(67,67,67);
         JPanel mainPanel = createGridPanel(1,2,0,0,0);
-        JPanel sidePanel = createGridPanel(7,1,20,20,20);
+        JPanel sidePanel = createGridPanel(8,1,20,20,20);
         JPanel tablePanel = createGridPanel(1,1,20,20,20);
         JPanel subPanel = createGridPanel(1,2,20,0,0);
 
@@ -66,6 +76,14 @@ public class CreateTableWindow extends MyDialog{
         tableNameField.setCaretPosition(textFieldText.length());
 
         JButton newColumnButton = createButton("New Column",event->new NewColumnWindow(this),true);
+        JButton deleteColumnButton = createButton("Delete Column", event->{
+            try {
+                controller.checkNumberOfColumns(columnNames.size());
+                new DeleteColumnWindow(this);
+            } catch (BadColumnNumberException ignored) {
+                new WarningWindow("No columns to delete", null, null);
+            }
+        }, true);
 
         JLabel primaryKeyLabel = createLabel("Primary Key:");
         primaryKeyLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -92,9 +110,7 @@ public class CreateTableWindow extends MyDialog{
                 new WarningWindow(exception.getMessage(), null, null);
             }
             catch (NoPrimaryKeyException exception){
-                new WarningWindow(exception.getMessage(), subEvent->{
-                    model.createTable(tableName, this ,primaryKey, false);
-                }, null);
+                new WarningWindow(exception.getMessage(), subEvent->model.createTable(tableName, this ,primaryKey, false), null);
             }
         },true);
         JButton cancelButton = createButton("Cancel",event->dispose(),true);
@@ -106,6 +122,7 @@ public class CreateTableWindow extends MyDialog{
         sidePanel.add(tableNameField);
         sidePanel.add(label);
         sidePanel.add(newColumnButton);
+        sidePanel.add(deleteColumnButton);
         sidePanel.add(subPanel);
         sidePanel.add(addRowButton);
         sidePanel.add(createTableButton);

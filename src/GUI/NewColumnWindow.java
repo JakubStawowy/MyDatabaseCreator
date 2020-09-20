@@ -1,13 +1,16 @@
 package GUI;
 
 import Logic.Controller;
+import Logic.Model;
 import Logic.MyExceptions.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 public class NewColumnWindow extends MyDialog {
@@ -17,6 +20,7 @@ public class NewColumnWindow extends MyDialog {
     private Vector<String> columnTypes;
     private Vector<String> constraintsVector;
     private Controller controller = new Controller();
+    private String foreignKey = null;
     private final String[] numericTypes = {
             "bit", "tinyint", "smallint","mediumint", "bigint",
             "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"
@@ -41,6 +45,9 @@ public class NewColumnWindow extends MyDialog {
         pack();
         setVisible(true);
     }
+    public void setForeignKey(String foreignKey){
+        this.foreignKey = foreignKey;
+    }
     @Override
     public void initWindow() {
 
@@ -61,7 +68,7 @@ public class NewColumnWindow extends MyDialog {
         for(String constraint: constraints)
             constraintsCheckBoxes.add(new JCheckBox(constraint));
 
-        JButton foreignKeyButton = createButton("Add Foreign Key", null, true);
+        JButton foreignKeyButton = createButton("Add Foreign Key", event->new AddForeignKeyReferenceWindow(this, createTableWindow.getModel()), true);
         JTextField defaultTextBox = createTextField("Default value");
         JTextField checkTextBox = createTextField("Check");
 
@@ -94,11 +101,12 @@ public class NewColumnWindow extends MyDialog {
                     if(constraintsCheckBoxes.get(i).isSelected()) {
                         _constraints.append(constraintsCheckBoxes.get(i).getText()).append(" ");
                     }
-
                 columnNames.add(columnName);
                 columnType = columnType+length;
                 columnTypes.add(columnType);
                 constraintsVector.add(String.valueOf(_constraints));
+                if(foreignKey != null)
+                    createTableWindow.addForeignKey("FOREIGN KEY ("+columnName+") REFERENCES "+foreignKey);
                 createTableWindow.addColumnToComboBox(columnName);
                 createTableWindow.displayTable(null);
                 dispose();

@@ -25,6 +25,9 @@ public class Model {
     public List<String> getTableNames(){
         return tableNames;
     }
+    public String getDatabaseName(){
+        return databaseName.substring(databaseName.lastIndexOf("/")+1);
+    }
 
     /*
     * Creates new instance of Logic.DatabaseConnector(connects with database)
@@ -469,6 +472,7 @@ public class Model {
         Vector<String> columnNames = createTableWindow.getColumnNames();
         Vector<String> columnTypes = createTableWindow.getColumnTypes();
         Vector<String> constraintsVector = createTableWindow.getConstraintsVector();
+        Vector<String> foreignKeys = createTableWindow.getForeignKeys();
 
         StringBuilder query = new StringBuilder("CREATE TABLE "+tableName+"(");
         for(int index = 0 ; index < createTableWindow.getColumnNames().size() ; index++) {
@@ -478,6 +482,9 @@ public class Model {
         }
         if(!primaryKey.equals("None"))
             query.append(", PRIMARY KEY(").append(primaryKey).append(")");
+        if(!foreignKeys.isEmpty())
+            for(String foreignKey: foreignKeys)
+                query.append(", ").append(foreignKey);
         query.append(");");
         if(dropExistingTable)
             dropTable(tableName);
@@ -500,6 +507,24 @@ public class Model {
                 return true;
         }
         return false;
+    }
+    public List<Map<String, String>> getPrimaryKeys() throws SQLException {
+        List<Map<String, String>> primaryKeys = new ArrayList<>();
+        Map<String, String> primaryKeyMap;
+        ResultSet rs;
+
+        for(String tableName: tableNames) {
+            primaryKeyMap = new HashMap<>();
+            rs = dbConnector.executeQuery("DESC " + tableName + ";");
+            while (rs.next()){
+                if(rs.getString("Key").equals("PRI")) {
+                    primaryKeyMap.put(tableName, rs.getString("Field"));
+                    break;
+                }
+            }
+            primaryKeys.add(primaryKeyMap);
+        }
+        return primaryKeys;
     }
 
     /*
