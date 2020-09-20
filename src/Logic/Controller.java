@@ -1,5 +1,6 @@
 package Logic;
 
+import GUI.CreateTableWindow;
 import Logic.MyExceptions.*;
 
 import javax.swing.*;
@@ -66,12 +67,12 @@ public class Controller {
 
         }
     }
-    public void checkNamesTypesQuantity(Vector<String> columnNames, Vector<String> columnTypes) throws BadNamesTypesQuantityException {
-        if(columnNames.size()!=columnTypes.size())
+    public void checkNamesTypesQuantity(CreateTableWindow createTableWindow) throws BadNamesTypesQuantityException {
+        int numberOfNames = createTableWindow.getColumnNames().size();
+        int numberOfTypes = createTableWindow.getColumnTypes().size();
+        int numberOfConstraints = createTableWindow.getConstraintsVector().size();
+        if(numberOfNames!=numberOfTypes || numberOfNames!=numberOfConstraints)
             throw new BadNamesTypesQuantityException();
     }
-    public void checkTwoCheckBoxesSelection(JCheckBox checkBox1, JCheckBox checkBox2) throws TwoCheckBoxesSelectedException {
-        if(checkBox1.isSelected() && checkBox2.isSelected())
-            throw new TwoCheckBoxesSelectedException(checkBox1, checkBox2);
-    }
+
 }

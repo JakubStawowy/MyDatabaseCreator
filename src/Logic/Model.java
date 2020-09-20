@@ -1,5 +1,7 @@
 package Logic;
 
+import GUI.CreateTableWindow;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -463,11 +465,19 @@ public class Model {
         return data;
     }
 
-    public void createTable(String tableName, Vector<String> columnNames, Vector<String> columnTypes, String primaryKey, Boolean dropExistingTable){
+    public void createTable(String tableName, CreateTableWindow createTableWindow, String primaryKey, Boolean dropExistingTable){
+        Vector<String> columnNames = createTableWindow.getColumnNames();
+        Vector<String> columnTypes = createTableWindow.getColumnTypes();
+        Vector<String> constraintsVector = createTableWindow.getConstraintsVector();
+
         StringBuilder query = new StringBuilder("CREATE TABLE "+tableName+"(");
-        for(int index = 0 ; index < columnNames.size() ; index++)
-            query.append(columnNames.get(index)).append(" ").append(columnTypes.get(index)).append(", ");
-        query.append("PRIMARY KEY(").append(primaryKey).append(")");
+        for(int index = 0 ; index < createTableWindow.getColumnNames().size() ; index++) {
+            query.append(columnNames.get(index)).append(" ").append(columnTypes.get(index).toUpperCase()).append(" ").append(constraintsVector.get(index).toUpperCase());
+            if(index<createTableWindow.getColumnNames().size()-1)
+                query.append(", ");
+        }
+        if(!primaryKey.equals("None"))
+            query.append(", PRIMARY KEY(").append(primaryKey).append(")");
         query.append(");");
         if(dropExistingTable)
             dropTable(tableName);
