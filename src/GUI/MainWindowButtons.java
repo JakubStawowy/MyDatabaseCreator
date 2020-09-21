@@ -5,6 +5,7 @@ import Logic.Model;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 
 /*
@@ -33,9 +34,7 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
 
 
-        addNewRowButton = createButton("Add new row",event->{
-
-        },false);
+        addNewRowButton = createButton("Add new row",event->new AddRowWindow(mainWindow.getSelectedTable(), model, mainWindow),false);
         editTableButton = createButton("Edit table",event->new EditTableWindow(model, mainWindow.getSelectedTable()), false);
         removeTableButton = createButton("Remove table",event->{
 
@@ -43,14 +42,18 @@ public class MainWindowButtons extends JPanel implements MyWindow {
             int tableIndex = mainWindow.getSelectedTableIndex();
 
             new WarningWindow("Remove table "+tableName+"?",subEvent->{
-                model.removeTableFromList(tableName);
-                model.dropTable(tableName);
-                mainWindow.removeTableFromJList(tableIndex);
-                setButtons(false);
+                try {
+                    model.dropTable(tableName);
+                    model.removeTableFromList(tableName);
+                    mainWindow.removeTableFromJList(tableIndex);
+                    setButtons(false);
+                } catch (SQLException exception) {
+                    new WarningWindow(exception.getMessage(), null, null);
+                }
             }, null
             );
         },false);
-        createTableButton = createButton("Create new table",event->new CreateTableWindow(model),true);
+        createTableButton = createButton("Create new table",event->new CreateTableWindow(model, mainWindow),true);
 
         add(addNewRowButton);
         add(editTableButton);

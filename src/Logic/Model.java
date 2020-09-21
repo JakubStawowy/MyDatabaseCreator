@@ -148,7 +148,7 @@ public class Model {
     public void importDatabase() throws SQLException{
 
         ResultSet rs = dbConnector.executeQuery("SHOW TABLES;");
-
+        tableNames.clear();
         String tableName;
         while(rs.next()){
             tableName = rs.getString("Tables_in_"+databaseName.substring(databaseName.lastIndexOf("/")+1));
@@ -404,17 +404,10 @@ public class Model {
     *
     * @param String tableName
     * */
-    public void dropTable(String tableName){
-
-        try {
+    public void dropTable(String tableName) throws SQLException {
 
             dbConnector.execute("DROP TABLE " + tableName + ";");
 
-        }catch (SQLException sqlException){
-
-            System.out.println("Blad przy usuwaniu tabeli");
-
-        }
     }
     /*
     * Search table method returns a new table containing all rows that met the conditions specified as an argument.
@@ -468,7 +461,7 @@ public class Model {
         return data;
     }
 
-    public void createTable(String tableName, CreateTableWindow createTableWindow, String primaryKey, Boolean dropExistingTable){
+    public void createTable(String tableName, CreateTableWindow createTableWindow, String primaryKey, Boolean dropExistingTable) throws SQLException {
         Vector<String> columnNames = createTableWindow.getColumnNames();
         Vector<String> columnTypes = createTableWindow.getColumnTypes();
         Vector<String> constraintsVector = createTableWindow.getConstraintsVector();
@@ -489,7 +482,7 @@ public class Model {
         if(dropExistingTable)
             dropTable(tableName);
 
-        System.out.println(query);
+        dbConnector.execute(String.valueOf(query));
     }
     /*
     * isNumeric method is used to check if given type is numeric or no.
@@ -518,7 +511,7 @@ public class Model {
             rs = dbConnector.executeQuery("DESC " + tableName + ";");
             while (rs.next()){
                 if(rs.getString("Key").equals("PRI")) {
-                    primaryKeyMap.put(tableName, rs.getString("Field"));
+                    primaryKeyMap.put(tableName, rs.getString("Field") + " " + rs.getString("Type"));
                     break;
                 }
             }

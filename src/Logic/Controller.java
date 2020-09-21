@@ -3,7 +3,6 @@ package Logic;
 import GUI.CreateTableWindow;
 import Logic.MyExceptions.*;
 
-import javax.swing.*;
 import java.util.Vector;
 
 public class Controller {
@@ -28,16 +27,16 @@ public class Controller {
         if(numberOfColumns==0)
             throw new BadColumnNumberException("Bad number of columns. You must add at least one column to a table");
     }
-    public String checkLength(String length) throws BadTypeLengthException {
-        if(!(length.equals("Length") || length.equals(""))) {
+    public String checkSize(String size) throws BadTypeSizeException {
+        if(!(size.equals("Size") || size.equals(""))) {
 
             try {
-                if(Integer.parseInt(length)<=0)
-                    throw  new BadTypeLengthException("Bad length. Length cannot be less or equal 0");
+                if(Integer.parseInt(size)<=0)
+                    throw  new BadTypeSizeException("Bad length. Length cannot be less or equal 0");
             } catch (NumberFormatException ignored) {
-                throw new BadTypeLengthException("Bad length. Length must be a number");
+                throw new BadTypeSizeException("Bad length. Length must be a number");
             }
-            return "("+length+")";
+            return "("+size+")";
         }
         else return "";
     }
@@ -57,8 +56,9 @@ public class Controller {
                 break;
             }
         }
-        if(flag)
+        if(flag) {
             throw new BadColumnTypeException("Bad Column Type");
+        }
     }
     public void checkColumnNameUniqueness(String columnName, Vector<String> columnNames) throws RepeteadColumnNameException {
         for(String name: columnNames){

@@ -1,10 +1,10 @@
 package Logic.MyExceptions;
 
-public class BadTypeLengthException extends MyException {
-    public BadTypeLengthException(){
+public class BadTypeSizeException extends MyException {
+    public BadTypeSizeException(){
         this.message = "Bad Type Length";
     }
-    public BadTypeLengthException(String message){
+    public BadTypeSizeException(String message){
         this.message = message;
     }
     @Override

@@ -15,11 +15,11 @@ public class AddRowWindow extends MyDialog {
     private String tableName;
     private Table table;
     private JTable displayedTable;
-    private EditTableWindow tableWindow;
+    private MyFrame tableWindow;
     private JPanel tablePanel = createGridPanel(1,1,0,0, 0);
     private Model model;
 
-    public AddRowWindow(String tableName, Model model, EditTableWindow tableWindow){
+    public AddRowWindow(String tableName, Model model, MyFrame tableWindow){
 
         this.model = model;
         this.tableName = tableName;

@@ -9,9 +9,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 public class NewColumnWindow extends MyDialog {
 
@@ -21,6 +20,9 @@ public class NewColumnWindow extends MyDialog {
     private Vector<String> constraintsVector;
     private Controller controller = new Controller();
     private String foreignKey = null;
+    private JComboBox<String> typeComboBox;
+    private JButton foreignKeyButton;
+    JTextField sizeField;
     private final String[] numericTypes = {
             "bit", "tinyint", "smallint","mediumint", "bigint",
             "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"
@@ -28,6 +30,9 @@ public class NewColumnWindow extends MyDialog {
     private final String[] stringTypes ={
             "char", "varchar", "binary", "tinyblob", "tinytext", "text",
             "blob", "mediumtext", "mediumblob", "longtext", "longblob", "enum", "set"
+    };
+    private final String[] dateAndTimeTypes = {
+            "date", "datetime", "timestamp", "time", "year"
     };
     private final String[] constraints = {
             "Not Null", "Unique", "Default", "Check"
@@ -58,9 +63,9 @@ public class NewColumnWindow extends MyDialog {
 
 
         JTextField columnNameField = createTextField("Column Name");
-        JTextField lengthField = createTextField("Length");
+        sizeField = createTextField("Size");
 
-        JComboBox<String> typeComboBox = new JComboBox<>();
+        typeComboBox = new JComboBox<>();
         typeComboBox.setRenderer(new MyComboBoxRenderer("Type"));
 
         Vector<JCheckBox> constraintsCheckBoxes = new Vector<>();
@@ -68,7 +73,8 @@ public class NewColumnWindow extends MyDialog {
         for(String constraint: constraints)
             constraintsCheckBoxes.add(new JCheckBox(constraint));
 
-        JButton foreignKeyButton = createButton("Add Foreign Key", event->new AddForeignKeyReferenceWindow(this, createTableWindow.getModel()), true);
+        foreignKeyButton = createButton("Add Foreign Key", event->new AddForeignKeyReferenceWindow(this, createTableWindow.getModel()), true);
+
         JTextField defaultTextBox = createTextField("Default value");
         JTextField checkTextBox = createTextField("Check");
 
@@ -77,11 +83,16 @@ public class NewColumnWindow extends MyDialog {
 
         CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, defaultTextBox, checkTextBox);
 
-        for(String numericType: numericTypes)
-            typeComboBox.addItem(numericType);
+        List<String> dataTypesList = new ArrayList<>();
 
-        for(String stringType: stringTypes)
-            typeComboBox.addItem(stringType);
+        dataTypesList.addAll(Arrays.asList(numericTypes));
+        dataTypesList.addAll(Arrays.asList(stringTypes));
+        dataTypesList.addAll(Arrays.asList(dateAndTimeTypes));
+
+        Collections.sort(dataTypesList);
+
+        for(String type: dataTypesList)
+            typeComboBox.addItem(type);
 
         typeComboBox.setSelectedIndex(-1);
 
@@ -89,28 +100,28 @@ public class NewColumnWindow extends MyDialog {
 
             String columnName = columnNameField.getText();
             String columnType = String.valueOf(typeComboBox.getSelectedItem());
-            String length;
+            String size;
             StringBuilder _constraints = new StringBuilder();
             try {
                 controller.checkColumnName(columnName);
                 controller.checkType(columnType);
                 controller.checkColumnNameUniqueness(columnName, columnNames);
-                length = controller.checkLength(lengthField.getText());
+                size = controller.checkSize(sizeField.getText());
 
                 for(int i = 0 ; i < constraints.length ; i++)
                     if(constraintsCheckBoxes.get(i).isSelected()) {
                         _constraints.append(constraintsCheckBoxes.get(i).getText()).append(" ");
                     }
                 columnNames.add(columnName);
-                columnType = columnType+length;
+                columnType = columnType+size;
                 columnTypes.add(columnType);
                 constraintsVector.add(String.valueOf(_constraints));
                 if(foreignKey != null)
-                    createTableWindow.addForeignKey("FOREIGN KEY ("+columnName+") REFERENCES "+foreignKey);
+                    createTableWindow.addForeignKey("FOREIGN KEY("+columnName+") REFERENCES "+foreignKey);
                 createTableWindow.addColumnToComboBox(columnName);
                 createTableWindow.displayTable(null);
                 dispose();
-            }catch (BadColumnNameException | BadTypeLengthException | BadColumnTypeException | RepeteadColumnNameException exception){
+            }catch (BadColumnNameException | BadTypeSizeException | BadColumnTypeException | RepeteadColumnNameException exception){
                 new WarningWindow(exception.getMessage(), null, null);
             }
         },true);
@@ -120,13 +131,15 @@ public class NewColumnWindow extends MyDialog {
         buttonsPanel.add(cancelButton);
 
         JLabel constraintsLabel = createLabel("Constraints:");
+
         constraintsLabel.setPreferredSize(new Dimension(80,20));
         sidePanel.add(constraintsLabel, BorderLayout.WEST);
         sidePanel.add(constraintsComboBox, BorderLayout.EAST);
 
+
         mainPanel.add(columnNameField);
         mainPanel.add(typeComboBox);
-        mainPanel.add(lengthField);
+        mainPanel.add(sizeField);
         mainPanel.add(sidePanel);
         mainPanel.add(foreignKeyButton);
         mainPanel.add(defaultTextBox);
@@ -134,6 +147,15 @@ public class NewColumnWindow extends MyDialog {
         mainPanel.add(buttonsPanel);
 
         add(mainPanel);
+    }
+    public void setForeignKeyComponents(){
+        foreignKeyButton.setText("Change Foreign Key");
+    }
+    public void setTypeAndSize(String type, String size){
+        typeComboBox.removeAllItems();
+        typeComboBox.addItem(type);
+        sizeField.setText(size);
+        sizeField.setEnabled(false);
     }
     @Override
     public void displayTable(List<List<Object>> data) {}

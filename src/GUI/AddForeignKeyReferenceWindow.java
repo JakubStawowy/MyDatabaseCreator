@@ -14,6 +14,7 @@ public class AddForeignKeyReferenceWindow extends MyDialog{
     private List<String> tableNames;
     private List<Map<String, String>> primaryKeyList;
     private NewColumnWindow newColumnWindow;
+    private String primaryKeyWithType;
     public AddForeignKeyReferenceWindow(NewColumnWindow newColumnWindow, Model model){
         this.model = model;
         tableNames = model.getTableNames();
@@ -36,7 +37,12 @@ public class AddForeignKeyReferenceWindow extends MyDialog{
         primaryKeysLabel.setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
 
         JButton addForeignKeyButton = createButton("Add Foreign Key", event->{
+
+            String type = primaryKeyWithType.substring(primaryKeyWithType.indexOf(" ")+1, primaryKeyWithType.indexOf("("));
+            String size = primaryKeyWithType.substring(primaryKeyWithType.indexOf("(")+1,primaryKeyWithType.indexOf(")"));
             newColumnWindow.setForeignKey(primaryKeyJList.getSelectedValue());
+            newColumnWindow.setTypeAndSize(type, size);
+            newColumnWindow.setForeignKeyComponents();
             dispose();
         },true);
         JButton cancelButton = createButton("Cancel", event->dispose(),true);
@@ -69,7 +75,8 @@ public class AddForeignKeyReferenceWindow extends MyDialog{
         }
         DefaultListModel<String> stringPrimaryKeyList = new DefaultListModel<>();
         for(int index = 0 ; index < tableNames.size() ; index++){
-            String tablePrimaryKey = tableNames.get(index)+"("+primaryKeyList.get(index).get(tableNames.get(index))+")";
+            primaryKeyWithType = primaryKeyList.get(index).get(tableNames.get(index));
+            String tablePrimaryKey = tableNames.get(index)+"("+primaryKeyWithType.substring(0,primaryKeyWithType.indexOf(" "))+")";
             stringPrimaryKeyList.addElement(tablePrimaryKey);
         }
         primaryKeyJList = new JList<>(stringPrimaryKeyList);

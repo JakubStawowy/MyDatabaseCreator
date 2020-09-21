@@ -10,6 +10,7 @@ import Logic.MyExceptions.NoPrimaryKeyException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
@@ -27,9 +28,11 @@ public class CreateTableWindow extends MyDialog{
     private Vector<String> columnTypes = new Vector<>();
     private Vector<String> constraintsVector = new Vector<>();
     private Vector<String> foreignKeys = new Vector<>();
-    public CreateTableWindow(Model model){
+    private MainWindow mainWindow;
+    public CreateTableWindow(Model model, MainWindow mainWindow){
 
         this.model = model;
+        this.mainWindow = mainWindow;
         setTitle("Create Table");
         setBounds(new Rectangle(800,600));
         setLocationRelativeTo(null);
@@ -105,12 +108,20 @@ public class CreateTableWindow extends MyDialog{
                 controller.checkNamesTypesQuantity(this);
                 if(primaryKeyComboBox.getSelectedItem().equals("None"))
                     throw new NoPrimaryKeyException();
-                model.createTable(tableName, this ,primaryKey, false);
-            } catch (BadTableNameException | BadColumnNumberException | BadNamesTypesQuantityException exception) {
+                model.createTable(tableName, this ,primaryKey, true);
+                dispose();
+            } catch (BadTableNameException | BadColumnNumberException | BadNamesTypesQuantityException | SQLException exception) {
                 new WarningWindow(exception.getMessage(), null, null);
             }
             catch (NoPrimaryKeyException exception){
-                new WarningWindow(exception.getMessage(), subEvent->model.createTable(tableName, this ,primaryKey, false), null);
+                new WarningWindow(exception.getMessage(), subEvent->{
+                    try {
+                        model.createTable(tableName, this ,primaryKey, true);
+                        dispose();
+                    } catch (SQLException subException) {
+                        new WarningWindow(subException.getMessage(), null, null);
+                    }
+                }, null);
             }
         },true);
         JButton cancelButton = createButton("Cancel",event->dispose(),true);

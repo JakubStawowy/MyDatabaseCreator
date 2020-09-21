@@ -139,6 +139,7 @@ public class MainWindow extends MyFrame{
 
         //------------------------------------TableList---------------------------------------------------
         tableList = model.getTableNames();
+//        list = new JList<>(tableList.toArray(new String[0]));
         list = new JList<>(tableList.toArray(new String[0]));
         list.setBackground(new Color(105,105,105));
         list.setForeground(Color.WHITE);
@@ -186,6 +187,8 @@ public class MainWindow extends MyFrame{
 
         tableList.remove(index);
         list = new JList<>(tableList.toArray(new String[0]));
+        list.setBackground(new Color(105,105,105));
+        list.setForeground(Color.WHITE);
         setListMouseListener();
         scroll.setViewportView(list);
         list.setLayoutOrientation(JList.VERTICAL);
