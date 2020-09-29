@@ -3,13 +3,27 @@ package GUI;
 import Logic.Model;
 import Logic.Table;
 
-import javax.swing.*;
+import javax.swing.JTable;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.BorderFactory;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+* AddRowWindow
+*
+* @extends MyDialog
+*
+* This window displays empty row of a selected table and allows to add new data to this table.
+* used in: MainWindow, EditTableWindow
+*
+* */
 public class AddRowWindow extends MyDialog {
 
     private String tableName;
@@ -24,25 +38,33 @@ public class AddRowWindow extends MyDialog {
         this.model = model;
         this.tableName = tableName;
         this.tableWindow = tableWindow;
+        final String title = "Add row";
+        final int height = 200;
+        final int width = 400;
 
         table = model.getTable(tableName);
-        String title = "Add row";
         setTitle(title);
-        int height = 200;
-        int width = 400;
         setSize(new Dimension(width, height));
         setLocationRelativeTo(null);
-        initWindow();
+        createWidgets();
         setVisible(true);
     }
     @Override
-    public void initWindow() {
+    public void createWidgets() {
 
         displayTable(null);
+
+//        ------------------------------mainPanel-----------------------------------------------------------------------
+
         JPanel mainPanel = createGridPanel(2,1,0,20, 20);
+
+//        ------------------------------buttonsPanel--------------------------------------------------------------------
+
         JPanel buttonsPanel = createGridPanel(1,3,20,0, 0);
 
-        JButton createButton = createButton("Add",event->{
+//        ------------------------------addRowButton---------------------------------------
+
+        JButton addRowButton = createButton("Add",event->{
             try {
                 model.addRow(getRow(), tableName);
                 tableWindow.displayTable(model.importTable(tableName).getData());
@@ -52,6 +74,8 @@ public class AddRowWindow extends MyDialog {
                 System.out.println(sqlException.getMessage());
             }
             },true);
+
+//        ------------------------------testButton---------------------------------------
 
         JButton testButton = createButton("Test",event->{
             try {
@@ -63,9 +87,11 @@ public class AddRowWindow extends MyDialog {
             }
         },true);
 
+//        ------------------------------cancelButton---------------------------------------
+
         JButton cancelButton = createButton("Cancel",event->dispose(),true);
 
-        buttonsPanel.add(createButton);
+        buttonsPanel.add(addRowButton);
         buttonsPanel.add(testButton);
         buttonsPanel.add(cancelButton);
 
@@ -87,7 +113,6 @@ public class AddRowWindow extends MyDialog {
         List<Object> row = new ArrayList<>();
         for(int i = 0; i < displayedTable.getColumnCount(); i++)
             row.add(displayedTable.getValueAt(0,i));
-
         return row;
     }
 }

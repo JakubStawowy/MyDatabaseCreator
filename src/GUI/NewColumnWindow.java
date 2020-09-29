@@ -1,17 +1,37 @@
 package GUI;
 
 import Logic.Controller;
-import Logic.Model;
-import Logic.MyExceptions.*;
-
-import javax.swing.*;
-import java.awt.*;
+import Logic.MyExceptions.BadColumnTypeException;
+import Logic.MyExceptions.BadColumnNameException;
+import Logic.MyExceptions.BadTypeSizeException;
+import Logic.MyExceptions.RepeteadColumnNameException;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.ListCellRenderer;
+import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
-import java.util.*;
+import java.awt.Component;
+import java.util.Vector;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+/*
+* NewColumnWindow
+*
+* @extends MyDialog
+*
+* This window allows to create and add a new Column in created table
+* */
 public class NewColumnWindow extends MyDialog {
 
     private CreateTableWindow createTableWindow;
@@ -39,14 +59,15 @@ public class NewColumnWindow extends MyDialog {
     };
     public NewColumnWindow(CreateTableWindow createTableWindow){
 
+        final String title = "New Column";
         this.createTableWindow = createTableWindow;
         columnNames = createTableWindow.getColumnNames();
         columnTypes = createTableWindow.getColumnTypes();
         constraintsVector = createTableWindow.getConstraintsVector();
 
-        setTitle("New Column");
+        setTitle(title);
         setLocationRelativeTo(null);
-        initWindow();
+        createWidgets();
         pack();
         setVisible(true);
     }
@@ -54,34 +75,58 @@ public class NewColumnWindow extends MyDialog {
         this.foreignKey = foreignKey;
     }
     @Override
-    public void initWindow() {
+    public void createWidgets() {
+
+//        -------------------------------------------mainPanel----------------------------------------------------------
 
         JPanel mainPanel = createGridPanel(8,1,0,20,20);
+
+//        -------------------------------------------buttonsPanel-------------------------------------------------------
+
         JPanel buttonsPanel = createGridPanel(1,2,20,0,0);
+
+//        -------------------------------------------sidePanel----------------------------------------------------------
+
         JPanel sidePanel = new JPanel(new BorderLayout());
         sidePanel.setBackground(new Color(67,67,67));
 
+//        -------------------------------------------columnNameField----------------------------------------------------
 
         JTextField columnNameField = createTextField("Column Name");
+
+//        -------------------------------------------sizeField----------------------------------------------------------
+
         sizeField = createTextField("Size");
+
+//        -------------------------------------------typeComboBox-------------------------------------------------------
 
         typeComboBox = new JComboBox<>();
         typeComboBox.setRenderer(new MyComboBoxRenderer("Type"));
+
+//        -------------------------------------------constraintsCheckBoxes----------------------------------------------
 
         Vector<JCheckBox> constraintsCheckBoxes = new Vector<>();
 
         for(String constraint: constraints)
             constraintsCheckBoxes.add(new JCheckBox(constraint));
 
+//        -------------------------------------------foreignKeyButton---------------------------------------------------
+
         foreignKeyButton = createButton("Add Foreign Key", event->new AddForeignKeyReferenceWindow(this, createTableWindow.getModel()), true);
 
-        JTextField defaultTextBox = createTextField("Default value");
-        JTextField checkTextBox = createTextField("Check");
+//        -------------------------------------------defaultValueField--------------------------------------------------
 
-        defaultTextBox.setEnabled(false);
+        JTextField defaultValueField = createTextField("Default value");
+        defaultValueField.setEnabled(false);
+
+//        -------------------------------------------checkTextBox-------------------------------------------------------
+
+        JTextField checkTextBox = createTextField("Check");
         checkTextBox.setEnabled(false);
 
-        CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, defaultTextBox, checkTextBox);
+//        -------------------------------------------constraintsComboBox------------------------------------------------
+
+        CheckBoxesComboBox constraintsComboBox = new CheckBoxesComboBox(constraintsCheckBoxes, defaultValueField, checkTextBox);
 
         List<String> dataTypesList = new ArrayList<>();
 
@@ -95,6 +140,8 @@ public class NewColumnWindow extends MyDialog {
             typeComboBox.addItem(type);
 
         typeComboBox.setSelectedIndex(-1);
+
+//        -------------------------------------------addColumnButton----------------------------------------------------
 
         JButton addColumnButton = createButton("Add Column",event->{
 
@@ -125,24 +172,28 @@ public class NewColumnWindow extends MyDialog {
                 new WarningWindow(exception.getMessage(), null, null);
             }
         },true);
+
+//        -------------------------------------------cancelButton-------------------------------------------------------
+
         JButton cancelButton = createButton("Cancel",event->dispose(),true);
+
+//        -------------------------------------------constraintsLabel---------------------------------------------------
+
+        JLabel constraintsLabel = createLabel("Constraints:");
+        constraintsLabel.setPreferredSize(new Dimension(80,20));
 
         buttonsPanel.add(addColumnButton);
         buttonsPanel.add(cancelButton);
 
-        JLabel constraintsLabel = createLabel("Constraints:");
-
-        constraintsLabel.setPreferredSize(new Dimension(80,20));
         sidePanel.add(constraintsLabel, BorderLayout.WEST);
         sidePanel.add(constraintsComboBox, BorderLayout.EAST);
-
 
         mainPanel.add(columnNameField);
         mainPanel.add(typeComboBox);
         mainPanel.add(sizeField);
         mainPanel.add(sidePanel);
         mainPanel.add(foreignKeyButton);
-        mainPanel.add(defaultTextBox);
+        mainPanel.add(defaultValueField);
         mainPanel.add(checkTextBox);
         mainPanel.add(buttonsPanel);
 

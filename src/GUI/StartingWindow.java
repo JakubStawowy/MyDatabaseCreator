@@ -1,40 +1,47 @@
 package GUI;
 
-import Logic.Run;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import javax.swing.JPanel;
+import javax.swing.JButton;
 import java.util.List;
 
 /*
-* StartingWindow class
+* StartingWindow
+*
+* @extends MyDialog
+*
 * */
 public class StartingWindow extends MyDialog {
 
     public StartingWindow(){
 
-        setSize(400,300);
-        setTitle("MyDatabaseCreator");
-        initWindow();
+        final String title = "MyDatabaseCreator";
+        final int width = 400;
+        final int height = 300;
+
+        setSize(width, height);
+        setTitle(title);
+        createWidgets();
         setVisible(true);
         setLocationRelativeTo(null);
 
     }
     @Override
-    public void initWindow() {
+    public void createWidgets() {
 
+//        ---------------------------------------mainPanel--------------------------------------------------------------
 
+        JPanel mainPanel = createGridPanel(3,1,0,20,20);
 
-        JPanel mainPanel = new JPanel(null);
-
-        mainPanel.setLayout(new GridLayout(3,1,0,20));
-        mainPanel.setBackground(new Color(67,67,67));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+//        ---------------------------------------importButton-----------------------------------------------------------
 
         JButton importButton = createButton("Import database", event->new ConnectWindow(this), true);
+
+//        ---------------------------------------skipButton-------------------------------------------------------------
+
         JButton skipButton = createButton("Skip", event->dispose(),false);
+
+//        ---------------------------------------closeButton------------------------------------------------------------
+
         JButton closeButton = createButton("Close", event->dispose(),true);
 
         mainPanel.add(importButton);

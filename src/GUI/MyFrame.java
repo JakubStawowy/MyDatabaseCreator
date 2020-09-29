@@ -1,13 +1,36 @@
 package GUI;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.BorderFactory;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 import java.util.List;
 
+/*
+ * MyFrame
+ *
+ * @extends JFrame
+ * @implements MyWindow
+ *
+ * this abstract class overrides the following methods from MyWindow Interface:
+ *   *createButton
+ *   *createTextField
+ *   *createLabel
+ *   *createGridPanel
+ *   *setTextField
+ * */
 abstract class MyFrame extends JFrame implements MyWindow {
     @Override
-    public abstract void initWindow();
+    public abstract void createWidgets();
 
     @Override
     public abstract void displayTable(List<List<Object>> data);

@@ -1,12 +1,17 @@
 package GUI;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.util.List;
 
 /*
-* WarningWindow class is responsible for displaying warnings and executing action passed as constructor parameters.
+* WarningWindow
+*
+* @extends MyDialog
+*
+* This window is responsible for displaying warnings and executing action passed as constructor parameters.
 * */
 public class WarningWindow extends MyDialog{
 
@@ -19,29 +24,43 @@ public class WarningWindow extends MyDialog{
         this.text = text;
         this.action = action;
         this.finalAction = finalAction;
+        final String title = "Warning";
 
-        setTitle("Warning");
+        setTitle(title);
         setLocationRelativeTo(null);
-
-        initWindow();
+        createWidgets();
         pack();
         setVisible(true);
     }
     @Override
-    public void initWindow() {
+    public void createWidgets() {
+
+//        ---------------------------------------mainPanel--------------------------------------------------------------
 
         JPanel mainPanel = createGridPanel(2,1,0,20,20);
+
+//        ---------------------------------------buttonsPanel-----------------------------------------------------------
+
         JPanel buttonsPanel;
+
+//        ---------------------------------------messageLabel-----------------------------------------------------------
 
         JLabel messageLabel = createLabel(text);
         messageLabel.setHorizontalAlignment(JLabel.CENTER);
 
         if(action!=null) {
-            buttonsPanel = createGridPanel(1,2,20,0,0);
-            JButton yesButton = createButton("Yes",action,true);
 
+//        ---------------------------------------buttonsPanel-----------------------------------------------------------
+
+            buttonsPanel = createGridPanel(1,2,20,0,0);
+
+//        ---------------------------------------yesButton--------------------------------------------------------------
+
+            JButton yesButton = createButton("Yes",action,true);
             yesButton.addActionListener(event -> dispose());
             yesButton.addActionListener(finalAction);
+
+//        ---------------------------------------noButton---------------------------------------------------------------
 
             JButton noButton = createButton("No", event->dispose(),true);
 
@@ -54,7 +73,13 @@ public class WarningWindow extends MyDialog{
 
         }
         else{
+
+//        ---------------------------------------buttonsPanel-----------------------------------------------------------
+
             buttonsPanel = createGridPanel(1,1,20,0,0);
+
+//        ---------------------------------------okButton---------------------------------------------------------------
+
             JButton okButton = createButton("Ok", event->dispose(), true);
             if(finalAction!=null) {
                 okButton.addActionListener(finalAction);

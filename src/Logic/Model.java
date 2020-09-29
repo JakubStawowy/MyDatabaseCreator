@@ -1,13 +1,19 @@
 package Logic;
 
 import GUI.CreateTableWindow;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Vector;
+import java.util.Map;
+import java.util.HashMap;
 
 /*
-* Logic.Model class is responsible for most logical methods such as creating tables, saving tables etc.
+* Model
+* this class is responsible for most logical methods such as creating tables, saving tables etc.
 * */
 public class Model {
 
@@ -406,7 +412,7 @@ public class Model {
     * */
     public void dropTable(String tableName) throws SQLException {
 
-            dbConnector.execute("DROP TABLE " + tableName + ";");
+            dbConnector.execute("DROP TABLE IF EXISTS " + tableName + ";");
 
     }
     /*

@@ -1,21 +1,28 @@
 package GUI;
+
 import Logic.Model;
 import Logic.Table;
-
-import javax.swing.*;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.BorderFactory;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.event.*;
 
 /*
-* DisplayTableWindow class is used to display all table data.
+* DisplayTableWindow
+*
+* @extends MyFrame
+*
+* This window allows to edit table (display table, search table, add new row, delete row).
+*
 * */
 public class EditTableWindow extends MyFrame{
 
@@ -23,47 +30,60 @@ public class EditTableWindow extends MyFrame{
     private Model model;
     private JTable displayedTable;
     private Object[][] tableData;
-    private JScrollPane scrollPane;
+    private JScrollPane tableScrollPane;
     private Object buffer;
     private Color backgroundColor = new Color(67,67,67);
-    JButton removeRowButton;
+    private JButton removeRowButton;
 
     public EditTableWindow(Model model, String tableName){
 
         this.table = model.importTable(tableName);
         this.model = model;
-        setLocation(new Point(300,200));
-        setPreferredSize(new Dimension(600,350));
-        setTitle(table.getTableName());
+        final String title = tableName;
+        final int width = 600;
+        final int height = 350;
+
         tableData = new Object[table.getData().size()][table.getColumnNames().size()];
-        initWindow();
+        setTitle(title);
+        setPreferredSize(new Dimension(width, height));
+        createWidgets();
         setVisible(true);
         pack();
     }
 
     @Override
-    public void initWindow() {
+    public void createWidgets() {
+
+//        -----------------------------------mainPanel------------------------------------------------------------------
+
         JPanel mainPanel = createGridPanel(2,1,0,20,20);
+
+//        -----------------------------------tablePanel-----------------------------------------------------------------
+
         JPanel tablePanel = createGridPanel(1,1,0,0,0);
+
+//        -----------------------------------buttonsPanel---------------------------------------------------------------
+
         JPanel buttonsPanel = createGridPanel(2,2,20,20,0);
 
-        //------------------------------------DisplayedTable---------------------------------------------------
+//-------------------------------------------tableScrollPane------------------------------------------------------------
 
-        scrollPane = new JScrollPane(displayedTable);
-        scrollPane.getViewport().setBackground(backgroundColor);
+        tableScrollPane = new JScrollPane(displayedTable);
+        tableScrollPane.getViewport().setBackground(backgroundColor);
+        tableScrollPane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+
         displayTable(table.getData());
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 
 
-        //------------------------------------SearchTableButton---------------------------------------------------
+//--------------------------------------------searchTableButton---------------------------------------------------------
 
         JButton searchTableButton = createButton("Search Table", event->new SearchTableWindow(this),true);
 
-        //------------------------------------AddRowButton---------------------------------------------------
+//--------------------------------------------addRowButton--------------------------------------------------------------
 
         JButton addRowButton = createButton("Add Row", event->new AddRowWindow(table.getTableName(), model, this), true);
 
-        //------------------------------------RemoveRowButton---------------------------------------------------
+//--------------------------------------------removeRowButton-----------------------------------------------------------
 
         removeRowButton = createButton("Remove Row", event->new WarningWindow("Remove row?",subEvent->{
 
@@ -86,7 +106,7 @@ public class EditTableWindow extends MyFrame{
             }
         }, null), false);
 
-        //------------------------------------CloseButton---------------------------------------------------
+//---------------------------------------------closeButton--------------------------------------------------------------
 
         JButton closeButton = createButton("Close", event->{
             model.dropCopiedTable(table.getTableName());
@@ -98,7 +118,7 @@ public class EditTableWindow extends MyFrame{
         buttonsPanel.add(removeRowButton);
         buttonsPanel.add(closeButton);
 
-        tablePanel.add(scrollPane);
+        tablePanel.add(tableScrollPane);
         mainPanel.add(tablePanel);
         mainPanel.add(buttonsPanel);
         add(mainPanel);
@@ -132,12 +152,6 @@ public class EditTableWindow extends MyFrame{
     public Model getModel(){
         return model;
     }
-    /*
-    * displayTable method displays table using data parameter
-    *
-    * @param data (multidimensional ArrayList)
-    * */
-
     @Override
     public void displayTable(List<List<Object>> data){
 
@@ -201,6 +215,6 @@ public class EditTableWindow extends MyFrame{
                 }
         });
         displayedTable.setBorder(null);
-        scrollPane.setViewportView(displayedTable);
+        tableScrollPane.setViewportView(displayedTable);
     }
 }

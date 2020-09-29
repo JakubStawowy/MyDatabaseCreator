@@ -1,13 +1,26 @@
 package GUI;
-
 import Logic.Model;
-
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.JList;
+import javax.swing.JLabel;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.DefaultListModel;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+/*
+* AddForeignKeyReferenceWindow
+*
+* @extends MyDialog
+*
+* This window displays all Primary Keys from connected Database and allows to select Foreign Key reference for created column.
+*
+* */
 public class AddForeignKeyReferenceWindow extends MyDialog{
     private Model model;
     private JList<String> primaryKeyJList;
@@ -20,21 +33,25 @@ public class AddForeignKeyReferenceWindow extends MyDialog{
         tableNames = model.getTableNames();
         this.newColumnWindow = newColumnWindow;
         importPrimaryKeys();
-        initWindow();
+        createWidgets();
         setLocationRelativeTo(null);
         pack();
         setVisible(true);
     }
     @Override
-    public void initWindow() {
+    public void createWidgets() {
+
+//        --------------------------------------mainPanel-----------------------------------------------------------------
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,0,20));
         mainPanel.setBackground(new Color(67,67,67));
+
+//        --------------------------------------buttonsPanel-----------------------------------------------------------------
+
         JPanel buttonsPanel = createGridPanel(1,2,20,0,20);
 
-        JLabel primaryKeysLabel = createLabel("Primary Keys in "+model.getDatabaseName()+" schema");
-        primaryKeysLabel.setHorizontalAlignment(JLabel.CENTER);
-        primaryKeysLabel.setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
+//        -------------------------------------addForeignKeyButton----------------------------------
 
         JButton addForeignKeyButton = createButton("Add Foreign Key", event->{
 
@@ -44,22 +61,36 @@ public class AddForeignKeyReferenceWindow extends MyDialog{
             newColumnWindow.setTypeAndSize(type, size);
             newColumnWindow.setForeignKeyComponents();
             dispose();
+
         },true);
+
+//        -------------------------------------cancelButton-----------------------------------------
+
         JButton cancelButton = createButton("Cancel", event->dispose(),true);
+
+//        -------------------------------------primaryKeysLabel----------------------------------
+
+        JLabel primaryKeysLabel = createLabel("Primary Keys in "+model.getDatabaseName()+" schema");
+        primaryKeysLabel.setHorizontalAlignment(JLabel.CENTER);
+        primaryKeysLabel.setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
+
+//        -------------------------------------primaryKeyJList----------------------------------
 
         primaryKeyJList.setBackground(new Color(105,105,105));
         primaryKeyJList.setForeground(Color.WHITE);
 
-        JScrollPane scroll = new JScrollPane();
-        scroll.setViewportView(primaryKeyJList);
-        scroll.setBorder(null);
+//        -------------------------------------primaryKeyScrollPane----------------------------------
+
+        JScrollPane primaryKeyScrollPane = new JScrollPane();
+        primaryKeyScrollPane.setViewportView(primaryKeyJList);
+        primaryKeyScrollPane.setBorder(null);
         primaryKeyJList.setLayoutOrientation(JList.VERTICAL);
 
         buttonsPanel.add(addForeignKeyButton);
         buttonsPanel.add(cancelButton);
 
         mainPanel.add(primaryKeysLabel, BorderLayout.NORTH);
-        mainPanel.add(scroll, BorderLayout.CENTER);
+        mainPanel.add(primaryKeyScrollPane, BorderLayout.CENTER);
         mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         add(mainPanel);

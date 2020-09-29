@@ -9,15 +9,19 @@ import java.sql.SQLException;
 import java.util.List;
 
 /*
-* GUI.MainWindowButtons class is a class that extends JPanel class and MyWindow interface.
-* It contains all main window buttons such as create table, delete table, display table etc.
+* MainWindowButtons
+*
+* @extends JPanel
+* @implements MyWindow
+*
+* This panel contains all buttons included in MainWindow
+*
 * */
 public class MainWindowButtons extends JPanel implements MyWindow {
 
     private Model model;
     private MainWindow mainWindow;
     private JButton addNewRowButton;
-    private JButton createTableButton;
     private JButton removeTableButton;
     private JButton editTableButton;
 
@@ -25,17 +29,25 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
         this.model = model;
         this.mainWindow = mainWindow;
-        setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
-        initWindow();
+
+        createWidgets();
         setLayout(new GridLayout(4,1,0,50));
+        setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+
     }
     @Override
-    public void initWindow() {
+    public void createWidgets() {
 
-
+//        ----------------------------------------addNewRowButton-------------------------------------------------------
 
         addNewRowButton = createButton("Add new row",event->new AddRowWindow(mainWindow.getSelectedTable(), model, mainWindow),false);
+
+//        ----------------------------------------editTableButton-------------------------------------------------------
+
         editTableButton = createButton("Edit table",event->new EditTableWindow(model, mainWindow.getSelectedTable()), false);
+
+//        ----------------------------------------removeTableButton-----------------------------------------------------
+
         removeTableButton = createButton("Remove table",event->{
 
             String tableName = mainWindow.getSelectedTable();
@@ -53,7 +65,10 @@ public class MainWindowButtons extends JPanel implements MyWindow {
             }, null
             );
         },false);
-        createTableButton = createButton("Create new table",event->new CreateTableWindow(model, mainWindow),true);
+
+//        ----------------------------------------createTableButton-----------------------------------------------------
+
+        JButton createTableButton = createButton("Create new table", event -> new CreateTableWindow(model, mainWindow), true);
 
         add(addNewRowButton);
         add(editTableButton);
@@ -64,6 +79,7 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
     @Override
     public void displayTable(List<List<Object>> data) {}
+
 
     @Override
     public void setTextField(JTextField textField, String textFieldText) {}
@@ -90,7 +106,12 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
     @Override
     public JPanel createGridPanel(int rows, int cols, int hgap, int vgap, int margin) {
-        return null;
+
+        JPanel panel = new JPanel(new GridLayout(rows,cols,hgap,vgap));
+        panel.setBorder(BorderFactory.createEmptyBorder(margin, margin, margin, margin));
+        panel.setBackground(new Color(67,67,67));
+        panel.setForeground(Color.WHITE);
+        return panel;
     }
 
     public void setButtons(Boolean enable){

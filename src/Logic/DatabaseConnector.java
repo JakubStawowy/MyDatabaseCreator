@@ -1,8 +1,12 @@
 package Logic;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 /*
-* Database Connector class is used to connect with sql database
+* Database Connector
+* this class is used to connect with sql database
 * */
 public class DatabaseConnector {
 

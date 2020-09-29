@@ -1,16 +1,24 @@
 package GUI;
 
 import Logic.Table;
-
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JCheckBox;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.util.EventListener;
+import java.awt.Color;
 import java.util.List;
 
 /*
-* SearchTableWindow class
+* SearchTableWindow
+*
+* @extends MyDialog
+*
+* This window allows to search table using conditions, sort table ascending or descending
 * */
 public class SearchTableWindow extends MyDialog{
 
@@ -18,29 +26,31 @@ public class SearchTableWindow extends MyDialog{
     private JCheckBox ascSortCheckBox;
     private JCheckBox descSortCheckBox;
     private Color backgroundColor = new Color(67,67,67);
-    private Color componentColor = new Color(105, 105, 105);
     public SearchTableWindow(EditTableWindow displayTableWindow){
 
         this.displayTableWindow = displayTableWindow;
-
-//        setPreferredSize(new Dimension(500,100));
-        setTitle("Search table "+displayTableWindow.getTable().getTableName());
-        initWindow();
+        final String title = "Search table "+displayTableWindow.getTable().getTableName();
+        setTitle(title);
+        createWidgets();
         setLocationRelativeTo(null);
         pack();
         setVisible(true);
     }
     @Override
-    public void initWindow() {
+    public void createWidgets() {
+
+//        --------------------------------------mainPanel---------------------------------------------------------------
 
         JPanel mainPanel = createGridPanel(2,3,20,20,20);
         JButton searchButton;
 
-        //------------------------------------Textfield---------------------------------------------------
-        JTextField textField = createTextField("Condition");
-        setTextField(textField, "Condition");
+//        --------------------------------------conditionField----------------------------------------------------------
 
-        //------------------------------------ColumnComboBox---------------------------------------------------
+        JTextField conditionField = createTextField("Condition");
+        setTextField(conditionField, "Condition");
+
+//        --------------------------------------columnComboBox----------------------------------------------------------
+
         JComboBox<String> columnComboBox = new JComboBox<>();
 
         for(String column: displayTableWindow.getTable().getColumnNames())
@@ -48,24 +58,26 @@ public class SearchTableWindow extends MyDialog{
 
         columnComboBox.setEnabled(false);
 
+//        -------------------------------------randomConditionButton----------------------------------------------------
 
-
-        //------------------------------------RandomConditionButton---------------------------------------------------
-        JButton randomButton = createButton("Random condition",event->{
+        JButton randomConditionButton = createButton("Random condition",event->{
             Table table = displayTableWindow.getTable();
-            textField.setText(displayTableWindow.getModel().generateRandomCondition(table));
+            conditionField.setText(displayTableWindow.getModel().generateRandomCondition(table));
         },true);
 
-        //------------------------------------SearchButton---------------------------------------------------
-        searchButton = createButton("Search",event->search(textField.getText(), (String) columnComboBox.getSelectedItem()),true);
+//        ------------------------------------searchButton--------------------------------------------------------------
+
+        searchButton = createButton("Search",event->search(conditionField.getText(), (String) columnComboBox.getSelectedItem()),true);
         searchButton.setEnabled(false);
 
-        //------------------------------------CloseButton---------------------------------------------------
+//        ------------------------------------closeButton---------------------------------------------------------------
+
         JButton closeButton = createButton("Close", event->dispose(), true);
         add(mainPanel);
 
-        //------------------------------------TextFieldDocumentListener---------------------------------------------------
-        textField.getDocument().addDocumentListener(new DocumentListener() {
+//        ------------------------------------conditionFieldDocumentListener--------------------------------------------
+
+        conditionField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
 
@@ -74,7 +86,7 @@ public class SearchTableWindow extends MyDialog{
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                if(textField.getText().equals("") && !descSortCheckBox.isSelected() && !ascSortCheckBox.isSelected())
+                if(conditionField.getText().equals("") && !descSortCheckBox.isSelected() && !ascSortCheckBox.isSelected())
                     searchButton.setEnabled(false);
             }
 
@@ -83,10 +95,13 @@ public class SearchTableWindow extends MyDialog{
             }
         });
 
-        //------------------------------------CheckBoxes---------------------------------------------------
+//        ------------------------------------ascSortCheckBox-----------------------------------------------------------
+
         ascSortCheckBox = new JCheckBox("Sort ascending");
         ascSortCheckBox.setBackground(backgroundColor);
         ascSortCheckBox.setForeground(Color.WHITE);
+
+//        ------------------------------------descSortCheckBox----------------------------------------------------------
 
         descSortCheckBox = new JCheckBox("Sort descending");
         descSortCheckBox.setBackground(backgroundColor);
@@ -103,7 +118,7 @@ public class SearchTableWindow extends MyDialog{
             else if(!ascSortCheckBox.isSelected() && !descSortCheckBox.isSelected()) {
                 columnComboBox.setEnabled(false);
 
-                if(textField.getText().equals(""))
+                if(conditionField.getText().equals(""))
                     searchButton.setEnabled(false);
             }
         });
@@ -119,20 +134,21 @@ public class SearchTableWindow extends MyDialog{
             else if(!ascSortCheckBox.isSelected() && !descSortCheckBox.isSelected()) {
                 columnComboBox.setEnabled(false);
 
-                if(textField.getText().equals(""))
+                if(conditionField.getText().equals(""))
                     searchButton.setEnabled(false);
             }
         });
 
-        //------------------------------------SortByLabel---------------------------------------------------
-        JLabel columnLabel = createLabel("Sort by:");
-        columnLabel.setHorizontalAlignment(SwingConstants.CENTER);
+//        ------------------------------------sortByLabel---------------------------------------------------------------
 
-        mainPanel.add(textField);
-        mainPanel.add(randomButton);
+        JLabel sortByLabel = createLabel("Sort by:");
+        sortByLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        mainPanel.add(conditionField);
+        mainPanel.add(randomConditionButton);
         mainPanel.add(searchButton);
         mainPanel.add(closeButton);
-        mainPanel.add(columnLabel);
+        mainPanel.add(sortByLabel);
         mainPanel.add(columnComboBox);
         mainPanel.add(ascSortCheckBox);
         mainPanel.add(descSortCheckBox);
@@ -146,7 +162,7 @@ public class SearchTableWindow extends MyDialog{
 
     }
 
-    public void search(String condition, String columnName){
+    private void search(String condition, String columnName){
         if(ascSortCheckBox.isSelected())
             displayTableWindow.displayTable(displayTableWindow.getModel().searchTable(displayTableWindow.getTable().getTableName(),condition,"ASC",columnName));
         else if(descSortCheckBox.isSelected())
