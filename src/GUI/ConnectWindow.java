@@ -114,6 +114,14 @@ public class ConnectWindow extends MyDialog{
 
         add(mainPanel);
     }
+    @Override
+    public JTextField createTextField(String text) {
+        Color textFieldColor = new Color(105,105,105);
+        JTextField textField = new JTextField(text);
+        textField.setBackground(textFieldColor);
+        textField.setForeground(Color.WHITE);
+        return textField;
+    }
 
     @Override
     public void displayTable(List<List<Object>> data) {

@@ -33,16 +33,16 @@ public class AddRowWindow extends MyDialog {
     private JPanel tablePanel = createGridPanel(1,1,0,0, 0);
     private Model model;
 
-    public AddRowWindow(String tableName, Model model, MyFrame tableWindow){
+    public AddRowWindow(Table table, Model model, MyFrame tableWindow){
 
         this.model = model;
-        this.tableName = tableName;
         this.tableWindow = tableWindow;
         final String title = "Add row";
         final int height = 200;
         final int width = 400;
 
-        table = model.getTable(tableName);
+        tableName = table.getTableName();
+        this.table = table;
         setTitle(title);
         setSize(new Dimension(width, height));
         setLocationRelativeTo(null);
@@ -62,11 +62,11 @@ public class AddRowWindow extends MyDialog {
 
         JPanel buttonsPanel = createGridPanel(1,3,20,0, 0);
 
-//        ------------------------------addRowButton---------------------------------------
+//        ------------------------------addRowButton--------------------------------------------------------------------
 
         JButton addRowButton = createButton("Add",event->{
             try {
-                model.addRow(getRow(), tableName);
+                model.addRow(getRow(), table);
                 tableWindow.displayTable(model.importTable(tableName).getData());
                 dispose();
             }catch (SQLException sqlException){
@@ -79,8 +79,8 @@ public class AddRowWindow extends MyDialog {
 
         JButton testButton = createButton("Test",event->{
             try {
-                model.addRow(getRow(), tableName);
-                model.deleteRow(tableName, table.getNumberOfRows());
+                model.addRow(getRow(), table);
+                model.deleteRow(table, getRow());
                 new WarningWindow("Row ok",null,null);
             } catch (SQLException sqlException) {
                 new WarningWindow(sqlException.getMessage(), null,  null);

@@ -1,5 +1,6 @@
 package GUI;
 
+import Logic.MyExceptions.EmptyTableException;
 import Logic.Table;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -26,9 +27,11 @@ public class SearchTableWindow extends MyDialog{
     private JCheckBox ascSortCheckBox;
     private JCheckBox descSortCheckBox;
     private Color backgroundColor = new Color(67,67,67);
-    public SearchTableWindow(EditTableWindow displayTableWindow){
+    private String tableName;
+    public SearchTableWindow(EditTableWindow displayTableWindow, String tableName){
 
         this.displayTableWindow = displayTableWindow;
+        this.tableName = tableName;
         final String title = "Search table "+displayTableWindow.getTable().getTableName();
         setTitle(title);
         createWidgets();
@@ -61,8 +64,12 @@ public class SearchTableWindow extends MyDialog{
 //        -------------------------------------randomConditionButton----------------------------------------------------
 
         JButton randomConditionButton = createButton("Random condition",event->{
-            Table table = displayTableWindow.getTable();
-            conditionField.setText(displayTableWindow.getModel().generateRandomCondition(table));
+            Table table = displayTableWindow.getModel().importTable(tableName);
+            try {
+                conditionField.setText(displayTableWindow.getModel().generateRandomCondition(table));
+            } catch (EmptyTableException emptyTableException) {
+                new WarningWindow(emptyTableException.getMessage(), null, null);
+            }
         },true);
 
 //        ------------------------------------searchButton--------------------------------------------------------------

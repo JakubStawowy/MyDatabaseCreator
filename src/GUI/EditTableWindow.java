@@ -37,14 +37,14 @@ public class EditTableWindow extends MyFrame{
 
     public EditTableWindow(Model model, String tableName){
 
+//        this.table = model.getTable(tableName);
         this.table = model.importTable(tableName);
         this.model = model;
-        final String title = tableName;
         final int width = 600;
         final int height = 350;
 
         tableData = new Object[table.getData().size()][table.getColumnNames().size()];
-        setTitle(title);
+        setTitle(tableName);
         setPreferredSize(new Dimension(width, height));
         createWidgets();
         setVisible(true);
@@ -77,11 +77,11 @@ public class EditTableWindow extends MyFrame{
 
 //--------------------------------------------searchTableButton---------------------------------------------------------
 
-        JButton searchTableButton = createButton("Search Table", event->new SearchTableWindow(this),true);
+        JButton searchTableButton = createButton("Search Table", event->new SearchTableWindow(this, table.getTableName()),true);
 
 //--------------------------------------------addRowButton--------------------------------------------------------------
 
-        JButton addRowButton = createButton("Add Row", event->new AddRowWindow(table.getTableName(), model, this), true);
+        JButton addRowButton = createButton("Add Row", event->new AddRowWindow(table, model, this),true);
 
 //--------------------------------------------removeRowButton-----------------------------------------------------------
 
@@ -92,7 +92,7 @@ public class EditTableWindow extends MyFrame{
                 for(int index = 0; index < table.getNumberOfColumns(); index++){
                     row.add(displayedTable.getValueAt(displayedTable.getSelectedRow(), index));
                 }
-                model.deleteRow_2(table.getTableName(), row);
+                model.deleteRow(table, row);
                 displayTable(model.importTable(table.getTableName()).getData());
 
 

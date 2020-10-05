@@ -6,6 +6,8 @@ import Logic.MyExceptions.BadColumnNumberException;
 import Logic.MyExceptions.BadNamesTypesQuantityException;
 import Logic.MyExceptions.BadTableNameException;
 import Logic.MyExceptions.NoPrimaryKeyException;
+import Logic.Table;
+
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -19,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Rectangle;
 import java.awt.Color;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -146,13 +149,17 @@ public class CreateTableWindow extends MyDialog{
         JButton createTableButton = createButton("Create Table",event->{
             String tableName = getTableName();
             String primaryKey = String.valueOf(primaryKeyComboBox.getSelectedItem());
+            int primaryKeyIndex = primaryKeyComboBox.getSelectedIndex();
+            List<Object>emptyRow = new ArrayList<>();
+            List<List<Object>> emptyData = new ArrayList<>();
+            emptyData.add(emptyRow);
             try{
                 controller.checkTableName(tableName);
                 controller.checkNumberOfColumns(columnNames.size());
                 controller.checkNamesTypesQuantity(this);
                 if(primaryKeyComboBox.getSelectedItem().equals("None"))
                     throw new NoPrimaryKeyException();
-                model.createTable(tableName, this ,primaryKey, true);
+                model.createTable(new Table(tableName, primaryKeyIndex, emptyData, columnNames,columnTypes,constraintsVector, foreignKeys),primaryKey, true);
                 mainWindow.addTableToJlist(tableName);
                 dispose();
             } catch (BadTableNameException | BadColumnNumberException | BadNamesTypesQuantityException | SQLException exception) {
@@ -161,7 +168,8 @@ public class CreateTableWindow extends MyDialog{
             catch (NoPrimaryKeyException exception){
                 new WarningWindow(exception.getMessage(), subEvent->{
                     try {
-                        model.createTable(tableName, this ,primaryKey, true);
+                        model.createTable(new Table(tableName, primaryKeyIndex, emptyData, columnNames,columnTypes,constraintsVector, foreignKeys) ,primaryKey, true);
+                        mainWindow.addTableToJlist(tableName);
                         dispose();
                     } catch (SQLException subException) {
                         new WarningWindow(subException.getMessage(), null, null);

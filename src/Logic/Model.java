@@ -1,6 +1,8 @@
 package Logic;
 
 import GUI.CreateTableWindow;
+import Logic.MyExceptions.EmptyTableException;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -50,59 +52,11 @@ public class Model {
     }
 
     /*
-    * Saves tables structure (this method forms sql query to create all tables from tables List in database).
-    * */
-    public void saveTables() throws SQLException {
-
-        for(Table table: tables){
-
-            StringBuilder query = new StringBuilder("CREATE TABLE " + table.getTableName() + " (");
-
-            int helpIndex = 0;
-
-            for(String columnName : table.getColumnNames()){
-                query.append(columnName);
-                if(table.getColumnTypes().get(helpIndex).equals(String.valueOf(Integer.class))){
-                    query.append(" int");
-                }
-                else if(table.getColumnTypes().get(helpIndex).equals(String.valueOf(String.class))){
-                    query.append(" varchar");
-                }
-
-                else if(table.getColumnTypes().get(helpIndex).equals(String.valueOf(Float.class))){
-                    query.append(" float");
-                }
-
-                else if(table.getColumnTypes().get(helpIndex).equals(String.valueOf(Double.class))){
-                    query.append(" double");
-                }
-                query.append(", ");
-                helpIndex++;
-            }
-
-            query.deleteCharAt(query.length()-2);
-            query.deleteCharAt(query.length()-1);
-            query.append(");");
-            dbConnector.execute(String.valueOf(query));
-
-        }
-    }
-    /*
-    * Adds new table object to tables List.
-    *
-    * @param Logic.Table table
-    * */
-    public void addTableToList(Table table){
-        tables.add(table);
-    }
-
-    /*
     * Removes table from tables List using table's name.
     *
     * @param String tableName
     * */
     public void removeTableFromList(String tableName){
-
         tables.removeIf(table -> table.getTableName().equals(tableName));
     }
 
@@ -111,8 +65,10 @@ public class Model {
     *
     * @param Logic.Table table
     * */
-    public String generateRandomCondition(Table table){
+    public String generateRandomCondition(Table table) throws EmptyTableException {
 
+        if(table.getNumberOfRows()==0)
+            throw new EmptyTableException("Cannot generate condition. Table "+table.getTableName()+" is empty");
         Random random = new Random();
         int randomColumnIndex = random.nextInt(table.getNumberOfColumns());
         int randomRowIndex = random.nextInt(table.getNumberOfRows());
@@ -172,8 +128,8 @@ public class Model {
     public Table importTable(String tableName) {
         ResultSet rs;
 
-        List<String> columnNames = new ArrayList<>();
-        List<String> columnTypes = new ArrayList<>();
+        Vector<String> columnNames = new Vector<>();
+        Vector<String> columnTypes = new Vector<>();
         List<Object> columns;
         List<List<Object>> data = new LinkedList<>();
         int numberOfColumns = 0;
@@ -212,18 +168,18 @@ public class Model {
             System.out.println("Problemy z importem tabeli");
         }
 
-        return new Table(tableName, numberOfColumns,numberOfRows, primaryKeyColumnIndex, data, columnNames, columnTypes);
+        return new Table(tableName,primaryKeyColumnIndex, data, columnNames, columnTypes, null, null);
+//        return new Table(tableName, numberOfColumns,numberOfRows, primaryKeyColumnIndex, data, columnNames, columnTypes);
     }
     /*
-    * DeleteRow method removes selected row using sql query.
+    * DeleteRow method removes selected row (using index) using sql query.
     *
     * @param String tableName
     * @param int rowIndex
     * */
-    public void deleteRow(String tableName, int rowIndex) throws SQLException {
+    public void deleteRow(Table table, int rowIndex) throws SQLException {
 
         StringBuilder condition = new StringBuilder();
-        Table table = getTable(tableName);
         Object value;
         String type;
 
@@ -239,16 +195,20 @@ public class Model {
                 condition.append(" AND ");
         }
 
-        table.getData().remove(rowIndex);
-        table.numberOfRowsDeincrement();
-        String query = "DELETE FROM "+tableName+" WHERE "+condition+";";
-        System.out.println(query);
+        String query = "DELETE FROM "+table.getTableName()+" WHERE "+condition+";";
         dbConnector.execute(query);
+        table.removeRow(rowIndex);
+//        table.getData().remove(rowIndex);
+//        table.numberOfRowsDeincrement();
     }
-
-    public void deleteRow_2(String tableName, List<Object> row) throws SQLException {
+     /*
+     * DeleteRow method removes selected row (using row) using sql query.
+     *
+     * @param String tableName
+     * @param List<Object> row
+     * */
+    public void deleteRow(Table table, List<Object> row) throws SQLException {
         StringBuilder condition = new StringBuilder();
-        Table table = importTable(tableName);
         String type;
         for(int index = 0; index<table.getNumberOfColumns(); index++){
             type=table.getColumnTypes().get(index);
@@ -260,9 +220,9 @@ public class Model {
             if(index < table.getNumberOfColumns()-1)
                 condition.append(" AND ");
         }
-        String query = "DELETE FROM "+tableName+" WHERE "+condition+";";
-        System.out.println(query);
+        String query = "DELETE FROM "+table.getTableName()+" WHERE "+condition+";";
         dbConnector.execute(query);
+        table.removeRow(row);
     }
     /*
     * updateRow method is used to update row in a given table.
@@ -304,15 +264,13 @@ public class Model {
                 query.append(" AND ");
         }
         query.append(";");
-        System.out.println(query);
         dbConnector.execute(String.valueOf(query));
     }
-    public void addRow(List<Object> row, String tableName) throws SQLException {
+    public void addRow(List<Object> row, Table table) throws SQLException {
 
-        Table table = getTable(tableName);
         String columntype;
         Object value;
-        StringBuilder query = new StringBuilder("INSERT INTO " + tableName + " VALUES (");
+        StringBuilder query = new StringBuilder("INSERT INTO " + table.getTableName() + " VALUES (");
         for(int i = 0; i < table.getNumberOfColumns(); i++){
             columntype = table.getColumnTypes().get(i);
             value = row.get(i);
@@ -325,24 +283,6 @@ public class Model {
         dbConnector.execute(String.valueOf(query));
 
         table.addRow(row);
-    }
-
-    /*
-    * copyTable method is used to create buffer table before editing original table
-    *
-    * @param String tableName
-    * */
-    public void copyTable(String tableName){
-        String copyTableName = tableName+"_cpy";
-        String query_1 = "CREATE TABLE IF NOT EXISTS "+copyTableName+" LIKE "+tableName+";";
-        String query_2 =  "INSERT INTO "+copyTableName+" SELECT * FROM "+tableName+";";
-        try{
-            dbConnector.execute(query_1);
-            dbConnector.execute(query_2);
-
-        }catch (SQLException sqlException){
-            System.out.println(sqlException.getMessage());
-        }
     }
     /*
     * dropCopiedTable method is used to drop buffer table created before editing table.
@@ -358,54 +298,6 @@ public class Model {
         }
     }
     /*
-    * undoChanges method is used to restore table to its original state.
-    * It requires table to have a primary key.
-    * It uses SQL DML Language (UPDATE, INSERT)
-    *
-    *@param String tableName
-    * */
-    public void undoChanges(String tableName) throws SQLException {
-
-        String query;
-        Table table = getTable(tableName);
-        String copiedTableName=tableName+"_cpy";
-        String primaryKey = table.getColumnNames().get(table.getPrimaryKeyColumnIndex());
-        String columnName;
-
-        ResultSet rs;
-        int[] tableRowCount = new int[2];
-
-        rs = dbConnector.executeQuery("SELECT COUNT(*) FROM " + tableName + " UNION SELECT COUNT(*) FROM " + copiedTableName + ";");
-        int i = 0;
-        while(rs.next()) {
-
-            tableRowCount[i] = Integer.parseInt(rs.getString("COUNT(*)"));
-            i++;
-        }
-
-        for(i = 0; i < table.getNumberOfColumns(); i++){
-            columnName = table.getColumnNames().get(i);
-            if(i!=table.getPrimaryKeyColumnIndex()){
-
-                query= "UPDATE "+tableName+" INNER JOIN "+copiedTableName+" ON "+tableName+"."+primaryKey+
-                        " = "+copiedTableName+"."+primaryKey+" SET "+tableName+"."+columnName+" = "+copiedTableName+"."+
-                        columnName+" where "+tableName+"."+columnName+"!="+copiedTableName+"."+columnName+";";
-
-                dbConnector.execute(query);
-
-            }
-        }
-        if(tableRowCount[0] < tableRowCount[1]) {
-            query = "INSERT INTO " + tableName + " SELECT * FROM " + copiedTableName + " EXCEPT SELECT * FROM " + tableName + ";";
-
-            dbConnector.execute(query);
-
-        }
-        else if(tableRowCount[0] > tableRowCount[1]){
-            deleteRow(tableName, table.getNumberOfRows());
-        }
-    }
-    /*
     * dropTable method removes table from database using table name
     *
     * @param String tableName
@@ -414,6 +306,13 @@ public class Model {
 
             dbConnector.execute("DROP TABLE IF EXISTS " + tableName + ";");
 
+    }
+    public void dropAllTables() throws SQLException {
+        for(String tableName: tableNames)
+            dropTable(tableName);
+    }
+    public List<Table> getTables(){
+        return tables;
     }
     /*
     * Search table method returns a new table containing all rows that met the conditions specified as an argument.
@@ -467,16 +366,16 @@ public class Model {
         return data;
     }
 
-    public void createTable(String tableName, CreateTableWindow createTableWindow, String primaryKey, Boolean dropExistingTable) throws SQLException {
-        Vector<String> columnNames = createTableWindow.getColumnNames();
-        Vector<String> columnTypes = createTableWindow.getColumnTypes();
-        Vector<String> constraintsVector = createTableWindow.getConstraintsVector();
-        Vector<String> foreignKeys = createTableWindow.getForeignKeys();
+    public void createTable(Table table, String primaryKey, Boolean dropExistingTable) throws SQLException {
+        Vector<String> columnNames = table.getColumnNames();
+        Vector<String> columnTypes = table.getColumnTypes();
+        Vector<String> constraintsVector = table.getConstraintsVector();
+        Vector<String> foreignKeys = table.getForeignKeys();
 
-        StringBuilder query = new StringBuilder("CREATE TABLE "+tableName+"(");
-        for(int index = 0 ; index < createTableWindow.getColumnNames().size() ; index++) {
+        StringBuilder query = new StringBuilder("CREATE TABLE "+table.getTableName()+"(");
+        for(int index = 0 ; index < columnNames.size() ; index++) {
             query.append(columnNames.get(index)).append(" ").append(columnTypes.get(index).toUpperCase()).append(" ").append(constraintsVector.get(index).toUpperCase());
-            if(index<createTableWindow.getColumnNames().size()-1)
+            if(index<columnNames.size()-1)
                 query.append(", ");
         }
         if(!primaryKey.equals("None"))
@@ -486,9 +385,11 @@ public class Model {
                 query.append(", ").append(foreignKey);
         query.append(");");
         if(dropExistingTable)
-            dropTable(tableName);
+            dropTable(table.getTableName());
 
         dbConnector.execute(String.valueOf(query));
+        tableNames.add(table.getTableName());
+        tables.add(table);
     }
     /*
     * isNumeric method is used to check if given type is numeric or no.

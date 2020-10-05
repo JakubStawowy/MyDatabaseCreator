@@ -1,6 +1,7 @@
 package Logic;
 
 import java.util.List;
+import java.util.Vector;
 
 /*
 * Table
@@ -13,23 +14,30 @@ public class Table {
     private int numberOfRows;
     private int primaryKeyColumnIndex;
     private List<List<Object>> data;
-    private List<String> columnNames;
-    private List<String> columnTypes;
+    private Vector<String> columnNames;
+    private Vector<String> columnTypes;
+    private Vector<String> constraints;
+    private Vector<String> foreignKeys;
 
-
-    public Table(String tableName, int numberOfColumns, int numberOfRows, int primaryKeyColumnIndex, List<List<Object>> data, List<String> columnNames, List<String> columnTypes){
+    public Table(String tableName, int primaryKeyColumnIndex, List<List<Object>> data, Vector<String> columnNames, Vector<String> columnTypes, Vector<String> constraints, Vector<String> foreignKeys){
 
         this.tableName = tableName;
-        this.numberOfColumns = numberOfColumns;
-        this.numberOfRows = numberOfRows;
         this.primaryKeyColumnIndex = primaryKeyColumnIndex;
         this.data = data;
         this.columnNames = columnNames;
         this.columnTypes = columnTypes;
+        this.constraints = constraints;
+        this.foreignKeys = foreignKeys;
+        numberOfColumns = columnNames.size();
+        numberOfRows = data.size();
     }
-
-    public void numberOfRowsDeincrement(){
-        numberOfRows--;
+    public void removeRow(int index){
+        data.remove(index);
+        numberOfRows = data.size();
+    }
+    public void removeRow(List<Object> row){
+        data.remove(row);
+        numberOfRows = data.size();
     }
 
     public String getTableName() {
@@ -45,7 +53,7 @@ public class Table {
     }
 
     public int getPrimaryKeyColumnIndex(){ return primaryKeyColumnIndex; }
-    public List<String> getColumnNames() {
+    public Vector<String> getColumnNames() {
         return columnNames;
     }
 
@@ -53,7 +61,7 @@ public class Table {
         return data;
     }
 
-    public List<String> getColumnTypes(){
+    public Vector<String> getColumnTypes(){
         return columnTypes;
     }
     /*
@@ -64,5 +72,14 @@ public class Table {
             this.data = data;
             numberOfRows = data.size();
     }
-    public void addRow(List<Object> row){ data.add(row); }
+    public void addRow(List<Object> row){
+        data.add(row); numberOfRows=data.size(); }
+
+    public Vector<String> getConstraintsVector() {
+        return constraints;
+    }
+
+    public Vector<String> getForeignKeys() {
+        return foreignKeys;
+    }
 }

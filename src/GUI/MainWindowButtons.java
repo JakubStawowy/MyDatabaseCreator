@@ -40,7 +40,7 @@ public class MainWindowButtons extends JPanel implements MyWindow {
 
 //        ----------------------------------------addNewRowButton-------------------------------------------------------
 
-        addNewRowButton = createButton("Add new row",event->new AddRowWindow(mainWindow.getSelectedTable(), model, mainWindow),false);
+        addNewRowButton = createButton("Add new row",event->new AddRowWindow(model.getTable(mainWindow.getSelectedTable()), model, mainWindow),false);
 
 //        ----------------------------------------editTableButton-------------------------------------------------------
 
