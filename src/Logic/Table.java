@@ -39,7 +39,6 @@ public class Table {
         data.remove(row);
         numberOfRows = data.size();
     }
-
     public String getTableName() {
         return tableName;
     }
@@ -81,5 +80,10 @@ public class Table {
 
     public Vector<String> getForeignKeys() {
         return foreignKeys;
+    }
+
+    @Override
+    public String toString() {
+        return "Name: "+tableName+"\nContent"+data;
     }
 }

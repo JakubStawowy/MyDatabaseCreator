@@ -212,16 +212,22 @@ public class MainWindow extends MyFrame{
 
     @Override
     public void displayTable(List<List<Object>> data) {
-        JTable displayedTable;
-        List<String>columnNames = model.importTable(tableJList.getSelectedValue()).getColumnNames();
-        Object[][] tableData = new Object[data.size()][columnNames.size()];
-        for(int i = 0 ; i < data.size(); i++)
-            for(int j = 0 ; j < columnNames.size() ; j++)
-                tableData[i][j] = data.get(i).get(j);
-        displayedTable = new JTable(new DefaultTableModel(tableData,columnNames.toArray()));
-        scrollPane.setViewportView(displayedTable);
-        scrollPane.getViewport().setBackground(backgroundColor);
-        scrollPane.setBorder(null);
+        try {
+            JTable displayedTable;
+            List<String>columnNames;
+            columnNames = model.importTable(tableJList.getSelectedValue()).getColumnNames();
+
+            Object[][] tableData = new Object[data.size()][columnNames.size()];
+            for(int i = 0 ; i < data.size(); i++)
+                for(int j = 0 ; j < columnNames.size() ; j++)
+                    tableData[i][j] = data.get(i).get(j);
+            displayedTable = new JTable(new DefaultTableModel(tableData,columnNames.toArray()));
+            scrollPane.setViewportView(displayedTable);
+            scrollPane.getViewport().setBackground(backgroundColor);
+            scrollPane.setBorder(null);
+        } catch (SQLException sqlException) {
+            new WarningWindow(sqlException.getMessage(),null,null);
+        }
     }
 
     /*
@@ -267,9 +273,12 @@ public class MainWindow extends MyFrame{
         tableJList.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
-                mainWindowButtons.setButtons(true);
-                displayTable(model.importTable(tableJList.getSelectedValue()).getData());
+                try {
+                    displayTable(model.importTable(tableJList.getSelectedValue()).getData());
+                    mainWindowButtons.setButtons(true);
+                }catch (SQLException sqlException){
+                    new WarningWindow(sqlException.getMessage(),null,null);
+                }
             }
 
             @Override

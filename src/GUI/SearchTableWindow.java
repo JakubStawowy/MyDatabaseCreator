@@ -12,6 +12,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.Color;
+import java.sql.SQLException;
 import java.util.List;
 
 /*
@@ -64,10 +65,10 @@ public class SearchTableWindow extends MyDialog{
 //        -------------------------------------randomConditionButton----------------------------------------------------
 
         JButton randomConditionButton = createButton("Random condition",event->{
-            Table table = displayTableWindow.getModel().importTable(tableName);
             try {
+                Table table = displayTableWindow.getModel().importTable(tableName);
                 conditionField.setText(displayTableWindow.getModel().generateRandomCondition(table));
-            } catch (EmptyTableException emptyTableException) {
+            } catch (EmptyTableException | SQLException emptyTableException) {
                 new WarningWindow(emptyTableException.getMessage(), null, null);
             }
         },true);

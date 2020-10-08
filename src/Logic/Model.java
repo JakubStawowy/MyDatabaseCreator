@@ -1,6 +1,5 @@
 package Logic;
 
-import GUI.CreateTableWindow;
 import Logic.MyExceptions.EmptyTableException;
 
 import java.sql.ResultSet;
@@ -125,7 +124,7 @@ public class Model {
     * @param String tableName
     * @returns new Logic.Table
     * */
-    public Table importTable(String tableName) {
+    public Table importTable(String tableName) throws SQLException {
         ResultSet rs;
 
         Vector<String> columnNames = new Vector<>();
@@ -135,39 +134,34 @@ public class Model {
         int numberOfColumns = 0;
         int numberOfRows = 0;
         int primaryKeyColumnIndex = 0;
-        try {
-            rs = dbConnector.executeQuery("DESC " + tableName + ";");
 
-            while(rs.next()) {
+        rs = dbConnector.executeQuery("DESC " + tableName + ";");
 
-                if(rs.getString("Key").equals("PRI"))
-                    primaryKeyColumnIndex = numberOfColumns;
+        while(rs.next()) {
 
-                columnNames.add(rs.getString("Field"));
-                columnTypes.add(rs.getString("Type"));
+            if(rs.getString("Key").equals("PRI"))
+                primaryKeyColumnIndex = numberOfColumns;
 
-                numberOfColumns++;
-            }
+            columnNames.add(rs.getString("Field"));
+            columnTypes.add(rs.getString("Type"));
 
-            rs = dbConnector.executeQuery("SELECT * FROM "+tableName+";");
-
-            while(rs.next()){
-
-                columns = new LinkedList<>();
-
-                for(String column : columnNames){
-
-                    columns.add(rs.getObject(column));
-                }
-
-                data.add(columns);
-                numberOfRows++;
-            }
-        }catch(SQLException sqlException){
-
-            System.out.println("Problemy z importem tabeli");
+            numberOfColumns++;
         }
 
+        rs = dbConnector.executeQuery("SELECT * FROM "+tableName+";");
+
+        while(rs.next()){
+
+            columns = new LinkedList<>();
+
+            for(String column : columnNames){
+
+                columns.add(rs.getObject(column));
+            }
+
+            data.add(columns);
+            numberOfRows++;
+        }
         return new Table(tableName,primaryKeyColumnIndex, data, columnNames, columnTypes, null, null);
 //        return new Table(tableName, numberOfColumns,numberOfRows, primaryKeyColumnIndex, data, columnNames, columnTypes);
     }
@@ -248,23 +242,29 @@ public class Model {
         }
 
         StringBuilder query = new StringBuilder("UPDATE "+tableName+" SET "+columnName+" = "+newValue+" WHERE ");
+        int floatSize = 2;
         for(int index = 0; index < table.getNumberOfColumns(); index++){
             if(index == columnIndex)
-                query.append(columnName).append(" = ").append(oldValue);
+                if(table.getColumnTypes().get(index).equals("float"))
+                    query.append("FORMAT(").append(columnName).append(", ").append(floatSize).append(")").append(" = FORMAT(").append(oldValue).append(", ").append(floatSize).append(")");
+                else
+                    query.append(columnName).append(" = ").append(oldValue);
             else {
                 String columnType = table.getColumnTypes().get(index);
-                if(!isNumeric(columnType)){
-
+                if(!isNumeric(columnType))
                     query.append(table.getColumnNames().get(index)).append(" = ").append("\"").append(newData.get(rowIndex).get(index)).append("\"");
-                }
                 else
-                    query.append(table.getColumnNames().get(index)).append(" = ").append(newData.get(rowIndex).get(index));
+                    if(table.getColumnTypes().get(index).equals("float"))
+                        query.append("FORMAT(").append(table.getColumnNames().get(index)).append(", ").append(floatSize).append(")").append(" = ").append("FORMAT(").append(newData.get(rowIndex).get(index)).append(", ").append(floatSize).append(")");
+                    else
+                        query.append(table.getColumnNames().get(index)).append(" = ").append(newData.get(rowIndex).get(index));
             }
             if(index < table.getNumberOfColumns()-1)
                 query.append(" AND ");
         }
         query.append(";");
         dbConnector.execute(String.valueOf(query));
+        table.setData(newData);
     }
     public void addRow(List<Object> row, Table table) throws SQLException {
 
@@ -285,27 +285,13 @@ public class Model {
         table.addRow(row);
     }
     /*
-    * dropCopiedTable method is used to drop buffer table created before editing table.
-    *
-    * @param String tableName
-    * */
-    public void dropCopiedTable(String tableName){
-        String query = "DROP TABLE IF EXISTS "+tableName+"_cpy;";
-        try{
-            dbConnector.execute(query);
-        }catch(SQLException sqlException){
-            System.out.println(sqlException.getMessage());
-        }
-    }
-    /*
     * dropTable method removes table from database using table name
     *
     * @param String tableName
     * */
     public void dropTable(String tableName) throws SQLException {
-
-            dbConnector.execute("DROP TABLE IF EXISTS " + tableName + ";");
-
+        dbConnector.execute("DROP TABLE IF EXISTS " + tableName + ";");
+        removeTableFromList(tableName);
     }
     public void dropAllTables() throws SQLException {
         for(String tableName: tableNames)

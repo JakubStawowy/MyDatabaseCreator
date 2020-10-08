@@ -38,17 +38,21 @@ public class EditTableWindow extends MyFrame{
     public EditTableWindow(Model model, String tableName){
 
 //        this.table = model.getTable(tableName);
-        this.table = model.importTable(tableName);
-        this.model = model;
-        final int width = 600;
-        final int height = 350;
+        try {
+            this.table = model.importTable(tableName);
+            this.model = model;
+            final int width = 600;
+            final int height = 350;
 
-        tableData = new Object[table.getData().size()][table.getColumnNames().size()];
-        setTitle(tableName);
-        setPreferredSize(new Dimension(width, height));
-        createWidgets();
-        setVisible(true);
-        pack();
+            tableData = new Object[table.getData().size()][table.getColumnNames().size()];
+            setTitle(tableName);
+            setPreferredSize(new Dimension(width, height));
+            createWidgets();
+            setVisible(true);
+            pack();
+        } catch (SQLException sqlException) {
+            new WarningWindow(sqlException.getMessage(),null,null);
+        }
     }
 
     @Override
@@ -108,10 +112,7 @@ public class EditTableWindow extends MyFrame{
 
 //---------------------------------------------closeButton--------------------------------------------------------------
 
-        JButton closeButton = createButton("Close", event->{
-            model.dropCopiedTable(table.getTableName());
-            dispose();
-        }, true);
+        JButton closeButton = createButton("Close", event->dispose(), true);
 
         buttonsPanel.add(searchTableButton);
         buttonsPanel.add(addRowButton);
