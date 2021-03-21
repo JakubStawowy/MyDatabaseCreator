@@ -7,15 +7,13 @@ import logic.repositories.DataTypesRepository;
 import java.util.Random;
 
 public class RandomConditionGenerator {
-    public static String generateRandomCondition(Table table) throws EmptyTableException {
-
+    public static String generateRandomCondition(final Table table) throws EmptyTableException {
         if(table.getNumberOfRows()==0)
             throw new EmptyTableException("Cannot generate condition. Table "+table.getTableName()+" is empty");
         Random random = new Random();
         int randomColumnIndex = random.nextInt(table.getNumberOfColumns());
         int randomRowIndex = random.nextInt(table.getNumberOfRows());
         int randomOperatorIndex;
-
         String[] operators = new String[]{"=", "!=", ">", "<", "<=",">="};
         String cellData;
         String columnType = table.getColumnTypes().get(randomColumnIndex);

@@ -14,34 +14,26 @@ public class DatabaseRepository implements TableRepository {
     private List<String> tableNames = new LinkedList<>();
     private List<Table> tables = new LinkedList<>();
 
-    public DatabaseRepository(DatabaseConnector databaseConnector) {
+    public DatabaseRepository(final DatabaseConnector databaseConnector) {
         this.databaseConnector = databaseConnector;
     }
 
-    /*
-     * Imports all tables from database using sql command "SHOW TABLES" and importTable() method.
-     * */
     @Override
     public void importDatabase() throws SQLException {
 
         ResultSet rs = databaseConnector.executeQuery("SHOW TABLES;");
         tableNames.clear();
         String tableName;
+        String database = databaseConnector.getDatabasePropertiesMap().get("databaseName");
         while (rs.next()) {
-            tableName = rs.getString("Tables_in_" + databaseConnector.getDatabaseName().substring(databaseConnector.getDatabaseName().lastIndexOf("/") + 1));
+            tableName = rs.getString("Tables_in_" + database.substring(database.lastIndexOf("/") + 1));
             tableNames.add(tableName);
             tables.add(importTable(tableName));
         }
     }
 
-    /*
-     * Imports all table parameters.
-     *
-     * @param String tableName
-     * @returns new Logic.Table
-     * */
     @Override
-    public Table importTable(String tableName) throws SQLException {
+    public Table importTable(final String tableName) throws SQLException {
         ResultSet rs;
 
         Vector<String> columnNames = new Vector<>();
@@ -49,7 +41,6 @@ public class DatabaseRepository implements TableRepository {
         List<Object> columns;
         List<List<Object>> data = new LinkedList<>();
         int numberOfColumns = 0;
-        int numberOfRows = 0;
         int primaryKeyColumnIndex = 0;
 
         rs = databaseConnector.executeQuery("DESC " + tableName + ";");
@@ -75,25 +66,13 @@ public class DatabaseRepository implements TableRepository {
 
                 columns.add(rs.getObject(column));
             }
-
             data.add(columns);
-            numberOfRows++;
         }
-        return new Table(tableName,primaryKeyColumnIndex, data, columnNames, columnTypes, null, null);
+        return new Table(tableName, data, columnNames, columnTypes, null, null);
     }
-    /*
-     * Search table method returns a new table containing all rows that met the conditions specified as an argument.
-     * It uses sql command SELECT * FROM tablename WHERE condition
-     *
-     * @param String tableName
-     * @param String condition
-     * @param String sorted ("ASC"/"DESC"/null)
-     * @param String columnName - table would be sorted using column with that name
-     *
-     * @return data (multidimensional ArrayList)
-     * */
+
     @Override
-    public List<List<Object>> searchTable(String tableName, String condition, String sorted, String columnName) {
+    public List<List<Object>> searchTable(final String tableName, String condition, final String sorted, final String columnName) {
 
         ResultSet rs;
 
@@ -135,47 +114,33 @@ public class DatabaseRepository implements TableRepository {
     }
 
     @Override
-    public List<Map<String, String>> getPrimaryKeys() throws SQLException {
-        List<Map<String, String>> primaryKeys = new ArrayList<>();
-        Map<String, String> primaryKeyMap;
+    public Map<String, String> getPrimaryKeys() throws SQLException {
+        Map<String, String> primaryKeyMap = new HashMap<>();
         ResultSet rs;
 
         for(String tableName: tableNames) {
-            primaryKeyMap = new HashMap<>();
             rs = databaseConnector.executeQuery("DESC " + tableName + ";");
-            while (rs.next()){
+            while (rs.next())
                 if(rs.getString("Key").equals("PRI")) {
                     primaryKeyMap.put(tableName, rs.getString("Field") + " " + rs.getString("Type"));
                     break;
                 }
-            }
-            primaryKeys.add(primaryKeyMap);
         }
-        return primaryKeys;
+        return primaryKeyMap;
     }
 
     @Override
     public List<Table> getTables(){
         return tables;
     }
-    /*
-     * Removes table from tables List using table's name.
-     *
-     * @param String tableName
-     * */
+
     @Override
-    public void removeTableFromList(String tableName){
+    public void removeTableFromList(final String tableName){
         tables.removeIf(table -> table.getTableName().equals(tableName));
     }
 
-    /*
-     * Returns table object using table name.
-     *
-     * @param String tableName
-     * @returns Logic.Table table
-     * */
     @Override
-    public Table getTable(String tableName) {
+    public Table getTable(final String tableName) {
 
         for (Table table : tables) {
             if (table.getTableName().equals(tableName))

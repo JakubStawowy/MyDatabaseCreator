@@ -18,18 +18,13 @@ public class TableManager implements DdlManager {
     private TableRepository tableRepository;
     private List<String> tableNames = new ArrayList<>();
 
-    public TableManager(DatabaseConnector databaseConnector, TableRepository tableRepository) {
+    public TableManager(final DatabaseConnector databaseConnector, final TableRepository tableRepository) {
         this.databaseConnector = databaseConnector;
         this.tableRepository = tableRepository;
     }
 
-    /*
-     * dropTable method removes table from database using table name
-     *
-     * @param String tableName
-     * */
     @Override
-    public void dropTable(String tableName) throws SQLException {
+    public void dropTable(final String tableName) throws SQLException {
         databaseConnector.execute("DROP TABLE IF EXISTS " + tableName + ";");
         tableRepository.removeTableFromList(tableName);
     }
@@ -41,7 +36,7 @@ public class TableManager implements DdlManager {
     }
 
     @Override
-    public void createTable(Table table, String primaryKey, Boolean dropExistingTable) throws SQLException {
+    public void createTable(final Table table, final String primaryKey, final Boolean dropExistingTable) throws SQLException {
         Vector<String> columnNames = table.getColumnNames();
         Vector<String> columnTypes = table.getColumnTypes();
         Vector<String> constraintsVector = table.getConstraintsVector();

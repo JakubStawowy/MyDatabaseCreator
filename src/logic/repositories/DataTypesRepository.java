@@ -1,11 +1,17 @@
 package logic.repositories;
 
-public class DataTypesRepository {
+public final class DataTypesRepository {
 
     private final static String[] numericTypes = {"bit", "tinyint", "smallint","mediumint", "bigint",
             "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"};
     private final static String[] stringTypes ={"char", "varchar", "binary", "tinyblob", "tinytext", "text",
             "blob", "mediumtext", "mediumblob", "longtext", "longblob", "enum", "set"};
+    private final static String[] dateAndTimeTypes = {
+            "date", "datetime", "timestamp", "time", "year"
+    };
+    private final static String[] constraints = {
+            "Not Null", "Unique"
+    };
 
     public static String[] getNumericTypes() {
         return numericTypes;
@@ -15,19 +21,21 @@ public class DataTypesRepository {
         return stringTypes;
     }
 
-    /*
-     * isNumeric method is used to check if given type is numeric or no.
-     *
-     * @param String type
-     * @return Boolean
-     * */
-    public static Boolean isNumeric(String type) {
+    public static String[] getDateAndTimeTypes() {
+        return dateAndTimeTypes;
+    }
 
-        type = type.toLowerCase();
+    public static String[] getConstraints() {
+        return constraints;
+    }
+
+    public static Boolean isNumeric(final String type) {
+
+        String lowerCaseType = type.toLowerCase();
         for (String types : numericTypes) {
-            if(type.length()>=types.length() && types.equals(type.substring(0,types.length())))
+            if(lowerCaseType.length()>=types.length() && types.equals(lowerCaseType.substring(0,types.length())))
                 return true;
-            else if(type.length()<types.length() && (type.equals(types.substring(0,type.length()))))
+            else if(lowerCaseType.length()<types.length() && (lowerCaseType.equals(types.substring(0,type.length()))))
                 return true;
         }
         return false;

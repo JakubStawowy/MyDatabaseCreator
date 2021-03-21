@@ -1,5 +1,6 @@
 package logic.controllers;
 
+import logic.repositories.DataTypesRepository;
 import view.windows.CreateTableWindow;
 import exceptions.*;
 
@@ -9,11 +10,7 @@ import java.util.Vector;
 *
 * This class contains methods that check if values typed by user are correct.
 * */
-public class ValidateController {
-    private final String[] numericTypes = {"bit", "tinyint", "smallint","mediumint", "bigint",
-            "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"};
-    private final String[] stringTypes ={"char", "varchar", "binary", "tinyblob", "tinytext", "text",
-            "blob", "mediumtext", "mediumblob", "longtext", "longblob", "enum", "set"};
+public class DataValidator {
 
     /*
     * checkTableName
@@ -24,12 +21,13 @@ public class ValidateController {
     *
     * @throws BadTableNameException
     * */
-    public void checkTableName(String tableName) throws BadTableNameException {
+    public void checkTableName(final String tableName) throws BadTableNameException {
         for(char character: tableName.toCharArray()){
             if(Character.isWhitespace(character))
                 throw new BadTableNameException("Bad table name. Table name cannot contain white spaces");
         }
     }
+
     /*
     * checkColumnName
     *
@@ -39,12 +37,13 @@ public class ValidateController {
     *
     * @throws BadTableNameException
     * */
-    public void checkColumnName(String columnName) throws BadColumnNameException{
+    public void checkColumnName(final String columnName) throws BadColumnNameException{
         for(char character: columnName.toCharArray()){
             if(Character.isWhitespace(character))
                 throw new BadColumnNameException("Bad column name. Column name cannot contain white spaces");
         }
     }
+
     /*
     * checkNumberOfColumns
     *
@@ -54,10 +53,11 @@ public class ValidateController {
     *
     * @throws BadColumnNumberException
     * */
-    public void checkNumberOfColumns(int numberOfColumns) throws BadColumnNumberException {
+    public void checkNumberOfColumns(final int numberOfColumns) throws BadColumnNumberException {
         if(numberOfColumns==0)
             throw new BadColumnNumberException("Bad number of columns. You must add at least one column to a table");
     }
+
     /*
     * checkSize
     *
@@ -69,7 +69,7 @@ public class ValidateController {
     *
     * @throws BadTypeSizeException
     * */
-    public String checkSize(String size) throws BadTypeSizeException {
+    public String checkSize(final String size) throws BadTypeSizeException {
         if(!(size.equals("Size") || size.equals(""))) {
             try {
                 if(Integer.parseInt(size)<=0)
@@ -81,6 +81,7 @@ public class ValidateController {
         }
         else return "";
     }
+
     /*
     * checkType
     *
@@ -90,17 +91,17 @@ public class ValidateController {
     *
     * @throws BadColumnTypeException
     */
-    public void checkType(String type) throws BadColumnTypeException {
+    public void checkType(final String type) throws BadColumnTypeException {
         boolean flag = true;
         if(type.equals("null"))
             throw new BadColumnTypeException("Choose column type");
-        for(String numericType: numericTypes){
+        for(String numericType: DataTypesRepository.getNumericTypes()){
             if (numericType.equals(type.toLowerCase())) {
                 flag = false;
                 break;
             }
         }
-        for(String stringType: stringTypes){
+        for(String stringType: DataTypesRepository.getStringTypes()){
             if (stringType.equals(type.toLowerCase())) {
                 flag = false;
                 break;
@@ -110,6 +111,7 @@ public class ValidateController {
             throw new BadColumnTypeException("Bad Column Type");
         }
     }
+
     /*
     * checkColumnNameUniqueness
     *
@@ -120,12 +122,13 @@ public class ValidateController {
     *
     * @throws RepeatedColumnNameException
     * */
-    public void checkColumnNameUniqueness(String columnName, Vector<String> columnNames) throws RepeteadColumnNameException {
+    public void checkColumnNameUniqueness(final String columnName, final Vector<String> columnNames) throws RepeteadColumnNameException {
         for(String name: columnNames){
             if(name.equals(columnName))
                 throw new RepeteadColumnNameException(name+" - repeated column name");
         }
     }
+
     /*
     * checkNamesTypesQuantity
     *
@@ -135,12 +138,11 @@ public class ValidateController {
     *
     * @throws BadNamesTypesQuantityException
     * */
-    public void checkNamesTypesQuantity(CreateTableWindow createTableWindow) throws BadNamesTypesQuantityException {
+    public void checkNamesTypesQuantity(final CreateTableWindow createTableWindow) throws BadNamesTypesQuantityException {
         int numberOfNames = createTableWindow.getColumnNames().size();
         int numberOfTypes = createTableWindow.getColumnTypes().size();
         int numberOfConstraints = createTableWindow.getConstraintsVector().size();
         if(numberOfNames!=numberOfTypes || numberOfNames!=numberOfConstraints)
             throw new BadNamesTypesQuantityException("Bad names and types quantity");
     }
-
 }

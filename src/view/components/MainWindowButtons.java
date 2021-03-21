@@ -39,16 +39,9 @@ public class MainWindowButtons extends JPanel implements MyWindow {
     @Override
     public void createWidgets() {
 
-//        ----------------------------------------addNewRowButton-------------------------------------------------------
 
         addNewRowButton = createButton("Add new row",event->new AddRowWindow(databaseFacade.getTable(mainWindow.getSelectedTable()), databaseFacade, mainWindow),false);
-
-//        ----------------------------------------editTableButton-------------------------------------------------------
-
         editTableButton = createButton("Edit table",event->new EditTableWindow(databaseFacade, mainWindow.getSelectedTable()), false);
-
-//        ----------------------------------------removeTableButton-----------------------------------------------------
-
         removeTableButton = createButton("Remove table",event->{
 
             String tableName = mainWindow.getSelectedTable();
@@ -66,8 +59,6 @@ public class MainWindowButtons extends JPanel implements MyWindow {
             }, null
             );
         },false);
-
-//        ----------------------------------------createTableButton-----------------------------------------------------
 
         JButton createTableButton = createButton("Create new table", event -> new CreateTableWindow(databaseFacade, mainWindow), true);
 

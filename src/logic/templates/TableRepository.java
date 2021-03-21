@@ -8,11 +8,11 @@ import java.util.Map;
 
 public interface TableRepository {
     void importDatabase() throws SQLException;
-    Table importTable(String tableName) throws SQLException;
-    List<List<Object>> searchTable(String tableName, String condition, String sorted, String columnName);
-    List<Map<String, String>> getPrimaryKeys() throws SQLException;
-    void removeTableFromList(String tableName);
+    Table importTable(final String tableName) throws SQLException;
+    List<List<Object>> searchTable(final String tableName, String condition, final String sorted, final String columnName);
+    Map<String, String> getPrimaryKeys() throws SQLException;
+    void removeTableFromList(final String tableName);
     List<Table> getTables();
-    Table getTable(String tableName);
+    Table getTable(final String tableName);
     List<String> getTableNames();
 }

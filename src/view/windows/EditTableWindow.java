@@ -17,14 +17,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-* DisplayTableWindow
-*
-* @extends MyFrame
-*
-* This window allows to edit table (display table, search table, add new row, delete row).
-*
-* */
 public class EditTableWindow extends MdcFrame {
 
     private Table table;
@@ -38,7 +30,6 @@ public class EditTableWindow extends MdcFrame {
 
     public EditTableWindow(DatabaseFacade databaseFacade, String tableName){
 
-//        this.table = model.getTable(tableName);
         try {
             this.table = databaseFacade.importTable(tableName);
             this.databaseFacade = databaseFacade;
@@ -59,19 +50,11 @@ public class EditTableWindow extends MdcFrame {
     @Override
     public void createWidgets() {
 
-//        -----------------------------------mainPanel------------------------------------------------------------------
-
         JPanel mainPanel = createGridPanel(2,1,0,20,20);
-
-//        -----------------------------------tablePanel-----------------------------------------------------------------
 
         JPanel tablePanel = createGridPanel(1,1,0,0,0);
 
-//        -----------------------------------buttonsPanel---------------------------------------------------------------
-
         JPanel buttonsPanel = createGridPanel(2,2,20,20,0);
-
-//-------------------------------------------tableScrollPane------------------------------------------------------------
 
         tableScrollPane = new JScrollPane(displayedTable);
         tableScrollPane.getViewport().setBackground(backgroundColor);
@@ -79,16 +62,9 @@ public class EditTableWindow extends MdcFrame {
 
         displayTable(table.getData());
 
-
-//--------------------------------------------searchTableButton---------------------------------------------------------
-
         JButton searchTableButton = createButton("Search Table", event->new SearchTableWindow(this, table.getTableName()),true);
 
-//--------------------------------------------addRowButton--------------------------------------------------------------
-
         JButton addRowButton = createButton("Add Row", event->new AddRowWindow(table, databaseFacade, this),true);
-
-//--------------------------------------------removeRowButton-----------------------------------------------------------
 
         removeRowButton = createButton("Remove Row", event->new WarningWindow("Remove row?",subEvent->{
 
@@ -111,8 +87,6 @@ public class EditTableWindow extends MdcFrame {
             }
         }, null), false);
 
-//---------------------------------------------closeButton--------------------------------------------------------------
-
         JButton closeButton = createButton("Close", event->dispose(), true);
 
         buttonsPanel.add(searchTableButton);
@@ -125,12 +99,6 @@ public class EditTableWindow extends MdcFrame {
         mainPanel.add(buttonsPanel);
         add(mainPanel);
     }
-
-    /*
-    * saveTable method returns multidimensional ArrayList with data collected from newTable (JTable)
-    *
-    * @return rows
-    * */
 
     private List<List<Object>> saveTable(){
 
@@ -148,15 +116,12 @@ public class EditTableWindow extends MdcFrame {
     public Table getTable(){
         return table;
     }
-    public Object[][] getTableData(){
-        return tableData;
-    }
-    public DatabaseFacade getModel(){
+    public DatabaseFacade getDatabaseFacade(){
         return databaseFacade;
     }
+
     @Override
     public void displayTable(List<List<Object>> data){
-
 
         tableData = new Object[data.size()][table.getColumnNames().size()];
         for(int i = 0 ; i < data.size() ; i++)
@@ -196,6 +161,7 @@ public class EditTableWindow extends MdcFrame {
 
             }
         });
+
         displayedTable.getModel().addTableModelListener(event -> {
 
             int rowIndex = displayedTable.getSelectedRow();

@@ -2,12 +2,12 @@ package logic.templates;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 public interface DatabaseConnector {
 
-    ResultSet executeQuery(String query) throws SQLException;
-    void execute(String query) throws SQLException;
+    ResultSet executeQuery(final String query) throws SQLException;
+    void execute(final String query) throws SQLException;
     void disconnect()throws SQLException;
-    String getDatabaseName();
-    String[] getDatabaseProperties();
+    Map<String, String> getDatabasePropertiesMap();
 }

@@ -17,19 +17,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 import java.util.List;
 
-/*
- * MyFrame
- *
- * @extends JFrame
- * @implements MyWindow
- *
- * this abstract class overrides the following methods from MyWindow Interface:
- *   *createButton
- *   *createTextField
- *   *createLabel
- *   *createGridPanel
- *   *setTextField
- * */
 public abstract class MdcFrame extends JFrame implements MyWindow {
     @Override
     public abstract void createWidgets();

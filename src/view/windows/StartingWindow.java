@@ -6,12 +6,6 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import java.util.List;
 
-/*
-* StartingWindow
-*
-* @extends MyDialog
-*
-* */
 public class StartingWindow extends MdcFrame {
 
     public StartingWindow(){
@@ -30,16 +24,9 @@ public class StartingWindow extends MdcFrame {
     @Override
     public void createWidgets() {
 
-//        ---------------------------------------mainPanel--------------------------------------------------------------
-
         JPanel mainPanel = createGridPanel(2,1,0,20,20);
 
-//        ---------------------------------------importButton-----------------------------------------------------------
-
         JButton importButton = createButton("Import database", event->new ConnectWindow(this), true);
-
-
-//        ---------------------------------------closeButton------------------------------------------------------------
 
         JButton closeButton = createButton("Close", event->dispose(),true);
 

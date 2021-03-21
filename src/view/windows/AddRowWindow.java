@@ -16,15 +16,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-* AddRowWindow
-*
-* @extends MyDialog
-*
-* This window displays empty row of a selected table and allows to add new data to this table.
-* used in: MainWindow, EditTableWindow
-*
-* */
 public class AddRowWindow extends MdcFrame {
 
     private String tableName;
@@ -55,15 +46,9 @@ public class AddRowWindow extends MdcFrame {
 
         displayTable(null);
 
-//        ------------------------------mainPanel-----------------------------------------------------------------------
-
         JPanel mainPanel = createGridPanel(2,1,0,20, 20);
 
-//        ------------------------------buttonsPanel--------------------------------------------------------------------
-
         JPanel buttonsPanel = createGridPanel(1,3,20,0, 0);
-
-//        ------------------------------addRowButton--------------------------------------------------------------------
 
         JButton addRowButton = createButton("Add",event->{
             try {
@@ -74,9 +59,7 @@ public class AddRowWindow extends MdcFrame {
                 new WarningWindow(sqlException.getMessage(), null, null);
                 System.out.println(sqlException.getMessage());
             }
-            },true);
-
-//        ------------------------------testButton---------------------------------------
+        },true);
 
         JButton testButton = createButton("Test",event->{
             try {
@@ -87,8 +70,6 @@ public class AddRowWindow extends MdcFrame {
                 new WarningWindow(sqlException.getMessage(), null,  null);
             }
         },true);
-
-//        ------------------------------cancelButton---------------------------------------
 
         JButton cancelButton = createButton("Cancel",event->dispose(),true);
 
@@ -101,6 +82,7 @@ public class AddRowWindow extends MdcFrame {
 
         add(mainPanel);
     }
+
     @Override
     public void displayTable(List<List<Object>> data){
 
@@ -110,6 +92,7 @@ public class AddRowWindow extends MdcFrame {
         scrollPane.getViewport().setBackground(new Color(67,67,67));
         tablePanel.add(scrollPane);
     }
+
     private List<Object> getRow(){
         List<Object> row = new ArrayList<>();
         for(int i = 0; i < displayedTable.getColumnCount(); i++)

@@ -14,19 +14,13 @@ public class TableDataManager implements DmlManager {
     private DatabaseConnector databaseConnector;
     private TableRepository tableRepository;
 
-    public TableDataManager(DatabaseConnector databaseConnector, TableRepository tableRepository) {
+    public TableDataManager(final DatabaseConnector databaseConnector, final TableRepository tableRepository) {
         this.databaseConnector = databaseConnector;
         this.tableRepository = tableRepository;
     }
 
-    /*
-     * DeleteRow method removes selected row (using index) using sql query.
-     *
-     * @param String tableName
-     * @param int rowIndex
-     * */
     @Override
-    public void deleteRow(Table table, int rowIndex) throws SQLException {
+    public void deleteRow(Table table, final int rowIndex) throws SQLException {
 
         StringBuilder condition = new StringBuilder();
         Object value;
@@ -49,14 +43,8 @@ public class TableDataManager implements DmlManager {
         table.removeRow(rowIndex);
     }
 
-    /*
-     * DeleteRow method removes selected row (using row) using sql query.
-     *
-     * @param String tableName
-     * @param List<Object> row
-     * */
     @Override
-    public void deleteRow(Table table, List<Object> row) throws SQLException {
+    public void deleteRow(Table table, final List<Object> row) throws SQLException {
         StringBuilder condition = new StringBuilder();
         String type;
         for(int index = 0; index<table.getNumberOfColumns(); index++){
@@ -74,20 +62,8 @@ public class TableDataManager implements DmlManager {
         table.removeRow(row);
     }
 
-    /*
-     * updateRow method is used to update row in a given table.
-     * It uses SQL DML Language (UPDATE)
-     *
-     * @param String tableName
-     * @param List<List<Object>> newData (table data after editing)
-     * @param int rowIndex (selected row index)
-     * @param int columnIndex (selected column index)
-     * @param Object oldValue
-     * @param Object newValue
-     * @throws SQLException
-     * */
     @Override
-    public void updateRow(String tableName, List<List<Object>> newData, int rowIndex, int columnIndex, Object oldValue, Object newValue) throws SQLException{
+    public void updateRow(final String tableName, List<List<Object>> newData, final int rowIndex, final int columnIndex, Object oldValue, Object newValue) throws SQLException{
 
         Table table = tableRepository.getTable(tableName);
         String type = table.getColumnTypes().get(columnIndex);
@@ -125,7 +101,7 @@ public class TableDataManager implements DmlManager {
     }
 
     @Override
-    public void addRow(List<Object> row, Table table) throws SQLException {
+    public void addRow(final List<Object> row, Table table) throws SQLException {
 
         String columntype;
         Object value;

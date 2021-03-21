@@ -17,13 +17,6 @@ import java.awt.Color;
 import java.sql.SQLException;
 import java.util.List;
 
-/*
-* SearchTableWindow
-*
-* @extends MyDialog
-*
-* This window allows to search table using conditions, sort table ascending or descending
-* */
 public class SearchTableWindow extends MdcFrame {
 
     private EditTableWindow displayTableWindow;
@@ -45,17 +38,11 @@ public class SearchTableWindow extends MdcFrame {
     @Override
     public void createWidgets() {
 
-//        --------------------------------------mainPanel---------------------------------------------------------------
-
         JPanel mainPanel = createGridPanel(2,3,20,20,20);
         JButton searchButton;
 
-//        --------------------------------------conditionField----------------------------------------------------------
-
         JTextField conditionField = createTextField("Condition");
         setTextField(conditionField, "Condition");
-
-//        --------------------------------------columnComboBox----------------------------------------------------------
 
         JComboBox<String> columnComboBox = new JComboBox<>();
 
@@ -64,28 +51,20 @@ public class SearchTableWindow extends MdcFrame {
 
         columnComboBox.setEnabled(false);
 
-//        -------------------------------------randomConditionButton----------------------------------------------------
-
         JButton randomConditionButton = createButton("Random condition",event->{
             try {
-                Table table = displayTableWindow.getModel().importTable(tableName);
+                Table table = displayTableWindow.getDatabaseFacade().importTable(tableName);
                 conditionField.setText(RandomConditionGenerator.generateRandomCondition(table));
             } catch (EmptyTableException | SQLException emptyTableException) {
                 new WarningWindow(emptyTableException.getMessage(), null, null);
             }
         },true);
 
-//        ------------------------------------searchButton--------------------------------------------------------------
-
         searchButton = createButton("Search",event->search(conditionField.getText(), (String) columnComboBox.getSelectedItem()),true);
         searchButton.setEnabled(false);
 
-//        ------------------------------------closeButton---------------------------------------------------------------
-
         JButton closeButton = createButton("Close", event->dispose(), true);
         add(mainPanel);
-
-//        ------------------------------------conditionFieldDocumentListener--------------------------------------------
 
         conditionField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -105,13 +84,9 @@ public class SearchTableWindow extends MdcFrame {
             }
         });
 
-//        ------------------------------------ascSortCheckBox-----------------------------------------------------------
-
         ascSortCheckBox = new JCheckBox("Sort ascending");
         ascSortCheckBox.setBackground(backgroundColor);
         ascSortCheckBox.setForeground(Color.WHITE);
-
-//        ------------------------------------descSortCheckBox----------------------------------------------------------
 
         descSortCheckBox = new JCheckBox("Sort descending");
         descSortCheckBox.setBackground(backgroundColor);
@@ -149,8 +124,6 @@ public class SearchTableWindow extends MdcFrame {
             }
         });
 
-//        ------------------------------------sortByLabel---------------------------------------------------------------
-
         JLabel sortByLabel = createLabel("Sort by:");
         sortByLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -163,9 +136,7 @@ public class SearchTableWindow extends MdcFrame {
         mainPanel.add(ascSortCheckBox);
         mainPanel.add(descSortCheckBox);
 
-
-
-        }
+    }
 
     @Override
     public void displayTable(List<List<Object>> data) {
@@ -174,10 +145,10 @@ public class SearchTableWindow extends MdcFrame {
 
     private void search(String condition, String columnName){
         if(ascSortCheckBox.isSelected())
-            displayTableWindow.displayTable(displayTableWindow.getModel().searchTable(displayTableWindow.getTable().getTableName(),condition,"ASC",columnName));
+            displayTableWindow.displayTable(displayTableWindow.getDatabaseFacade().searchTable(displayTableWindow.getTable().getTableName(),condition,"ASC",columnName));
         else if(descSortCheckBox.isSelected())
-            displayTableWindow.displayTable(displayTableWindow.getModel().searchTable(displayTableWindow.getTable().getTableName(),condition,"DESC", columnName));
+            displayTableWindow.displayTable(displayTableWindow.getDatabaseFacade().searchTable(displayTableWindow.getTable().getTableName(),condition,"DESC", columnName));
         else
-            displayTableWindow.displayTable(displayTableWindow.getModel().searchTable(displayTableWindow.getTable().getTableName(),condition,null,null));
+            displayTableWindow.displayTable(displayTableWindow.getDatabaseFacade().searchTable(displayTableWindow.getTable().getTableName(),condition,null,null));
     }
 }

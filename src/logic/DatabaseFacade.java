@@ -45,7 +45,7 @@ public class DatabaseFacade implements TableRepository, DdlManager, DmlManager, 
     }
 
     @Override
-    public List<Map<String, String>> getPrimaryKeys() throws SQLException {
+    public Map<String, String> getPrimaryKeys() throws SQLException {
         return tableRepository.getPrimaryKeys();
     }
 
@@ -120,13 +120,7 @@ public class DatabaseFacade implements TableRepository, DdlManager, DmlManager, 
     }
 
     @Override
-    public String getDatabaseName() {
-        return databaseConnector.getDatabaseName();
+    public Map<String, String> getDatabasePropertiesMap() {
+        return databaseConnector.getDatabasePropertiesMap();
     }
-
-    @Override
-    public String[] getDatabaseProperties() {
-        return databaseConnector.getDatabaseProperties();
-    }
-
 }

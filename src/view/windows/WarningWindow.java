@@ -37,32 +37,20 @@ public class WarningWindow extends MdcFrame {
     @Override
     public void createWidgets() {
 
-//        ---------------------------------------mainPanel--------------------------------------------------------------
-
         JPanel mainPanel = createGridPanel(2,1,0,20,20);
 
-//        ---------------------------------------buttonsPanel-----------------------------------------------------------
-
         JPanel buttonsPanel;
-
-//        ---------------------------------------messageLabel-----------------------------------------------------------
 
         JLabel messageLabel = createLabel(text);
         messageLabel.setHorizontalAlignment(JLabel.CENTER);
 
         if(action!=null) {
 
-//        ---------------------------------------buttonsPanel-----------------------------------------------------------
-
             buttonsPanel = createGridPanel(1,2,20,0,0);
-
-//        ---------------------------------------yesButton--------------------------------------------------------------
 
             JButton yesButton = createButton("Yes",action,true);
             yesButton.addActionListener(event -> dispose());
             yesButton.addActionListener(finalAction);
-
-//        ---------------------------------------noButton---------------------------------------------------------------
 
             JButton noButton = createButton("No", event->dispose(),true);
 
@@ -72,15 +60,10 @@ public class WarningWindow extends MdcFrame {
 
             buttonsPanel.add(yesButton);
             buttonsPanel.add(noButton);
-
         }
         else{
 
-//        ---------------------------------------buttonsPanel-----------------------------------------------------------
-
             buttonsPanel = createGridPanel(1,1,20,0,0);
-
-//        ---------------------------------------okButton---------------------------------------------------------------
 
             JButton okButton = createButton("Ok", event->dispose(), true);
             if(finalAction!=null) {

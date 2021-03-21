@@ -5,7 +5,7 @@ import logic.models.Table;
 import java.sql.SQLException;
 
 public interface DdlManager {
-    void dropTable(String tableName) throws SQLException;
+    void dropTable(final String tableName) throws SQLException;
     void dropAllTables() throws SQLException;
-    void createTable(Table table, String primaryKey, Boolean dropExistingTable) throws SQLException;
+    void createTable(final Table table, final String primaryKey, final Boolean dropExistingTable) throws SQLException;
 }

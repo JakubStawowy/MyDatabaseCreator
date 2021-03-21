@@ -15,20 +15,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-/*
-* AddForeignKeyReferenceWindow
-*
-* @extends MyDialog
-*
-* This window displays all Primary Keys from connected Database and allows to select Foreign Key reference for created column.
-*
-* */
 public class AddForeignKeyReferenceWindow extends MdcFrame {
 
     private DatabaseFacade databaseFacade;
     private JList<String> primaryKeyJList;
     private List<String> tableNames;
-    private List<Map<String, String>> primaryKeyList;
+    private Map<String, String> primaryKeysMap;
     private AddNewColumnWindow newColumnWindow;
     private String primaryKeyWithType;
 
@@ -45,17 +37,11 @@ public class AddForeignKeyReferenceWindow extends MdcFrame {
     @Override
     public void createWidgets() {
 
-//        --------------------------------------mainPanel-----------------------------------------------------------------
-
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20,20,0,20));
         mainPanel.setBackground(new Color(67,67,67));
 
-//        --------------------------------------buttonsPanel-----------------------------------------------------------------
-
         JPanel buttonsPanel = createGridPanel(1,2,20,0,20);
-
-//        -------------------------------------addForeignKeyButton----------------------------------
 
         JButton addForeignKeyButton = createButton("Add Foreign Key", event->{
 
@@ -68,22 +54,14 @@ public class AddForeignKeyReferenceWindow extends MdcFrame {
 
         },true);
 
-//        -------------------------------------cancelButton-----------------------------------------
-
         JButton cancelButton = createButton("Cancel", event->dispose(),true);
 
-//        -------------------------------------primaryKeysLabel----------------------------------
-
-        JLabel primaryKeysLabel = createLabel("Primary Keys in "+databaseFacade.getDatabaseName()+" schema");
+        JLabel primaryKeysLabel = createLabel("Primary Keys in "+databaseFacade.getDatabasePropertiesMap().get("databaseName")+" schema");
         primaryKeysLabel.setHorizontalAlignment(JLabel.CENTER);
         primaryKeysLabel.setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
 
-//        -------------------------------------primaryKeyJList----------------------------------
-
         primaryKeyJList.setBackground(new Color(105,105,105));
         primaryKeyJList.setForeground(Color.WHITE);
-
-//        -------------------------------------primaryKeyScrollPane----------------------------------
 
         JScrollPane primaryKeyScrollPane = new JScrollPane();
         primaryKeyScrollPane.setViewportView(primaryKeyJList);
@@ -104,14 +82,14 @@ public class AddForeignKeyReferenceWindow extends MdcFrame {
     public void displayTable(List<List<Object>> data) {}
     private void importPrimaryKeys(){
         try {
-            primaryKeyList = databaseFacade.getPrimaryKeys();
+            primaryKeysMap = databaseFacade.getPrimaryKeys();
         } catch (SQLException ignored) {
             new WarningWindow("There was a problem with primary keys import. Reconnect database and try again", null, null);
         }
         DefaultListModel<String> stringPrimaryKeyList = new DefaultListModel<>();
-        for(int index = 0 ; index < tableNames.size() ; index++){
-            primaryKeyWithType = primaryKeyList.get(index).get(tableNames.get(index));
-            String tablePrimaryKey = tableNames.get(index)+"("+primaryKeyWithType.substring(0,primaryKeyWithType.indexOf(" "))+")";
+        for (String tableName : tableNames) {
+            primaryKeyWithType = primaryKeysMap.get(tableName);
+            String tablePrimaryKey = tableName + "(" + primaryKeyWithType.substring(0, primaryKeyWithType.indexOf(" ")) + ")";
             stringPrimaryKeyList.addElement(tablePrimaryKey);
         }
         primaryKeyJList = new JList<>(stringPrimaryKeyList);

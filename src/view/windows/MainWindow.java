@@ -24,14 +24,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
-/*
-* MainWindow
-*
-* @extends MyFrame
-*
-* MainWindow allows to use all functions operating on database (create table, drop table, remove row etc.)
-* */
 public class MainWindow extends MdcFrame {
 
     private DatabaseFacade databaseFacade;
@@ -64,7 +58,6 @@ public class MainWindow extends MdcFrame {
                     } catch (SQLException sqlException) {
                         sqlException.printStackTrace();
                     }
-//                    System.exit(0);
                 }, null);
             }
         });
@@ -73,66 +66,53 @@ public class MainWindow extends MdcFrame {
     @Override
     public void createWidgets() {
 
-//        -----------------------------------------mainPanel------------------------------------------------------------
-
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(backgroundColor);
 
-//        -----------------------------------------tablePanel------------------------------------------------------------
-
         JPanel tablePanel = createGridPanel(1, 1, 0, 0, 20);
-
-//        -----------------------------------------scrollPane-----------------------------------------------------------
 
         scrollPane = new JScrollPane();
         scrollPane.getViewport().setBackground(backgroundColor);
         scrollPane.setBorder(null);
 
-//        -----------------------------------------mainPanel------------------------------------------------------------
-
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40,40,40,40));
         mainPanel.setPreferredSize(new Dimension(800,600));
 
-//        -----------------------------------------menu-----------------------------------------------------------------
-
         JMenu menu = new JMenu("menu");
-
-//        -----------------------------------------menuBar--------------------------------------------------------------
 
         JMenuBar menuBar = new JMenuBar();
 
-//        -----------------------------------------newItem--------------------------------------------------------------
-
         JMenu newItem = new JMenu("New");
-
-//        -----------------------------------------newConnectionItem----------------------------------------------------
 
         JMenuItem newConnectionItem = new JMenuItem("Connection");
         newConnectionItem.addActionListener(event->
-                        new WarningWindow("Close current connection?", subEvent -> {
-                            try {
-                                databaseFacade.disconnect();
-                            } catch (SQLException sqlException) {
-                                sqlException.getMessage();
-                            }
-                            dispose();
-                        }, finalAction->new Run())
+            new WarningWindow("Close current connection?", subEvent -> {
+                try {
+                    databaseFacade.disconnect();
+                } catch (SQLException sqlException) {
+                    sqlException.getMessage();
+                }
+                dispose();
+            }, finalAction->new Run())
         );
-
-//        -----------------------------------------reconnectItem--------------------------------------------------------
 
         JMenuItem reconnectItem = new JMenuItem("Reconnect");
         reconnectItem.addActionListener(event->
             new WarningWindow("Reconnect?", subEvent->{
-                String[] loginData = databaseFacade.getDatabaseProperties();
-//                String[] loginData = databaseFacade.get;
+                Map<String, String> propertiesMap = databaseFacade.getDatabasePropertiesMap();
                 try {
                     databaseFacade.disconnect();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 try {
-                    databaseFacade = new DatabaseFacade(loginData[0], loginData[1], loginData[2], loginData[3], loginData[4]);
+                    databaseFacade = new DatabaseFacade(
+                            propertiesMap.get("host"),
+                            propertiesMap.get("port"),
+                            propertiesMap.get("databaseName"),
+                            propertiesMap.get("username"),
+                            propertiesMap.get("password")
+                    );
                     databaseFacade.importDatabase();
                     new MainWindow(databaseFacade);
                     dispose();
@@ -141,8 +121,6 @@ public class MainWindow extends MdcFrame {
                 }
             }, null)
         );
-
-//        -----------------------------------------closeConnectionItem--------------------------------------------------
 
         JMenuItem closeConnectionItem = new JMenuItem("Close connection");
         closeConnectionItem.addActionListener(event->
@@ -156,8 +134,6 @@ public class MainWindow extends MdcFrame {
                 new Run();
             }, null));
 
-//        -----------------------------------------exitItem-------------------------------------------------------------
-
         JMenuItem exitItem = new JMenuItem("Exit");
         exitItem.addActionListener(event->
             new WarningWindow("Are you sure you want to exit?",subEvent->{
@@ -167,7 +143,6 @@ public class MainWindow extends MdcFrame {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-//                System.exit(0);
             }, null));
 
         newItem.add(newConnectionItem);
@@ -178,25 +153,17 @@ public class MainWindow extends MdcFrame {
         menuBar.add(menu);
         setJMenuBar(menuBar);
 
-
         for(String tableName: databaseFacade.getTableNames())
             tableList.addElement(tableName);
-
-
-//        -----------------------------------------tableJList-----------------------------------------------------------
 
         tableJList = new JList<>(tableList);
         tableJList.setBackground(new Color(105,105,105));
         tableJList.setForeground(Color.WHITE);
         setListMouseListener();
 
-//        -----------------------------------------mainWindowButtons----------------------------------------------------
-
         mainWindowButtons = new MainWindowButtons(databaseFacade, this);
         mainWindowButtons.setPreferredSize(new Dimension(300,0));
         mainWindowButtons.setBackground(new Color(67,67,67));
-
-//        -----------------------------------------tablesScroll---------------------------------------------------------
 
         tablesScroll = new JScrollPane(tableJList);
         tablesScroll.setBorder(null);
@@ -233,11 +200,6 @@ public class MainWindow extends MdcFrame {
         }
     }
 
-    /*
-    * removeTableFromJList method sets new list without removed table (using table index).
-    *
-    * @param int index
-    * */
     public void removeTableFromJList(int index){
 
         tableList.remove(index);
@@ -249,11 +211,6 @@ public class MainWindow extends MdcFrame {
         tableJList.setLayoutOrientation(JList.VERTICAL);
     }
 
-     /*
-     * addTableToJlist method sets new list with new created table
-     *
-     * @param String tableName
-     * */
     public void addTableToJlist(String tableName){
         tableList.addElement(tableName);
         tableJList = new JList<>(tableList);
@@ -269,9 +226,7 @@ public class MainWindow extends MdcFrame {
     public int getSelectedTableIndex(){
         return tableJList.getSelectedIndex();
     }
-    /*
-    * setListMouseListener method sets all buttons which require table to be selected from table list enabled.
-    * */
+
     private void setListMouseListener(){
         tableJList.addMouseListener(new MouseListener() {
             @Override

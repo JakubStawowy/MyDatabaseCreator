@@ -15,14 +15,6 @@ import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 import java.util.List;
 
-/*
-* ConnectWindow
-*
-* @extends MyDialog
-*
-* This window allows to connect with database using database name, username and password
-*
-* */
 public class ConnectWindow extends MdcFrame {
 
     private MdcFrame startingWindow;
@@ -45,8 +37,6 @@ public class ConnectWindow extends MdcFrame {
     @Override
     public void createWidgets() {
 
-//---------------------------------------mainPanel----------------------------------------------------------------------
-
         JPanel mainPanel = createGridPanel(7,2,20,20,20);
 
         JLabel hostLabel = createLabel("Host:");
@@ -55,34 +45,19 @@ public class ConnectWindow extends MdcFrame {
         JLabel portLabel = createLabel("Port:");
         JTextField portTextField = createTextField("3306");
 
-//--------------------------------------databaseNameLabel------------------------------------------------
-
         JLabel databaseNameLabel = createLabel("Database name:");
 
-//--------------------------------------databaseNameField------------------------------------------------
-
         JTextField databaseNameField = createTextField("mdc_db");
-//        JTextField databaseNameField = createTextField("jdbc:mysql://localhost:3306/");
-
-//--------------------------------------usernameLabel----------------------------------------------------
 
         JLabel usernameLabel = createLabel("Username:");
 
-//--------------------------------------usernameField----------------------------------------------------
-
         JTextField usernameField = createTextField("root");
 
-//--------------------------------------passwordLabel----------------------------------------------------
-
         JLabel passwordLabel = createLabel("Password:");
-
-//--------------------------------------passwordField----------------------------------------------------
 
         JPasswordField passwordField = new JPasswordField();
         passwordField.setBackground(new Color(105,105,105));
         passwordField.setForeground(Color.WHITE);
-
-//--------------------------------------hidePasswordCheckBox---------------------------------------------
 
         JCheckBox hidePasswordCheckBox = new JCheckBox();
         hidePasswordCheckBox.setSelected(true);
@@ -102,8 +77,6 @@ public class ConnectWindow extends MdcFrame {
         hidePasswordCheckBox.setBackground(new Color(67,67,67));
         hidePasswordCheckBox.setForeground(Color.WHITE);
 
-//--------------------------------------connectButton----------------------------------------------------
-
         JButton connectButton = createButton("Connect", event-> connect(
                 hostTextField.getText(),
                 databaseNameField.getText(),
@@ -111,8 +84,6 @@ public class ConnectWindow extends MdcFrame {
                 usernameField.getText(),
                 String.valueOf(passwordField.getPassword())
         ),true);
-
-//--------------------------------------cancelButton----------------------------------------------------
 
         JButton cancelButton = createButton("Cancel", event-> new WarningWindow("Are you sure you want to exit?", subEvent-> dispose(), null), true);
 
@@ -133,6 +104,7 @@ public class ConnectWindow extends MdcFrame {
 
         add(mainPanel);
     }
+
     @Override
     public JTextField createTextField(String text) {
         Color textFieldColor = new Color(105,105,105);
@@ -147,14 +119,6 @@ public class ConnectWindow extends MdcFrame {
 
     }
 
-    /*
-    * connect method allows to connect with database using given parameters and initializes WarningWindow class
-    * if the connection was failed. If user decides to connect again, method calls itself.
-    *
-    * @param String databaseName
-    * @param String username
-    * @param String password
-    * */
     public void connect(String host, String databaseName, String port, String username, String password){
 
         try {
