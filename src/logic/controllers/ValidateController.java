@@ -1,7 +1,7 @@
-package Logic;
+package logic.controllers;
 
-import GUI.CreateTableWindow;
-import Logic.MyExceptions.*;
+import view.windows.CreateTableWindow;
+import exceptions.*;
 
 import java.util.Vector;
 /*
@@ -9,7 +9,7 @@ import java.util.Vector;
 *
 * This class contains methods that check if values typed by user are correct.
 * */
-public class Controller {
+public class ValidateController {
     private final String[] numericTypes = {"bit", "tinyint", "smallint","mediumint", "bigint",
             "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"};
     private final String[] stringTypes ={"char", "varchar", "binary", "tinyblob", "tinytext", "text",
@@ -123,7 +123,7 @@ public class Controller {
     public void checkColumnNameUniqueness(String columnName, Vector<String> columnNames) throws RepeteadColumnNameException {
         for(String name: columnNames){
             if(name.equals(columnName))
-                throw new RepeteadColumnNameException();
+                throw new RepeteadColumnNameException(name+" - repeated column name");
         }
     }
     /*
@@ -140,7 +140,7 @@ public class Controller {
         int numberOfTypes = createTableWindow.getColumnTypes().size();
         int numberOfConstraints = createTableWindow.getConstraintsVector().size();
         if(numberOfNames!=numberOfTypes || numberOfNames!=numberOfConstraints)
-            throw new BadNamesTypesQuantityException();
+            throw new BadNamesTypesQuantityException("Bad names and types quantity");
     }
 
 }
