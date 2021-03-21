@@ -1,7 +1,7 @@
 package view.windows;
 
 import logic.DatabaseFacade;
-import view.components.MyDialog;
+import view.components.MdcFrame;
 import logic.controllers.ValidateController;
 import exceptions.BadColumnNumberException;
 import exceptions.BadNamesTypesQuantityException;
@@ -34,7 +34,7 @@ import java.util.Vector;
 * This window allows to create new table.
 *
 * */
-public class CreateTableWindow extends MyDialog {
+public class CreateTableWindow extends MdcFrame {
 
     private DatabaseFacade databaseFacade;
     private ValidateController controller = new ValidateController();
@@ -124,7 +124,7 @@ public class CreateTableWindow extends MyDialog {
 
 //        ----------------------------------------newColumnButton-------------------------------------------------------
 
-        JButton newColumnButton = createButton("New Column",event->new NewColumnWindow(this),true);
+        JButton newColumnButton = createButton("New Column",event->new AddNewColumnWindow(this),true);
 
 //        ----------------------------------------deleteColumnButton----------------------------------------------------
 

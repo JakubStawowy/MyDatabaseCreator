@@ -1,8 +1,7 @@
 package view.windows;
 
 import logic.DatabaseFacade;
-import view.components.MyDialog;
-import view.components.MyFrame;
+import view.components.MdcFrame;
 import logic.models.Table;
 
 import javax.swing.JTable;
@@ -26,16 +25,16 @@ import java.util.List;
 * used in: MainWindow, EditTableWindow
 *
 * */
-public class AddRowWindow extends MyDialog {
+public class AddRowWindow extends MdcFrame {
 
     private String tableName;
     private Table table;
     private JTable displayedTable;
-    private MyFrame tableWindow;
+    private MdcFrame tableWindow;
     private JPanel tablePanel = createGridPanel(1,1,0,0, 0);
     private DatabaseFacade databaseFacade;
 
-    public AddRowWindow(Table table, DatabaseFacade databaseFacade, MyFrame tableWindow){
+    public AddRowWindow(Table table, DatabaseFacade databaseFacade, MdcFrame tableWindow){
 
         this.databaseFacade = databaseFacade;
         this.tableWindow = tableWindow;

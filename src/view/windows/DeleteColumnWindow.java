@@ -1,6 +1,6 @@
 package view.windows;
 
-import view.components.MyDialog;
+import view.components.MdcFrame;
 
 import javax.swing.JPanel;
 import javax.swing.JComboBox;
@@ -16,7 +16,7 @@ import java.util.Vector;
 * This window allows to delete selected column from created table
 *
 * */
-public class DeleteColumnWindow extends MyDialog {
+public class DeleteColumnWindow extends MdcFrame {
 
     private Vector<String> columnNames;
     private CreateTableWindow createTableWindow;

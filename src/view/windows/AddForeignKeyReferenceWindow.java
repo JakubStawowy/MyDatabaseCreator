@@ -1,6 +1,7 @@
 package view.windows;
 import logic.DatabaseFacade;
-import view.components.MyDialog;
+import view.components.MdcFrame;
+
 import javax.swing.JPanel;
 import javax.swing.JList;
 import javax.swing.JLabel;
@@ -22,14 +23,16 @@ import java.util.Map;
 * This window displays all Primary Keys from connected Database and allows to select Foreign Key reference for created column.
 *
 * */
-public class AddForeignKeyReferenceWindow extends MyDialog {
+public class AddForeignKeyReferenceWindow extends MdcFrame {
+
     private DatabaseFacade databaseFacade;
     private JList<String> primaryKeyJList;
     private List<String> tableNames;
     private List<Map<String, String>> primaryKeyList;
-    private NewColumnWindow newColumnWindow;
+    private AddNewColumnWindow newColumnWindow;
     private String primaryKeyWithType;
-    public AddForeignKeyReferenceWindow(NewColumnWindow newColumnWindow, DatabaseFacade databaseFacade){
+
+    public AddForeignKeyReferenceWindow(AddNewColumnWindow newColumnWindow, DatabaseFacade databaseFacade){
         this.databaseFacade = databaseFacade;
         tableNames = databaseFacade.getTableNames();
         this.newColumnWindow = newColumnWindow;

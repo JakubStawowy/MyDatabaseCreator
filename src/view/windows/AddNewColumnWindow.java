@@ -1,6 +1,7 @@
 package view.windows;
 
-import view.components.MyDialog;
+import logic.repositories.DataTypesRepository;
+import view.components.MdcFrame;
 import logic.controllers.ValidateController;
 import exceptions.BadColumnTypeException;
 import exceptions.BadColumnNameException;
@@ -35,7 +36,7 @@ import java.util.logging.Logger;
 *
 * This window allows to create and add a new Column in created table
 * */
-public class NewColumnWindow extends MyDialog {
+public class AddNewColumnWindow extends MdcFrame {
 
     private CreateTableWindow createTableWindow;
     private Vector<String> columnNames;
@@ -45,7 +46,8 @@ public class NewColumnWindow extends MyDialog {
     private String foreignKey = null;
     private JComboBox<String> typeComboBox;
     private JButton foreignKeyButton;
-    JTextField sizeField;
+    private final int defaultSize = 255;
+    private JTextField sizeField;
     private final String[] numericTypes = {
             "bit", "tinyint", "smallint","mediumint", "bigint",
             "int", "boolean", "bool", "integer", "float" ,"double", "decimal", "dec"
@@ -60,7 +62,7 @@ public class NewColumnWindow extends MyDialog {
     private final String[] constraints = {
             "Not Null", "Unique"
     };
-    public NewColumnWindow(CreateTableWindow createTableWindow){
+    public AddNewColumnWindow(CreateTableWindow createTableWindow){
 
         final String title = "New Column";
         this.createTableWindow = createTableWindow;
@@ -125,7 +127,7 @@ public class NewColumnWindow extends MyDialog {
 //        -------------------------------------------checkTextBox-------------------------------------------------------
 
         JTextField checkTextBox = createTextField("Check");
-        checkTextBox.setEnabled(false);
+        checkTextBox.setEnabled(true);
 
 //        -------------------------------------------constraintsComboBox------------------------------------------------
 
@@ -146,7 +148,7 @@ public class NewColumnWindow extends MyDialog {
 
 //        -------------------------------------------addColumnButton----------------------------------------------------
 
-        JButton addColumnButton = createButton("Add Column",event->{
+        JButton addColumnButton = createButton("Add Column", event->{
 
             String columnName = columnNameField.getText();
             String columnType = String.valueOf(typeComboBox.getSelectedItem());
@@ -162,11 +164,25 @@ public class NewColumnWindow extends MyDialog {
                     if(constraintsCheckBoxes.get(i).isSelected()) {
                         _constraints.append(constraintsCheckBoxes.get(i).getText()).append(" ");
                     }
+
                 if(!defaultValueField.getText().equals("") && !defaultValueField.getText().equals("Default value"))
-                    _constraints.append("DEFAULT '"+defaultValueField.getText()+"'");
+                    _constraints.append("DEFAULT '").append(defaultValueField.getText()).append("'");
+
+                if(!checkTextBox.getText().equals("") && !checkTextBox.getText().equals("Check"))
+                    _constraints.append(", CHECK(").append(checkTextBox.getText()).append(")");
+
                 Logger.getGlobal().log(Level.INFO, _constraints.toString());
                 columnNames.add(columnName);
-                columnType = columnType+size;
+
+                Logger.getGlobal().log(Level.INFO, String.valueOf(!DataTypesRepository.isNumeric(columnType)));
+                Logger.getGlobal().log(Level.INFO, String.valueOf(!columnType.toLowerCase().equals("text")));
+                Logger.getGlobal().log(Level.INFO, String.valueOf(sizeField.getText().equals("")));
+                Logger.getGlobal().log(Level.INFO, String.valueOf(sizeField.getText().equals("Size")));
+                if(!DataTypesRepository.isNumeric(columnType) && !columnType.toLowerCase().contains("text") && (sizeField.getText().equals("") || sizeField.getText().equals("Size")))
+                    columnType = columnType+"("+defaultSize+")";
+                else
+                    columnType = columnType+size;
+                Logger.getGlobal().log(Level.INFO, columnType);
                 columnTypes.add(columnType);
                 constraintsVector.add(String.valueOf(_constraints));
                 if(foreignKey != null)
@@ -235,40 +251,32 @@ public class NewColumnWindow extends MyDialog {
     }
     public static class CheckBoxesComboBox extends JComboBox<JCheckBox>{
 
-        private final int defaultIndex = 2;
-        private final int checkIndex = 3;
+        private final int checkIndex = 0;
 
         public CheckBoxesComboBox(Vector<JCheckBox> checkBoxes, JTextField defaultTextField, JTextField checkTextBox) {
             super(checkBoxes);
-            setRenderer(new ListCellRenderer<Component>() {
-                @Override
-                public Component getListCellRendererComponent(JList<? extends Component> list, Component value, int index, boolean isSelected, boolean cellHasFocus) {
-
-                    if (isSelected) {
-                        value.setBackground(list.getSelectionBackground());
-                        value.setForeground(list.getSelectionForeground());
-                    } else {
-                        value.setBackground(list.getBackground());
-                        value.setForeground(list.getForeground());
-                    }
-                    return value;
+            setRenderer((ListCellRenderer<Component>) (list, value, index, isSelected, cellHasFocus) -> {
+                if (isSelected) {
+                    value.setBackground(list.getSelectionBackground());
+                    value.setForeground(list.getSelectionForeground());
+                } else {
+                    value.setBackground(list.getBackground());
+                    value.setForeground(list.getForeground());
                 }
+                return value;
             }
             );
-            addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    showPopup();
-                    setPopupVisible(true);
-                    JCheckBox checkBox = (JCheckBox)getSelectedItem();
-                    if(checkBox!=null) {
-                        checkBox.setSelected(!checkBox.isSelected());
-
-                        if(getItemAt(checkIndex).isSelected())
-                            checkTextBox.setEnabled(true);
-                        else
-                            checkTextBox.setEnabled(false);
-                    }
+            addActionListener(e -> {
+                showPopup();
+                setPopupVisible(true);
+                JCheckBox checkBox = (JCheckBox)getSelectedItem();
+                if(checkBox!=null) {
+                    checkBox.setSelected(!checkBox.isSelected());
+//                        Logger.getGlobal().log(Level.INFO, String.valueOf(checkIndex));
+//                        if(getItemAt(checkIndex).isSelected())
+//                            checkTextBox.setEnabled(true);
+//                        else
+//                            checkTextBox.setEnabled(false);
                 }
             });
         }

@@ -30,7 +30,7 @@ import java.util.List;
  *   *createGridPanel
  *   *setTextField
  * */
-public abstract class MyFrame extends JFrame implements MyWindow {
+public abstract class MdcFrame extends JFrame implements MyWindow {
     @Override
     public abstract void createWidgets();
 

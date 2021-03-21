@@ -2,7 +2,7 @@ package view.windows;
 
 import logic.DatabaseFacade;
 import view.components.MainWindowButtons;
-import view.components.MyFrame;
+import view.components.MdcFrame;
 import run.Run;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -32,7 +32,7 @@ import java.util.List;
 *
 * MainWindow allows to use all functions operating on database (create table, drop table, remove row etc.)
 * */
-public class MainWindow extends MyFrame {
+public class MainWindow extends MdcFrame {
 
     private DatabaseFacade databaseFacade;
     private DefaultListModel<String> tableList = new DefaultListModel<>();

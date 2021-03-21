@@ -1,7 +1,7 @@
 package view.windows;
 
 import logic.RandomConditionGenerator;
-import view.components.MyDialog;
+import view.components.MdcFrame;
 import exceptions.EmptyTableException;
 import logic.models.Table;
 import javax.swing.JPanel;
@@ -24,7 +24,7 @@ import java.util.List;
 *
 * This window allows to search table using conditions, sort table ascending or descending
 * */
-public class SearchTableWindow extends MyDialog {
+public class SearchTableWindow extends MdcFrame {
 
     private EditTableWindow displayTableWindow;
     private JCheckBox ascSortCheckBox;

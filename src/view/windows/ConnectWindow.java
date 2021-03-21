@@ -1,7 +1,8 @@
 package view.windows;
 
 import logic.DatabaseFacade;
-import view.components.MyDialog;
+import view.components.MdcFrame;
+
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -22,11 +23,11 @@ import java.util.List;
 * This window allows to connect with database using database name, username and password
 *
 * */
-public class ConnectWindow extends MyDialog {
+public class ConnectWindow extends MdcFrame {
 
-    private MyDialog startingWindow;
+    private MdcFrame startingWindow;
 
-    public ConnectWindow(MyDialog window){
+    public ConnectWindow(MdcFrame window){
 
         this.startingWindow = window;
         final String title = "Connect";

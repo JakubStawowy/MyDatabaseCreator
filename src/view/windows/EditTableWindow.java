@@ -1,7 +1,7 @@
 package view.windows;
 
 import logic.DatabaseFacade;
-import view.components.MyFrame;
+import view.components.MdcFrame;
 import logic.models.Table;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
@@ -25,7 +25,7 @@ import java.util.List;
 * This window allows to edit table (display table, search table, add new row, delete row).
 *
 * */
-public class EditTableWindow extends MyFrame {
+public class EditTableWindow extends MdcFrame {
 
     private Table table;
     private DatabaseFacade databaseFacade;

@@ -1,6 +1,6 @@
 package view.windows;
 
-import view.components.MyDialog;
+import view.components.MdcFrame;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -15,7 +15,7 @@ import java.util.List;
 *
 * This window is responsible for displaying warnings and executing action passed as constructor parameters.
 * */
-public class WarningWindow extends MyDialog {
+public class WarningWindow extends MdcFrame {
 
     private ActionListener action;
     private ActionListener finalAction;
