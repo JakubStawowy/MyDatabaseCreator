@@ -36,7 +36,7 @@ public class MainWindow extends MdcFrame {
     private MainWindowButtons mainWindowButtons;
     private Color backgroundColor = new Color(67,67,67);
 
-    public MainWindow(DatabaseFacade databaseFacade){
+    public MainWindow(DatabaseFacade databaseFacade) throws SQLException{
 
         this.databaseFacade = databaseFacade;
         final String title = "MyDatabaseCreator";
@@ -64,7 +64,7 @@ public class MainWindow extends MdcFrame {
     }
 
     @Override
-    public void createWidgets() {
+    public void createWidgets() throws SQLException {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(backgroundColor);

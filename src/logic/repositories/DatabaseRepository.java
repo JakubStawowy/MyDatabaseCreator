@@ -4,9 +4,12 @@ import logic.models.Table;
 import logic.templates.DatabaseConnector;
 import logic.templates.TableRepository;
 
+import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DatabaseRepository implements TableRepository {
 
@@ -40,20 +43,15 @@ public class DatabaseRepository implements TableRepository {
         Vector<String> columnTypes = new Vector<>();
         List<Object> columns;
         List<List<Object>> data = new LinkedList<>();
-        int numberOfColumns = 0;
-        int primaryKeyColumnIndex = 0;
-
         rs = databaseConnector.executeQuery("DESC " + tableName + ";");
 
         while (rs.next()) {
 
             if (rs.getString("Key").equals("PRI"))
-                primaryKeyColumnIndex = numberOfColumns;
 
             columnNames.add(rs.getString("Field"));
             columnTypes.add(rs.getString("Type"));
 
-            numberOfColumns++;
         }
 
         rs = databaseConnector.executeQuery("SELECT * FROM " + tableName + ";");
@@ -118,7 +116,7 @@ public class DatabaseRepository implements TableRepository {
         Map<String, String> primaryKeyMap = new HashMap<>();
         ResultSet rs;
 
-        for(String tableName: tableNames) {
+        for(String tableName: getTableNames()) {
             rs = databaseConnector.executeQuery("DESC " + tableName + ";");
             while (rs.next())
                 if(rs.getString("Key").equals("PRI")) {
@@ -126,6 +124,8 @@ public class DatabaseRepository implements TableRepository {
                     break;
                 }
         }
+
+        Logger.getGlobal().log(Level.INFO, String.valueOf(primaryKeyMap));
         return primaryKeyMap;
     }
 
@@ -150,7 +150,15 @@ public class DatabaseRepository implements TableRepository {
     }
 
     @Override
-    public List<String> getTableNames() {
+    public List<String> getTableNames() throws SQLException {
+        String database = databaseConnector.getDatabasePropertiesMap().get("databaseName");
+        String query = "SHOW TABLES IN "+database+";";
+        ResultSet rs = databaseConnector.executeQuery(query);
+        tableNames.clear();
+
+        while (rs.next())
+            tableNames.add(rs.getString("Tables_in_"+database));
+
         return tableNames;
     }
 }

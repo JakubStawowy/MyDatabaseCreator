@@ -65,7 +65,7 @@ public class DatabaseFacade implements TableRepository, DdlManager, DmlManager, 
     }
 
     @Override
-    public List<String> getTableNames() {
+    public List<String> getTableNames() throws SQLException {
         return tableRepository.getTableNames();
     }
 

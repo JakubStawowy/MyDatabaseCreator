@@ -16,7 +16,7 @@ public class TableManager implements DdlManager {
 
     private DatabaseConnector databaseConnector;
     private TableRepository tableRepository;
-    private List<String> tableNames = new ArrayList<>();
+//    private List<String> tableNames = new ArrayList<>();
 
     public TableManager(final DatabaseConnector databaseConnector, final TableRepository tableRepository) {
         this.databaseConnector = databaseConnector;
@@ -31,7 +31,7 @@ public class TableManager implements DdlManager {
 
     @Override
     public void dropAllTables() throws SQLException {
-        for(String tableName: tableNames)
+        for(String tableName: tableRepository.getTableNames())
             dropTable(tableName);
     }
 
@@ -57,9 +57,8 @@ public class TableManager implements DdlManager {
         if(dropExistingTable)
             dropTable(table.getTableName());
 
-        Logger.getGlobal().log(Level.INFO, String.valueOf(query));
         databaseConnector.execute(String.valueOf(query));
-        tableNames.add(table.getTableName());
+//        tableNames.add(table.getTableName());
         tableRepository.getTables().add(table);
     }
 }

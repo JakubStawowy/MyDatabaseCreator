@@ -15,11 +15,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
+import java.sql.SQLException;
 import java.util.List;
 
 public abstract class MdcFrame extends JFrame implements MyWindow {
     @Override
-    public abstract void createWidgets();
+    public abstract void createWidgets() throws SQLException;
 
     @Override
     public abstract void displayTable(List<List<Object>> data);

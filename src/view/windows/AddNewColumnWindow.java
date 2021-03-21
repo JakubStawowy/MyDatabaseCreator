@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Component;
+import java.sql.SQLException;
 import java.util.Vector;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -79,7 +80,13 @@ public class AddNewColumnWindow extends MdcFrame {
         for(String constraint: DataTypesRepository.getConstraints())
             constraintsCheckBoxes.add(new JCheckBox(constraint));
 
-        foreignKeyButton = createButton("Add Foreign Key", event->new AddForeignKeyReferenceWindow(this, createTableWindow.getDatabaseFacade()), true);
+        foreignKeyButton = createButton("Add Foreign Key", event-> {
+            try {
+                new AddForeignKeyReferenceWindow(this, createTableWindow.getDatabaseFacade());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }, true);
 
         JTextField defaultValueField = createTextField("Default value");
         defaultValueField.setEnabled(true);

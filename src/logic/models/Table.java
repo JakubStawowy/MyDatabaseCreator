@@ -37,7 +37,7 @@ public class Table {
     }
 
     public int getNumberOfColumns() {
-        return data.get(0).size();
+        return columnNames.size();
     }
 
     public int getNumberOfRows() {

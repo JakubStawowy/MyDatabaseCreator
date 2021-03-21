@@ -14,5 +14,5 @@ public interface TableRepository {
     void removeTableFromList(final String tableName);
     List<Table> getTables();
     Table getTable(final String tableName);
-    List<String> getTableNames();
+    List<String> getTableNames() throws SQLException;
 }

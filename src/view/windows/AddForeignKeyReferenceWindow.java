@@ -24,7 +24,7 @@ public class AddForeignKeyReferenceWindow extends MdcFrame {
     private AddNewColumnWindow newColumnWindow;
     private String primaryKeyWithType;
 
-    public AddForeignKeyReferenceWindow(AddNewColumnWindow newColumnWindow, DatabaseFacade databaseFacade){
+    public AddForeignKeyReferenceWindow(AddNewColumnWindow newColumnWindow, DatabaseFacade databaseFacade) throws SQLException{
         this.databaseFacade = databaseFacade;
         tableNames = databaseFacade.getTableNames();
         this.newColumnWindow = newColumnWindow;

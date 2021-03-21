@@ -5,6 +5,7 @@ import javax.swing.JTextField;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 
 /*
@@ -15,7 +16,7 @@ public interface MyWindow {
     /*
      * createWidgets method is responsible for adding all components to parent class window
      * */
-    void createWidgets();
+    void createWidgets() throws SQLException;
 
     /*
     * displayTable method allows to display table (JTable) on a subclass window
