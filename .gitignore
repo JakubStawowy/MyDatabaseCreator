@@ -1,9 +1,5 @@
 .idea
-
 out
-
 *.iml
 
-src/*
-!GUI
-!Logic
+src/logic/thrash
