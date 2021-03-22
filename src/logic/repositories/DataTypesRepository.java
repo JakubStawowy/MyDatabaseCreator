@@ -40,4 +40,14 @@ public final class DataTypesRepository {
         }
         return false;
     }
+
+    public static String[] getAllTypes() {
+
+        String[] allTypes = new String[numericTypes.length + stringTypes.length + dateAndTimeTypes.length];
+        System.arraycopy(numericTypes, 0, allTypes, 0, numericTypes.length);
+        System.arraycopy(stringTypes, 0, allTypes, numericTypes.length, stringTypes.length);
+        System.arraycopy(dateAndTimeTypes, 0, allTypes, numericTypes.length+stringTypes.length, dateAndTimeTypes.length);
+
+        return allTypes;
+    }
 }

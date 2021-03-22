@@ -6,7 +6,7 @@ import logic.controllers.DataValidator;
 import exceptions.BadColumnTypeException;
 import exceptions.BadColumnNameException;
 import exceptions.BadTypeSizeException;
-import exceptions.RepeteadColumnNameException;
+import exceptions.RepeatedColumnNameException;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -147,7 +147,7 @@ public class AddNewColumnWindow extends MdcFrame {
                 createTableWindow.addColumnToComboBox(columnName);
                 createTableWindow.displayTable(null);
                 dispose();
-            }catch (BadColumnNameException | BadTypeSizeException | BadColumnTypeException | RepeteadColumnNameException exception){
+            }catch (BadColumnNameException | BadTypeSizeException | BadColumnTypeException | RepeatedColumnNameException exception){
                 new WarningWindow(exception.getMessage(), null, null);
             }
         },true);

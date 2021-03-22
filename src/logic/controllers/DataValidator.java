@@ -4,6 +4,7 @@ import logic.repositories.DataTypesRepository;
 import view.windows.CreateTableWindow;
 import exceptions.*;
 
+import java.util.List;
 import java.util.Vector;
 /*
 * Controller
@@ -54,7 +55,7 @@ public class DataValidator {
     * @throws BadColumnNumberException
     * */
     public void checkNumberOfColumns(final int numberOfColumns) throws BadColumnNumberException {
-        if(numberOfColumns==0)
+        if(numberOfColumns<=0)
             throw new BadColumnNumberException("Bad number of columns. You must add at least one column to a table");
     }
 
@@ -95,18 +96,14 @@ public class DataValidator {
         boolean flag = true;
         if(type.equals("null"))
             throw new BadColumnTypeException("Choose column type");
-        for(String numericType: DataTypesRepository.getNumericTypes()){
+
+        for(String numericType: DataTypesRepository.getAllTypes()){
             if (numericType.equals(type.toLowerCase())) {
                 flag = false;
                 break;
             }
         }
-        for(String stringType: DataTypesRepository.getStringTypes()){
-            if (stringType.equals(type.toLowerCase())) {
-                flag = false;
-                break;
-            }
-        }
+
         if(flag) {
             throw new BadColumnTypeException("Bad Column Type");
         }
@@ -122,10 +119,10 @@ public class DataValidator {
     *
     * @throws RepeatedColumnNameException
     * */
-    public void checkColumnNameUniqueness(final String columnName, final Vector<String> columnNames) throws RepeteadColumnNameException {
+    public void checkColumnNameUniqueness(final String columnName, final List<String> columnNames) throws RepeatedColumnNameException {
         for(String name: columnNames){
             if(name.equals(columnName))
-                throw new RepeteadColumnNameException(name+" - repeated column name");
+                throw new RepeatedColumnNameException(name+" - repeated column name");
         }
     }
 
