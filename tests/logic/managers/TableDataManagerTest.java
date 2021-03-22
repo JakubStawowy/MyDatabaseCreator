@@ -3,6 +3,8 @@ package logic.managers;
 import logic.DatabaseFacade;
 import logic.database.TestDatabaseCreator;
 import logic.models.Table;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
@@ -14,10 +16,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TableDataManagerTest {
 
+    private DatabaseFacade databaseFacade;
+
+    @BeforeEach
+    void init() throws SQLException {
+        databaseFacade = TestDatabaseCreator.createTestDatabase();
+    }
+
+    @AfterEach
+    void tearDown() throws SQLException {
+        databaseFacade.dropAllTables();
+        databaseFacade.disconnect();
+    }
+
     @Test
     void deleteRow() {
         try {
-            DatabaseFacade databaseFacade = TestDatabaseCreator.createTestDatabase();
             List<Object> row1 = Arrays.asList("0", "abc", "2.33", "true");
             List<Object> row2 = Arrays.asList("1", "abc", "2.33", "true");
             for(Table table: databaseFacade.getTables()){
@@ -37,8 +51,6 @@ class TableDataManagerTest {
                 assertEquals(0, table.getNumberOfRows());
 
             }
-            databaseFacade.dropAllTables();
-            databaseFacade.disconnect();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -47,7 +59,7 @@ class TableDataManagerTest {
     @Test
     void updateRow() {
         try {
-            DatabaseFacade databaseFacade = TestDatabaseCreator.createTestDatabase();
+
             List<Object> row = Arrays.asList("0", "abc", "2.33", "true");
             List<Object> updatedRow = Arrays.asList("0", "abc", "2.33", "false");
             List<List<Object>> data = new ArrayList<>();
@@ -60,16 +72,13 @@ class TableDataManagerTest {
                 databaseFacade.updateRow(table.getTableName(), data, 0, 3, "true", "false");
                 assertEquals(updatedRow, table.getData().get(0));
             }
-            databaseFacade.dropAllTables();
-            databaseFacade.disconnect();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @Test
-    void addRow() throws SQLException {
-        DatabaseFacade databaseFacade = TestDatabaseCreator.createTestDatabase();
+    void addRow() {
 
         List<Object> row = Arrays.asList("0", "abc", "2.33", "true");
         List<Object> badRow = Arrays.asList("0", "abc", "badValue", "true");

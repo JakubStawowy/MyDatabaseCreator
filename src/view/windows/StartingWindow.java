@@ -26,7 +26,7 @@ public class StartingWindow extends MdcFrame {
 
         JPanel mainPanel = createGridPanel(2,1,0,20,20);
 
-        JButton importButton = createButton("Import database", event->new ConnectWindow(this), true);
+        JButton importButton = createButton("Connect to database", event->new ConnectWindow(this), true);
 
         JButton closeButton = createButton("Close", event->dispose(),true);
 
