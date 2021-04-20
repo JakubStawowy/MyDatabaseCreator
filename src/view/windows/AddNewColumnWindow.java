@@ -1,8 +1,9 @@
 package view.windows;
 
+import logic.facades.ValidatorFacade;
 import logic.repositories.DataTypesRepository;
+import logic.templates.ValidatorFacadeApi;
 import view.components.MdcFrame;
-import logic.controllers.DataValidator;
 import exceptions.BadColumnTypeException;
 import exceptions.BadColumnNameException;
 import exceptions.BadTypeSizeException;
@@ -34,7 +35,7 @@ public class AddNewColumnWindow extends MdcFrame {
     private Vector<String> columnNames;
     private Vector<String> columnTypes;
     private Vector<String> constraintsVector;
-    private DataValidator controller = new DataValidator();
+    private ValidatorFacadeApi validatorFacade;
     private String foreignKey = null;
     private JComboBox<String> typeComboBox;
     private JButton foreignKeyButton;
@@ -48,7 +49,7 @@ public class AddNewColumnWindow extends MdcFrame {
         columnNames = createTableWindow.getColumnNames();
         columnTypes = createTableWindow.getColumnTypes();
         constraintsVector = createTableWindow.getConstraintsVector();
-
+        validatorFacade = ValidatorFacade.getInstance();
         setTitle(title);
         setLocationRelativeTo(null);
         createWidgets();
@@ -116,10 +117,10 @@ public class AddNewColumnWindow extends MdcFrame {
             String size;
             StringBuilder constraints = new StringBuilder();
             try {
-                controller.checkColumnName(columnName);
-                controller.checkType(columnType);
-                controller.checkColumnNameUniqueness(columnName, columnNames);
-                size = controller.checkSize(sizeField.getText());
+                validatorFacade.checkColumnName(columnName);
+                validatorFacade.checkType(columnType);
+                validatorFacade.checkColumnNameUniqueness(columnName, columnNames);
+                size = validatorFacade.checkSize(sizeField.getText());
 
                 for(int i = 0 ; i < DataTypesRepository.getConstraints().length ; i++)
                     if(constraintsCheckBoxes.get(i).isSelected()) {

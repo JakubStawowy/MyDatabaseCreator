@@ -1,6 +1,6 @@
 package logic.managers;
 
-import logic.DatabaseFacade;
+import logic.facades.DatabaseFacade;
 import logic.database.TestDatabaseCreator;
 import logic.models.Table;
 import org.junit.jupiter.api.AfterEach;

@@ -1,8 +1,7 @@
 package logic.repositories;
 
-import logic.DatabaseFacade;
+import logic.facades.DatabaseFacade;
 import logic.database.TestDatabaseCreator;
-import logic.models.Table;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,27 +35,6 @@ class DatabaseRepositoryTest {
     }
 
     @Test
-    void importTable() {
-        for(Table table: databaseFacade.getTables()){
-            assertDoesNotThrow(()->databaseFacade.importTable(table.getTableName()));
-        }
-    }
-
-    @Test
-    void searchTable() {
-        List<List<Object>> searchData = new ArrayList<>();
-        searchData.add(Arrays.asList("2", "abc", "2.2", "true"));
-        searchData.add(Arrays.asList("4", "abc", "2.2", "true"));
-        for(Table table: databaseFacade.getTables()) {
-            for (int id = 0; id < 5; id++) {
-                int finalId = id;
-                assertDoesNotThrow(() -> databaseFacade.addRow(Arrays.asList(String.valueOf(finalId), "abc", "2.2", "true"), table));
-            }
-            assertEquals(String.valueOf(searchData), String.valueOf(databaseFacade.searchTable(table.getTableName(),"col1%2=0 AND col1!=0", null, null)));
-        }
-    }
-
-    @Test
     void getPrimaryKeys() {
         Map<String, String> primaryKeysMap = new HashMap<>();
         assertDoesNotThrow(databaseFacade::getPrimaryKeys);
@@ -64,21 +42,6 @@ class DatabaseRepositoryTest {
             primaryKeysMap.put("testtable"+i, "col1 int(11)");
         }
         assertDoesNotThrow(() -> assertEquals(primaryKeysMap, databaseFacade.getPrimaryKeys()));
-    }
-
-    @Test
-    void getTables() {
-    }
-
-    @Test
-    void removeTableFromList() {
-    }
-
-    @Test
-    void getTable() {
-        for(Table table: databaseFacade.getTables()){
-            assertEquals(table, databaseFacade.getTable(table.getTableName()));
-        }
     }
 
     @Test

@@ -1,6 +1,6 @@
 package view.windows;
 
-import logic.RandomConditionGenerator;
+import logic.services.RandomConditionGenerator;
 import view.components.MdcFrame;
 import exceptions.EmptyTableException;
 import logic.models.Table;

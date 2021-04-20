@@ -1,6 +1,6 @@
 package logic.connectors;
 
-import logic.templates.DatabaseConnector;
+import logic.templates.DatabaseConnectorApi;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -15,10 +15,10 @@ import java.util.logging.Logger;
 * Database Connector
 * this class is used to connect with sql database
 * */
-public class MySqlDatabaseConnector implements DatabaseConnector {
+public final class MySqlDatabaseConnector implements DatabaseConnectorApi {
 
-    private Connection connection;
-    private Map<String, String> databasePropertiesMap = new HashMap<>();
+    private final Connection connection;
+    private final Map<String, String> databasePropertiesMap = new HashMap<>();
 
     public MySqlDatabaseConnector(String host, String port, String databaseName, String username, String password) throws SQLException {
 

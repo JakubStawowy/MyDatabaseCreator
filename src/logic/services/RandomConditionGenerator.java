@@ -1,4 +1,4 @@
-package logic;
+package logic.services;
 
 import exceptions.EmptyTableException;
 import logic.models.Table;
@@ -6,7 +6,7 @@ import logic.repositories.DataTypesRepository;
 
 import java.util.Random;
 
-public class RandomConditionGenerator {
+public final class RandomConditionGenerator {
     public static String generateRandomCondition(final Table table) throws EmptyTableException {
         if(table.getNumberOfRows()==0)
             throw new EmptyTableException("Cannot generate condition. Table "+table.getTableName()+" is empty");

@@ -1,24 +1,28 @@
 package logic.repositories;
 
 import logic.models.Table;
-import logic.templates.DatabaseConnector;
-import logic.templates.TableRepository;
+import logic.templates.DatabaseConnectorApi;
+import logic.templates.DatabaseRepositoryApi;
+import logic.templates.TableRepositoryApi;
 
-import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DatabaseRepository implements TableRepository {
+public final class DatabaseRepository implements DatabaseRepositoryApi {
 
-    private DatabaseConnector databaseConnector;
-    private List<String> tableNames = new LinkedList<>();
-    private List<Table> tables = new LinkedList<>();
+    private final DatabaseConnectorApi databaseConnector;
+    private final TableRepositoryApi tableRepository;
+    private List<String> tableNames;
+    private List<Table> tables;
 
-    public DatabaseRepository(final DatabaseConnector databaseConnector) {
+    public DatabaseRepository(final DatabaseConnectorApi databaseConnector) {
         this.databaseConnector = databaseConnector;
+        tables = new ArrayList<>();
+        tableRepository = new TableRepository(databaseConnector, tables);
+        tableNames = new ArrayList<>();
     }
 
     @Override
@@ -31,84 +35,8 @@ public class DatabaseRepository implements TableRepository {
         while (rs.next()) {
             tableName = rs.getString("Tables_in_" + database.substring(database.lastIndexOf("/") + 1));
             tableNames.add(tableName);
-            tables.add(importTable(tableName));
+            tables.add(tableRepository.importTable(tableName));
         }
-    }
-
-    @Override
-    public Table importTable(final String tableName) throws SQLException {
-        ResultSet rs;
-
-        Vector<String> columnNames = new Vector<>();
-        Vector<String> columnTypes = new Vector<>();
-        List<Object> columns;
-        List<List<Object>> data = new LinkedList<>();
-        rs = databaseConnector.executeQuery("DESC " + tableName + ";");
-
-        while (rs.next()) {
-
-            if (rs.getString("Key").equals("PRI"))
-
-            columnNames.add(rs.getString("Field"));
-            columnTypes.add(rs.getString("Type"));
-
-        }
-
-        rs = databaseConnector.executeQuery("SELECT * FROM " + tableName + ";");
-
-        while (rs.next()) {
-
-            columns = new LinkedList<>();
-
-            for (String column : columnNames) {
-
-                columns.add(rs.getObject(column));
-            }
-            data.add(columns);
-        }
-        return new Table(tableName, data, columnNames, columnTypes, null, null);
-    }
-
-    @Override
-    public List<List<Object>> searchTable(final String tableName, String condition, final String sorted, final String columnName) {
-
-        ResultSet rs;
-
-        List<String> columnNames = new ArrayList<>();
-        List<Object> columns;
-        List<List<Object>> data = new LinkedList<>();
-
-        if(condition.equals(""))
-            condition = "TRUE";
-
-        try {
-            rs = databaseConnector.executeQuery("DESC "+tableName+";");
-
-            while(rs.next()) {
-
-                columnNames.add(rs.getString("Field"));
-            }
-            if(sorted!=null)
-                rs = databaseConnector.executeQuery("SELECT * FROM " + tableName + " WHERE "+condition+" ORDER BY("+columnName+") "+sorted+";");
-            else
-                rs = databaseConnector.executeQuery("SELECT * FROM " + tableName + " WHERE "+condition+";");
-
-            while(rs.next()){
-
-                columns = new LinkedList<>();
-
-                for(String column : columnNames){
-
-                    columns.add(rs.getObject(column));
-                }
-                data.add(columns);
-            }
-        }catch(SQLException sqlException){
-
-            System.out.println("Problemy z przeszukaniem tabeli");
-        }
-
-        return data;
     }
 
     @Override
@@ -116,7 +44,7 @@ public class DatabaseRepository implements TableRepository {
         Map<String, String> primaryKeyMap = new HashMap<>();
         ResultSet rs;
 
-        for(String tableName: getTableNames()) {
+        for(String tableName: tableNames) {
             rs = databaseConnector.executeQuery("DESC " + tableName + ";");
             while (rs.next())
                 if(rs.getString("Key").equals("PRI")) {
@@ -137,16 +65,6 @@ public class DatabaseRepository implements TableRepository {
     @Override
     public void removeTableFromList(final String tableName){
         tables.removeIf(table -> table.getTableName().equals(tableName));
-    }
-
-    @Override
-    public Table getTable(final String tableName) {
-
-        for (Table table : tables) {
-            if (table.getTableName().equals(tableName))
-                return table;
-        }
-        return null;
     }
 
     @Override

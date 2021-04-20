@@ -1,10 +1,10 @@
 package view.windows;
 
-import logic.DatabaseFacade;
+import logic.facades.DatabaseFacade;
+import logic.facades.ValidatorFacade;
+import logic.templates.ValidatorFacadeApi;
 import view.components.MdcFrame;
-import logic.controllers.DataValidator;
 import exceptions.BadColumnNumberException;
-import exceptions.BadNamesTypesQuantityException;
 import exceptions.BadTableNameException;
 import exceptions.NoPrimaryKeyException;
 import logic.models.Table;
@@ -29,7 +29,7 @@ import java.util.Vector;
 public class CreateTableWindow extends MdcFrame {
 
     private DatabaseFacade databaseFacade;
-    private DataValidator controller = new DataValidator();
+    private ValidatorFacadeApi validatorFacade;
     private Object[][] tableData;
     private JTable displayedTable;
     private JScrollPane tableScrollPane;
@@ -50,7 +50,7 @@ public class CreateTableWindow extends MdcFrame {
         final String title = "Create Table";
         final int width = 800;
         final int height = 600;
-
+        validatorFacade = ValidatorFacade.getInstance();
         setTitle(title);
         setBounds(new Rectangle(width,height));
         setLocationRelativeTo(null);
@@ -102,7 +102,7 @@ public class CreateTableWindow extends MdcFrame {
 
         JButton deleteColumnButton = createButton("Delete Column", event->{
             try {
-                controller.checkNumberOfColumns(columnNames.size());
+                validatorFacade.checkNumberOfColumns(columnNames.size());
                 new DeleteColumnWindow(this);
             } catch (BadColumnNumberException ignored) {
                 new WarningWindow("No columns to delete", null, null);
@@ -123,15 +123,14 @@ public class CreateTableWindow extends MdcFrame {
             List<List<Object>> emptyData = new ArrayList<>();
             emptyData.add(emptyRow);
             try{
-                controller.checkTableName(tableName);
-                controller.checkNumberOfColumns(columnNames.size());
-                controller.checkNamesTypesQuantity(this);
+                validatorFacade.checkTableName(tableName);
+                validatorFacade.checkNumberOfColumns(columnNames.size());
                 if(primaryKeyComboBox.getSelectedItem().equals("None"))
                     throw new NoPrimaryKeyException("No primary key chosen");
                 databaseFacade.createTable(new Table(tableName, emptyData, columnNames,columnTypes,constraintsVector, foreignKeys),primaryKey, true);
                 mainWindow.addTableToJlist(tableName);
                 dispose();
-            } catch (BadTableNameException | BadColumnNumberException | BadNamesTypesQuantityException | SQLException exception) {
+            } catch (BadTableNameException | BadColumnNumberException | SQLException exception) {
                 new WarningWindow(exception.getMessage(), null, null);
             }
             catch (NoPrimaryKeyException exception){

@@ -5,7 +5,7 @@ import logic.models.Table;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface DmlManager {
+public interface DmlManagerApi {
 
     void deleteRow(Table table, final int rowIndex) throws SQLException;
     void deleteRow(Table table, final List<Object> row) throws SQLException;

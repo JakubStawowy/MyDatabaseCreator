@@ -1,12 +1,11 @@
 package logic.managers;
 
-import logic.DatabaseFacade;
+import logic.facades.DatabaseFacade;
 import logic.database.TestDatabaseCreator;
 import logic.models.Table;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import java.sql.SQLException;
 

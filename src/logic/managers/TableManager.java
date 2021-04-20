@@ -1,37 +1,32 @@
 package logic.managers;
 
 import logic.models.Table;
-import logic.templates.DatabaseConnector;
-import logic.templates.DdlManager;
-import logic.templates.TableRepository;
+import logic.templates.DatabaseConnectorApi;
+import logic.templates.DatabaseRepositoryApi;
+import logic.templates.DdlManagerApi;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class TableManager implements DdlManager {
+public final class TableManager implements DdlManagerApi {
 
-    private DatabaseConnector databaseConnector;
-    private TableRepository tableRepository;
-//    private List<String> tableNames = new ArrayList<>();
+    private DatabaseConnectorApi databaseConnector;
+    private DatabaseRepositoryApi databaseRepository;
 
-    public TableManager(final DatabaseConnector databaseConnector, final TableRepository tableRepository) {
+    public TableManager(final DatabaseConnectorApi databaseConnector, final DatabaseRepositoryApi databaseRepository) {
         this.databaseConnector = databaseConnector;
-        this.tableRepository = tableRepository;
+        this.databaseRepository = databaseRepository;
     }
 
     @Override
     public void dropTable(final String tableName) throws SQLException {
         databaseConnector.execute("DROP TABLE IF EXISTS " + tableName + ";");
-        tableRepository.removeTableFromList(tableName);
+        databaseRepository.removeTableFromList(tableName);
     }
 
     @Override
     public void dropAllTables() throws SQLException {
-        for(String tableName: tableRepository.getTableNames())
+        for(String tableName: databaseRepository.getTableNames())
             dropTable(tableName);
     }
 
@@ -58,7 +53,6 @@ public class TableManager implements DdlManager {
             dropTable(table.getTableName());
 
         databaseConnector.execute(String.valueOf(query));
-//        tableNames.add(table.getTableName());
-        tableRepository.getTables().add(table);
+        databaseRepository.getTables().add(table);
     }
 }
