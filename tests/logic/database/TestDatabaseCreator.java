@@ -1,6 +1,6 @@
 package logic.database;
 
-import logic.DatabaseFacade;
+import logic.facades.DatabaseFacade;
 import logic.models.Table;
 
 import java.sql.SQLException;

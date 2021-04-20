@@ -7,7 +7,7 @@ import java.util.Vector;
 * Table
 * this class keeps basic table properties: table name, number of columns, number of rows, column names, column types and table data.
 * */
-public class Table {
+public final class Table {
 
     private String tableName;
     private List<List<Object>> data;

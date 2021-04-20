@@ -2,19 +2,19 @@ package logic.managers;
 
 import logic.models.Table;
 import logic.repositories.DataTypesRepository;
-import logic.templates.DatabaseConnector;
-import logic.templates.DmlManager;
-import logic.templates.TableRepository;
+import logic.templates.DatabaseConnectorApi;
+import logic.templates.DmlManagerApi;
+import logic.templates.TableRepositoryApi;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public class TableDataManager implements DmlManager {
+public final class TableDataManager implements DmlManagerApi {
 
-    private DatabaseConnector databaseConnector;
-    private TableRepository tableRepository;
+    private DatabaseConnectorApi databaseConnector;
+    private TableRepositoryApi tableRepository;
 
-    public TableDataManager(final DatabaseConnector databaseConnector, final TableRepository tableRepository) {
+    public TableDataManager(final DatabaseConnectorApi databaseConnector, final TableRepositoryApi tableRepository) {
         this.databaseConnector = databaseConnector;
         this.tableRepository = tableRepository;
     }

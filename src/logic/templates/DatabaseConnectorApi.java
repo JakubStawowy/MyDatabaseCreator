@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public interface DatabaseConnector {
+public interface DatabaseConnectorApi {
 
     ResultSet executeQuery(final String query) throws SQLException;
     void execute(final String query) throws SQLException;

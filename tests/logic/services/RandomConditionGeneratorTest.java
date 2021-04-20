@@ -1,8 +1,10 @@
-package logic;
+package logic.services;
 
 import exceptions.EmptyTableException;
 import logic.database.TestDatabaseCreator;
+import logic.facades.DatabaseFacade;
 import logic.models.Table;
+import logic.services.RandomConditionGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;

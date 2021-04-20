@@ -2,34 +2,19 @@ package logic.controllers;
 
 import exceptions.*;
 import logic.repositories.DataTypesRepository;
+import logic.templates.DataValidatorApi;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DataValidatorTest {
 
-    DataValidator dataValidator = new DataValidator();
+    private static DataValidatorApi dataValidator;
 
-    @Test
-    void checkTableName() {
-        assertThrows(BadTableNameException.class, ()->dataValidator.checkTableName("Table name"));
-        assertDoesNotThrow(()->dataValidator.checkTableName("TableName"));
-    }
-
-    @Test
-    void checkColumnName() {
-        assertThrows(BadColumnNameException.class, ()->dataValidator.checkColumnName("Column name"));
-        assertDoesNotThrow(()->dataValidator.checkColumnName("ColumnName"));
-    }
-
-    @Test
-    void checkNumberOfColumns() {
-        assertThrows(BadColumnNumberException.class, ()->dataValidator.checkNumberOfColumns(0));
-        assertThrows(BadColumnNumberException.class, ()->dataValidator.checkNumberOfColumns(-1));
-        assertDoesNotThrow(()->dataValidator.checkNumberOfColumns(1));
+    @BeforeAll
+    static void beforeAll() {
+        dataValidator = new DataValidator();
     }
 
     @Test
@@ -48,10 +33,4 @@ class DataValidatorTest {
         }
     }
 
-    @Test
-    void checkColumnNameUniqueness() {
-        List<String> columnNameVector = Arrays.asList("column_1", "column_2", "column_3");
-        assertThrows(RepeatedColumnNameException.class, ()->dataValidator.checkColumnNameUniqueness("column_2", columnNameVector));
-        assertDoesNotThrow(()->dataValidator.checkColumnNameUniqueness("column_4", columnNameVector));
-    }
 }

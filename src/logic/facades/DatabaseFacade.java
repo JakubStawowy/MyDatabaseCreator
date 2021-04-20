@@ -1,37 +1,37 @@
-package logic;
+package logic.facades;
 
 import logic.connectors.MySqlDatabaseConnector;
 import logic.managers.TableDataManager;
 import logic.managers.TableManager;
 import logic.models.Table;
 import logic.repositories.DatabaseRepository;
-import logic.templates.DatabaseConnector;
-import logic.templates.DdlManager;
-import logic.templates.DmlManager;
-import logic.templates.TableRepository;
+import logic.repositories.TableRepository;
+import logic.templates.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-public class DatabaseFacade implements TableRepository, DdlManager, DmlManager, DatabaseConnector {
+public final class DatabaseFacade implements DatabaseFacadeApi {
 
-    private TableRepository tableRepository;
-    private DdlManager ddlManager;
-    private DmlManager dmlManager;
-    private DatabaseConnector databaseConnector;
+    private final DdlManagerApi ddlManager;
+    private final DmlManagerApi dmlManager;
+    private final DatabaseConnectorApi databaseConnector;
+    private final DatabaseRepositoryApi databaseRepository;
+    private final TableRepositoryApi tableRepository;
 
     public DatabaseFacade(String host, String port, String database, String username, String password) throws SQLException {
         databaseConnector = new MySqlDatabaseConnector(host, port, database, username, password);
-        tableRepository = new DatabaseRepository(databaseConnector);
-        ddlManager = new TableManager(databaseConnector, tableRepository);
+        databaseRepository = new DatabaseRepository(databaseConnector);
+        tableRepository = new TableRepository(databaseConnector, databaseRepository.getTables());
+        ddlManager = new TableManager(databaseConnector, databaseRepository);
         dmlManager = new TableDataManager(databaseConnector, tableRepository);
     }
 
     @Override
     public void importDatabase() throws SQLException {
-        tableRepository.importDatabase();
+        databaseRepository.importDatabase();
     }
 
     @Override
@@ -46,17 +46,17 @@ public class DatabaseFacade implements TableRepository, DdlManager, DmlManager, 
 
     @Override
     public Map<String, String> getPrimaryKeys() throws SQLException {
-        return tableRepository.getPrimaryKeys();
+        return databaseRepository.getPrimaryKeys();
     }
 
     @Override
     public void removeTableFromList(String tableName) {
-        tableRepository.removeTableFromList(tableName);
+        databaseRepository.removeTableFromList(tableName);
     }
 
     @Override
     public List<Table> getTables() {
-        return tableRepository.getTables();
+        return databaseRepository.getTables();
     }
 
     @Override
@@ -66,7 +66,7 @@ public class DatabaseFacade implements TableRepository, DdlManager, DmlManager, 
 
     @Override
     public List<String> getTableNames() throws SQLException {
-        return tableRepository.getTableNames();
+        return databaseRepository.getTableNames();
     }
 
     @Override
