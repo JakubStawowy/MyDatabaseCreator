@@ -1,6 +1,6 @@
 package view.windows;
 
-import logic.facades.DatabaseFacade;
+import database.facades.DatabaseFacade;
 import view.components.MdcFrame;
 
 import javax.swing.JButton;

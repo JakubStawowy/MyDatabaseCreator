@@ -1,8 +1,8 @@
 package view.windows;
 
-import logic.facades.DatabaseFacade;
+import database.facades.DatabaseFacade;
 import view.components.MdcFrame;
-import logic.models.Table;
+import database.models.Table;
 
 import javax.swing.JTable;
 import javax.swing.JPanel;
