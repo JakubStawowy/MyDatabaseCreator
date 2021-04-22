@@ -1,13 +1,13 @@
 package view.windows;
 
-import logic.facades.DatabaseFacade;
-import logic.facades.ValidatorFacade;
-import logic.templates.ValidatorFacadeApi;
+import database.facades.DatabaseFacade;
+import controllers.facades.ValidatorFacade;
+import controllers.templates.ValidatorFacadeApi;
 import view.components.MdcFrame;
 import exceptions.BadColumnNumberException;
 import exceptions.BadTableNameException;
 import exceptions.NoPrimaryKeyException;
-import logic.models.Table;
+import database.models.Table;
 
 import javax.swing.JTable;
 import javax.swing.JScrollPane;

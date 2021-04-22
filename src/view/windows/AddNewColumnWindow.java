@@ -1,8 +1,8 @@
 package view.windows;
 
-import logic.facades.ValidatorFacade;
-import logic.repositories.DataTypesRepository;
-import logic.templates.ValidatorFacadeApi;
+import controllers.facades.ValidatorFacade;
+import database.repositories.DataTypesRepository;
+import controllers.templates.ValidatorFacadeApi;
 import view.components.MdcFrame;
 import exceptions.BadColumnTypeException;
 import exceptions.BadColumnNameException;

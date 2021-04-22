@@ -1,9 +1,9 @@
 package view.windows;
 
-import logic.services.RandomConditionGenerator;
+import database.services.RandomConditionGenerator;
 import view.components.MdcFrame;
 import exceptions.EmptyTableException;
-import logic.models.Table;
+import database.models.Table;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import javax.swing.JButton;

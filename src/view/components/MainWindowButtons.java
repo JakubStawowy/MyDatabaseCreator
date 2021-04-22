@@ -1,6 +1,6 @@
 package view.components;
 
-import logic.facades.DatabaseFacade;
+import database.facades.DatabaseFacade;
 import view.windows.*;
 
 import javax.swing.*;
