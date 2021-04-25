@@ -1,7 +1,7 @@
 package database.repositories;
 
 import database.models.Table;
-import database.templates.DatabaseConnectorApi;
+import database.templates.DatabaseQueryExecutorApi;
 import database.templates.TableRepositoryApi;
 
 import java.sql.ResultSet;
@@ -13,11 +13,11 @@ import java.util.Vector;
 
 public final class TableRepository implements TableRepositoryApi {
 
-    private final DatabaseConnectorApi databaseConnector;
+    private final DatabaseQueryExecutorApi databaseQueryExecutor;
     private List<Table> tables;
 
-    public TableRepository(DatabaseConnectorApi databaseConnector, List<Table> tables) {
-        this.databaseConnector = databaseConnector;
+    public TableRepository(final DatabaseQueryExecutorApi databaseQueryExecutor, List<Table> tables) {
+        this.databaseQueryExecutor = databaseQueryExecutor;
         this.tables = tables;
     }
 
@@ -29,7 +29,7 @@ public final class TableRepository implements TableRepositoryApi {
         Vector<String> columnTypes = new Vector<>();
         List<Object> columns;
         List<List<Object>> data = new LinkedList<>();
-        rs = databaseConnector.executeQuery("DESC " + tableName + ";");
+        rs = databaseQueryExecutor.getExecutedQueryResultSet("DESC " + tableName + ";");
 
         while (rs.next()) {
 
@@ -40,7 +40,7 @@ public final class TableRepository implements TableRepositoryApi {
 
         }
 
-        rs = databaseConnector.executeQuery("SELECT * FROM " + tableName + ";");
+        rs = databaseQueryExecutor.getExecutedQueryResultSet("SELECT * FROM " + tableName + ";");
 
         while (rs.next()) {
 
@@ -68,16 +68,16 @@ public final class TableRepository implements TableRepositoryApi {
             condition = "TRUE";
 
         try {
-            rs = databaseConnector.executeQuery("DESC "+tableName+";");
+            rs = databaseQueryExecutor.getExecutedQueryResultSet("DESC "+tableName+";");
 
             while(rs.next()) {
 
                 columnNames.add(rs.getString("Field"));
             }
             if(sorted!=null)
-                rs = databaseConnector.executeQuery("SELECT * FROM " + tableName + " WHERE "+condition+" ORDER BY("+columnName+") "+sorted+";");
+                rs = databaseQueryExecutor.getExecutedQueryResultSet("SELECT * FROM " + tableName + " WHERE "+condition+" ORDER BY("+columnName+") "+sorted+";");
             else
-                rs = databaseConnector.executeQuery("SELECT * FROM " + tableName + " WHERE "+condition+";");
+                rs = databaseQueryExecutor.getExecutedQueryResultSet("SELECT * FROM " + tableName + " WHERE "+condition+";");
 
             while(rs.next()){
 
@@ -90,7 +90,6 @@ public final class TableRepository implements TableRepositoryApi {
                 data.add(columns);
             }
         }catch(SQLException sqlException){
-
             System.out.println("Problemy z przeszukaniem tabeli");
         }
 

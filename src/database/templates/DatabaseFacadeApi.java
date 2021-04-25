@@ -1,4 +1,4 @@
 package database.templates;
 
-public interface DatabaseFacadeApi extends TableRepositoryApi, DatabaseRepositoryApi, DdlManagerApi, DmlManagerApi, DatabaseConnectorApi {
+public interface DatabaseFacadeApi extends TableRepositoryApi, DatabaseRepositoryApi, DdlManagerApi, DmlManagerApi, DatabaseConnectorApi, DatabaseQueryExecutorApi {
 }

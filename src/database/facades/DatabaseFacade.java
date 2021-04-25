@@ -1,6 +1,7 @@
 package database.facades;
 
-import database.connectors.MySqlDatabaseConnector;
+import database.connectors.DatabaseConnector;
+import database.connectors.DatabaseQueryExecutor;
 import database.managers.TableDataManager;
 import database.managers.TableManager;
 import database.models.Table;
@@ -17,16 +18,18 @@ public final class DatabaseFacade implements DatabaseFacadeApi {
 
     private final DdlManagerApi ddlManager;
     private final DmlManagerApi dmlManager;
-    private final DatabaseConnectorApi databaseConnector;
+    private final DatabaseConnectorConnectionApi databaseConnector;
     private final DatabaseRepositoryApi databaseRepository;
     private final TableRepositoryApi tableRepository;
+    private final DatabaseQueryExecutorConnectionApi databaseQueryExecutor;
 
     public DatabaseFacade(String host, String port, String database, String username, String password) throws SQLException {
-        databaseConnector = new MySqlDatabaseConnector(host, port, database, username, password);
-        databaseRepository = new DatabaseRepository(databaseConnector);
-        tableRepository = new TableRepository(databaseConnector, databaseRepository.getTables());
-        ddlManager = new TableManager(databaseConnector, databaseRepository);
-        dmlManager = new TableDataManager(databaseConnector, tableRepository);
+        databaseConnector = new DatabaseConnector(host, port, database, username, password);
+        databaseQueryExecutor = new DatabaseQueryExecutor(databaseConnector);
+        databaseRepository = new DatabaseRepository(databaseQueryExecutor);
+        tableRepository = new TableRepository(databaseQueryExecutor, databaseRepository.getTables());
+        ddlManager = new TableManager(databaseQueryExecutor, databaseRepository);
+        dmlManager = new TableDataManager(databaseQueryExecutor, tableRepository);
     }
 
     @Override
@@ -105,13 +108,13 @@ public final class DatabaseFacade implements DatabaseFacadeApi {
     }
 
     @Override
-    public ResultSet executeQuery(String query) throws SQLException {
-        return databaseConnector.executeQuery(query);
+    public ResultSet getExecutedQueryResultSet(String query) throws SQLException {
+        return databaseQueryExecutor.getExecutedQueryResultSet(query);
     }
 
     @Override
-    public void execute(String query) throws SQLException {
-        databaseConnector.execute(query);
+    public void executeQuery(String query) throws SQLException {
+        databaseQueryExecutor.executeQuery(query);
     }
 
     @Override
@@ -123,4 +126,5 @@ public final class DatabaseFacade implements DatabaseFacadeApi {
     public Map<String, String> getDatabasePropertiesMap() {
         return databaseConnector.getDatabasePropertiesMap();
     }
+
 }
