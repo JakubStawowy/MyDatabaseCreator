@@ -2,7 +2,7 @@ package database.managers;
 
 import database.models.Table;
 import database.repositories.DataTypesRepository;
-import database.templates.DatabaseConnectorApi;
+import database.templates.DatabaseQueryExecutorApi;
 import database.templates.DmlManagerApi;
 import database.templates.TableRepositoryApi;
 
@@ -11,11 +11,11 @@ import java.util.List;
 
 public final class TableDataManager implements DmlManagerApi {
 
-    private DatabaseConnectorApi databaseConnector;
+    private DatabaseQueryExecutorApi databaseQueryExecutor;
     private TableRepositoryApi tableRepository;
 
-    public TableDataManager(final DatabaseConnectorApi databaseConnector, final TableRepositoryApi tableRepository) {
-        this.databaseConnector = databaseConnector;
+    public TableDataManager(final DatabaseQueryExecutorApi databaseQueryExecutor, final TableRepositoryApi tableRepository) {
+        this.databaseQueryExecutor = databaseQueryExecutor;
         this.tableRepository = tableRepository;
     }
 
@@ -39,7 +39,7 @@ public final class TableDataManager implements DmlManagerApi {
         }
 
         String query = "DELETE FROM "+table.getTableName()+" WHERE "+condition+";";
-        databaseConnector.execute(query);
+        databaseQueryExecutor.executeQuery(query);
         table.removeRow(rowIndex);
     }
 
@@ -58,7 +58,7 @@ public final class TableDataManager implements DmlManagerApi {
                 condition.append(" AND ");
         }
         String query = "DELETE FROM "+table.getTableName()+" WHERE "+condition+";";
-        databaseConnector.execute(query);
+        databaseQueryExecutor.executeQuery(query);
         table.removeRow(row);
     }
 
@@ -96,7 +96,7 @@ public final class TableDataManager implements DmlManagerApi {
                 query.append(" AND ");
         }
         query.append(";");
-        databaseConnector.execute(String.valueOf(query));
+        databaseQueryExecutor.executeQuery(String.valueOf(query));
         table.setData(newData);
     }
 
@@ -115,7 +115,7 @@ public final class TableDataManager implements DmlManagerApi {
         }
         query = new StringBuilder(query.substring(0, query.length() - 2));
         query.append(");");
-        databaseConnector.execute(String.valueOf(query));
+        databaseQueryExecutor.executeQuery(String.valueOf(query));
 
         table.addRow(row);
     }

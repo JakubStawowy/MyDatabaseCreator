@@ -1,7 +1,7 @@
 package database.managers;
 
 import database.models.Table;
-import database.templates.DatabaseConnectorApi;
+import database.templates.DatabaseQueryExecutorApi;
 import database.templates.DatabaseRepositoryApi;
 import database.templates.DdlManagerApi;
 
@@ -10,17 +10,17 @@ import java.util.Vector;
 
 public final class TableManager implements DdlManagerApi {
 
-    private DatabaseConnectorApi databaseConnector;
+    private DatabaseQueryExecutorApi databaseQueryExecutor;
     private DatabaseRepositoryApi databaseRepository;
 
-    public TableManager(final DatabaseConnectorApi databaseConnector, final DatabaseRepositoryApi databaseRepository) {
-        this.databaseConnector = databaseConnector;
+    public TableManager(final DatabaseQueryExecutorApi databaseQueryExecutor, final DatabaseRepositoryApi databaseRepository) {
+        this.databaseQueryExecutor = databaseQueryExecutor;
         this.databaseRepository = databaseRepository;
     }
 
     @Override
     public void dropTable(final String tableName) throws SQLException {
-        databaseConnector.execute("DROP TABLE IF EXISTS " + tableName + ";");
+        databaseQueryExecutor.executeQuery("DROP TABLE IF EXISTS " + tableName + ";");
         databaseRepository.removeTableFromList(tableName);
     }
 
@@ -52,7 +52,7 @@ public final class TableManager implements DdlManagerApi {
         if(dropExistingTable)
             dropTable(table.getTableName());
 
-        databaseConnector.execute(String.valueOf(query));
+        databaseQueryExecutor.executeQuery(String.valueOf(query));
         databaseRepository.getTables().add(table);
     }
 }
